@@ -1,4 +1,4 @@
-package com.courier.kitman
+package com.delivery.Knitman
 
 import io.flutter.embedding.android.FlutterActivity
 

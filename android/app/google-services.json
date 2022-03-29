@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "853162747548",
+    "project_id": "kitman-3a2d0",
+    "storage_bucket": "kitman-3a2d0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:853162747548:android:11dcdafa782664bd1fef59",
+        "android_client_info": {
+          "package_name": "com.delivery.Knitman"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "853162747548-6rv2m6uububspe08ttmu5obmr8ki8lqb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqsiCTWY09YdZPNmtDpw56MxjukjI3w6g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "853162747548-6rv2m6uububspe08ttmu5obmr8ki8lqb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "853162747548-6j7sdb0m3kc3j67p4a89m5k0scscrmg5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.delivery.Knitman"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

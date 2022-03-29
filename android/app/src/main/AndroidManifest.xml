@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.courier.kitman">
+    package="com.delivery.Knitman">
 
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -11,7 +11,7 @@
 
 
    <application
-       android:label="kitman"
+       android:label="Knitman"
        android:usesCleartextTraffic="true"
        android:allowBackup="true"
        android:largeHeap="true"

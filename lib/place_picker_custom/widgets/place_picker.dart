@@ -2,11 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_courier_delivery/place_picker_custom/widgets/rich_suggestion.dart';
-import 'package:flutter_courier_delivery/place_picker_custom/widgets/search_input.dart';
-import 'package:flutter_courier_delivery/place_picker_custom/widgets/select_place_action.dart';
-// import 'package:kitman/place_picker_custom/entities/localization_item.dart';
-// import 'package:kitman/place_picker_custom/entities/location_result.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
@@ -19,6 +14,9 @@ import '../entities/localization_item.dart';
 import '../entities/location_result.dart';
 import '../entities/near_by_place.dart';
 import '../uuid.dart';
+import '../widgets/rich_suggestion.dart';
+import '../widgets/search_input.dart';
+import '../widgets/select_place_action.dart';
 import 'near_by_place_item.dart';
 
 /// Place picker widget made with map widget from

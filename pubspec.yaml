@@ -42,6 +42,8 @@ dependencies:
   location: ^4.1.1
   pin_input_text_field: ^4.1.1
   google_maps_flutter: ^2.1.2
+  firebase_auth: ^3.0.1
+  firebase_core: ^1.4.0
 
 
 
