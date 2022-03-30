@@ -106,10 +106,10 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
         "bottom_icon_2.png",
         "bottom_icon_3.png",
         "bottom_icon_4.png",
-        // Icons.category,
-        // Icons.add_box_outlined,
-        // Icons.message_outlined,
-        // Icons.account_box,
+        "Icons.category",
+        "Icons.add_box_outlined",
+        "Icons.message_outlined",
+        "Icons.account_box",
       ],
       textStyle: TextStyle(
           color: ConstantData.mainTextColor,
@@ -785,12 +785,12 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ConstantWidget.getTextWidget(
-            //     S.of(context).noActiveOrdersAtTheMoment,
-            //     Colors.grey,
-            //     TextAlign.start,
-            //     FontWeight.w400,
-            //     ConstantData.font18Px),
+            ConstantWidget.getTextWidget(
+                S.of(context).noActiveOrdersAtTheMoment,
+                Colors.grey,
+                TextAlign.start,
+                FontWeight.w400,
+                ConstantData.font18Px),
             Expanded(
                 child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -812,7 +812,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                         ));
                   },
                 ),
-                InkWell(
+                /*InkWell(
                   child: getActivityButton(
                       S.of(context).buyFromStorage,
                       S.of(context).haveYourOrderBoughtAndDeliveredFromAnyStore,
@@ -825,7 +825,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                           builder: (context) => SchedulePage(false),
                         ));
                   },
-                ),
+                ), */
                 InkWell(
                   child: getActivityButton(
                       S.of(context).iAmRecipient,

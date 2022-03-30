@@ -1,13 +1,15 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:place_picker/place_picker.dart';
 
-import 'PreferencePage.dart';
 import 'generated/l10n.dart';
-import 'place_picker_custom/entities/location_result.dart';
-import 'place_picker_custom/widgets/place_picker.dart';
+//import 'place_picker_custom/entities/location_result.dart';
+//import 'place_picker_custom/widgets/place_picker.dart';
 import 'util/ConstantData.dart';
 import 'util/ConstantWidget.dart';
 import 'util/DataFile.dart';
@@ -33,16 +35,27 @@ class _LocationPage extends State<LocationPage> {
   String pointTime, pointDate;
   String deliveryTime, deliveryDate;
 
+  String fullName;
+  String company;
+  int age;
+
+  static String userUid;
+  //AddUser(this.fullName, this.company, this.age);
+
   Future<bool> _requestPop() {
     Navigator.of(context).pop();
     return new Future.value(true);
   }
 
   @override
-  void initState() {
+  Future<void> initState() {
     // TODO: implement initState
     super.initState();
+    //FirebaseFirestore firestore = FirebaseFirestore.instance;
 
+    fullName = "dodos";
+    company = "pcpcpc";
+    age = 40;
     pointAddressController.text =
         "Mubarak masjid ,Patakar compound,Glibert Hill Rd,Munshi Nagar,Andheri west.";
     deliveryAddressController.text =
@@ -51,6 +64,8 @@ class _LocationPage extends State<LocationPage> {
     // deliveryPhoneController.text="+91 9845632173";
     // pointCommentController.text="klfjklgj";
     // deliveryCommentController.text="klfjklgj";
+    WidgetsFlutterBinding.ensureInitialized();
+    Firebase.initializeApp();
 
     setState(() {
       pointDate = "Today";
@@ -62,6 +77,45 @@ class _LocationPage extends State<LocationPage> {
 
   double margin;
   double radius;
+
+  static Future<void> addItem({
+    String title,
+    String description,
+  }) async {
+    Firebase.initializeApp();
+    FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    CollectionReference _mainCollection = _firestore.collection('notes');
+    DocumentReference documentReferencer =
+        _mainCollection.doc(userUid).collection('items').doc();
+
+    Map<String, dynamic> data = <String, dynamic>{
+      "title": title,
+      "description": description,
+    };
+
+    await documentReferencer
+        .set(data)
+        .whenComplete(() => print("Notes item added to the database"))
+        .catchError((e) => print(e));
+  }
+
+  Future<void> AddUser() {
+    // FirebaseApp knitman = Firebase.app('Knitman');
+    // FirebaseFirestore firestore = FirebaseFirestore.instanceFor(app: knitman);
+    FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    //CollectionReference _mainCollection = _firestore.collection('notes');
+    CollectionReference users = _firestore.collection("orders");
+    //Call the user's CollectionReference to add a new user
+
+    users
+        .add({
+          'number': "255", // John Doe
+          'order_type': "company", // Stokes and Sons
+          'package_size': "43" // 42
+        })
+        .then((value) => print("User Added"))
+        .catchError((error) => print("Failed to add user: $error"));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,11 +170,12 @@ class _LocationPage extends State<LocationPage> {
                 getCommentCell(deliveryCommentController),
                 spaceWidget,
                 ConstantWidget.getBottomText(context, "Add Delivery Point", () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PreferencePage(),
-                      ));
+                  AddUser();
+                  //Navigator.push(
+                  //context,
+                  // MaterialPageRoute(
+                  //builder: (context) => PreferencePage(),
+                  // ));
                 })
               ],
             ),
@@ -182,9 +237,16 @@ class _LocationPage extends State<LocationPage> {
   }
 
   void showPlacePicker() async {
+    //LocationResult result = await Navigator.of(context).push(MaterialPageRoute(
+    // builder: (context) =>
+    // PlacePicker("3f8db118-746d-434c-9c0c-2c135f091100")));
+
+    // Handle the result in your way
+    //print(result);
+
     LocationResult result = await Navigator.of(context).push(MaterialPageRoute(
         builder: (context) =>
-            PlacePicker("AIzaSyAZ6df2DrqkaZLPYjUMX4D_4iMCqeFMsZ0")));
+            PlacePicker("3f8db118-746d-434c-9c0c-2c135f091100")));
 
     // Handle the result in your way
     print(result);

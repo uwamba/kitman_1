@@ -87,7 +87,7 @@ class _NewOrderPage extends State<NewOrderPage> {
                                 ),
                                 padding: EdgeInsets.all(
                                     ConstantWidget.getPercentSize(
-                                        cellHeight, 20)),
+                                        cellHeight, 40)),
                                 child: Image.asset(
                                   ConstantData.assetsPath +
                                       orderTypeList[index].image,
@@ -97,7 +97,7 @@ class _NewOrderPage extends State<NewOrderPage> {
                               ConstantWidget.getTextWidget(
                                   orderTypeList[index].title,
                                   ConstantData.mainTextColor,
-                                  TextAlign.center,
+                                  TextAlign.left,
                                   FontWeight.w600,
                                   ConstantWidget.getPercentSize(height, 20)),
                             ],
