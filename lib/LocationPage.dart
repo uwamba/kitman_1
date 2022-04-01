@@ -32,6 +32,7 @@ class _LocationPage extends State<LocationPage> {
   TextEditingController deliveryAddressController = new TextEditingController();
   TextEditingController deliveryPhoneController = new TextEditingController();
   TextEditingController deliveryCommentController = new TextEditingController();
+
   String pointTime, pointDate;
   String deliveryTime, deliveryDate;
 
@@ -78,36 +79,15 @@ class _LocationPage extends State<LocationPage> {
   double margin;
   double radius;
 
-  static Future<void> addItem({
-    String title,
-    String description,
-  }) async {
-    Firebase.initializeApp();
-    FirebaseFirestore _firestore = FirebaseFirestore.instance;
-    CollectionReference _mainCollection = _firestore.collection('notes');
-    DocumentReference documentReferencer =
-        _mainCollection.doc(userUid).collection('items').doc();
-
-    Map<String, dynamic> data = <String, dynamic>{
-      "title": title,
-      "description": description,
-    };
-
-    await documentReferencer
-        .set(data)
-        .whenComplete(() => print("Notes item added to the database"))
-        .catchError((e) => print(e));
-  }
-
-  Future<void> AddUser() {
+  Future<void> newOrder() {
     // FirebaseApp knitman = Firebase.app('Knitman');
     // FirebaseFirestore firestore = FirebaseFirestore.instanceFor(app: knitman);
     FirebaseFirestore _firestore = FirebaseFirestore.instance;
     //CollectionReference _mainCollection = _firestore.collection('notes');
-    CollectionReference users = _firestore.collection("orders");
+    CollectionReference orders = _firestore.collection("orders");
+    //String date=getTimeAndDateCell(true).text;
     //Call the user's CollectionReference to add a new user
-
-    users
+    orders
         .add({
           'number': "255", // John Doe
           'order_type': "company", // Stokes and Sons
@@ -170,7 +150,7 @@ class _LocationPage extends State<LocationPage> {
                 getCommentCell(deliveryCommentController),
                 spaceWidget,
                 ConstantWidget.getBottomText(context, "Add Delivery Point", () {
-                  AddUser();
+                  newOrder();
                   //Navigator.push(
                   //context,
                   // MaterialPageRoute(
@@ -272,6 +252,46 @@ class _LocationPage extends State<LocationPage> {
             hintText: S.of(context).comment,
             hintStyle: TextStyle(
                 fontFamily: ConstantData.fontFamily, color: Colors.grey)),
+      ),
+    );
+  }
+
+  getDateCell(Text date) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: (margin / 2), horizontal: margin),
+      decoration: getDecoration(),
+      margin: EdgeInsets.symmetric(horizontal: margin),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          date,
+          Padding(
+            padding: EdgeInsets.all(margin),
+            child: Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    child: getCell(true, true),
+                    onTap: () {
+                      bottomDateDialog((true));
+                    },
+                  ),
+                  flex: 1,
+                ),
+                Expanded(
+                  child: InkWell(
+                    child: getCell(true, false),
+                    onTap: () {
+                      bottomTimeDialog(true);
+                    },
+                  ),
+                  flex: 1,
+                ),
+              ],
+            ),
+          )
+        ],
       ),
     );
   }
