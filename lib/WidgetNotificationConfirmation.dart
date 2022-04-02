@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_courier_delivery/util/ConstantData.dart';
+import 'package:knitman/util/ConstantData.dart';
 import 'package:transformer_page_view/parallax.dart';
 
 import 'SignInPage.dart';

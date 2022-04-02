@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_courier_delivery/util/CustomDialogBox.dart';
+import 'package:knitman/util/CustomDialogBox.dart';
 import 'package:pin_input_text_field/pin_input_text_field.dart';
 
 import 'WidgetNotificationConfirmation.dart';

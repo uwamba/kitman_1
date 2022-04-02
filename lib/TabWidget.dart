@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:knitman/model/orderList.dart';
 import 'package:timelines/timelines.dart';
 
 import 'AboutUsPage.dart';
@@ -55,6 +56,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
   List<String> s = ["Orders", "New Order", "Chat", "Profile"];
   List<NewOrderTypeModel> orderTypeList = DataFile.getOrderTypeList();
   List<CompletedOrderModel> completeOrderList = DataFile.getCompleteOrder();
+  List<orderList> completeOrderList_test;
   List<ActiveOrderModel> activeOrderList = DataFile.getActiveOrderList();
 
   bool isAppbarVisible = true;
@@ -79,21 +81,22 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
     super.initState();
 
     getThemeMode();
-
     _tabController = new MotionTabController(
         initialIndex: _selectedIndex, length: s.length, vsync: this);
   }
 
   CollectionReference _collectionRef =
       FirebaseFirestore.instance.collection('orders');
-  Future<void> getData() async {
+  Future<void> getOrders() async {
     // Get docs from collection reference
     QuerySnapshot querySnapshot = await _collectionRef.get();
 
-    // Get data from docs and convert map to List
-    final List allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+    final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
 
-    print(allData);
+    completeOrderList_test =
+        parsed.map<orderList>((json) => orderList.fromJson(json)).toList();
+
+    print(completeOrderList_test);
   }
 
   @override
@@ -575,6 +578,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
   }
 
   tabCompletedWidget() {
+    getOrders();
     double margin = ConstantWidget.getScreenPercentSize(context, 2);
     double height = ConstantWidget.getScreenPercentSize(context, 5);
 
@@ -613,7 +617,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                             ))))),
             Expanded(
               child: ListView.builder(
-                itemCount: completeOrderList.length,
+                itemCount: completeOrderList_test.length,
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
                   return InkWell(
@@ -642,7 +646,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                                   padding: EdgeInsets.symmetric(
                                       horizontal: (margin / 2)),
                                   child: ConstantWidget.getCustomText(
-                                      completeOrderList[index].orderNumber,
+                                      completeOrderList_test[index].number,
                                       Colors.white,
                                       1,
                                       TextAlign.start,
@@ -655,7 +659,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                               height: (margin / 2),
                             ),
                             ConstantWidget.getCustomText(
-                                completeOrderList[index].price,
+                                completeOrderList_test[index].package_size,
                                 ConstantData.mainTextColor,
                                 1,
                                 TextAlign.start,
