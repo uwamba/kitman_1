@@ -40,6 +40,7 @@ class _LocationPage extends State<LocationPage> {
   String company;
   int age;
 
+
   static String userUid;
   //AddUser(this.fullName, this.company, this.age);
 
@@ -80,6 +81,11 @@ class _LocationPage extends State<LocationPage> {
   double radius;
 
   Future<void> newOrder() {
+    String comment=deliveryCommentController.text;
+    String address=pointAddressController.text;
+    String adress=deliveryAddressController.text;
+    String phone=deliveryPhoneController.text;
+    String tel=pointPhoneController.text;
     // FirebaseApp knitman = Firebase.app('Knitman');
     // FirebaseFirestore firestore = FirebaseFirestore.instanceFor(app: knitman);
     FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -89,8 +95,13 @@ class _LocationPage extends State<LocationPage> {
     //Call the user's CollectionReference to add a new user
     orders
         .add({
-          'number': "255", // John Doe
-          'order_type': "company", // Stokes and Sons
+          'number': comment, // John Doe
+          'order_type': "company",
+          'order_date': "Today",
+          'phone': phone,// Stokes and Sons
+          'tel': tel,// Stokes and Sons
+          'address': address,// Stokes and Sons
+          'adress': adress,// Stokes and Sons
           'package_size': "43" // 42
         })
         .then((value) => print("User Added"))
