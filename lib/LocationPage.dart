@@ -82,10 +82,25 @@ class _LocationPage extends State<LocationPage> {
 
   Future<void> newOrder() {
     String comment=deliveryCommentController.text;
-    String address=pointAddressController.text;
-    String adress=deliveryAddressController.text;
+    String sender_address=pointAddressController.text;
+    String receiver_address=deliveryAddressController.text;
     String phone=deliveryPhoneController.text;
     String tel=pointPhoneController.text;
+    String pointTime, pointDate;
+    String deliveryTime, deliveryDate;
+    String order_number;
+    String sender_id;
+    String sender_email;
+    String receiver_id;
+    String receiver_email;
+    String picking_location;
+    String picking_coordinate;
+    String package_type;
+    String delivery_type;
+    String package_width;
+    String package_height;
+    String drop_location;
+    String drop_coordinate;
     // FirebaseApp knitman = Firebase.app('Knitman');
     // FirebaseFirestore firestore = FirebaseFirestore.instanceFor(app: knitman);
     FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -96,13 +111,34 @@ class _LocationPage extends State<LocationPage> {
     orders
         .add({
           'number': comment, // John Doe
+          'delivery_time': pointTime,
+          'delivery_date': pointDate,
+          'received_time': deliveryTime,
+          'received_date': deliveryDate,
+           'order_number': order_number,
+           'sender_id': sender_id,
+           'sender_email': sender_email,
+          'receiver_id': receiver_id,
+          'receiver_email': receiver_email,
+          'picking_location': picking_location,
+          'picking_coordinate': picking_coordinate,
+           'package_type': package_type,
+          'delivery_type': delivery_type,
+          'package_width': package_width,
+          'package_height': package_height,
+          'drop_location': drop_location,
+          'drop_coordinate': drop_coordinate,
           'order_type': "company",
-          'order_date': "Today",
           'phone': phone,// Stokes and Sons
           'tel': tel,// Stokes and Sons
-          'address': address,// Stokes and Sons
-          'adress': adress,// Stokes and Sons
+          'sender_address': sender_address,// Stokes and Sons
+          'receiver_address': receiver_address,// Stokes and Sons
           'package_size': "43" // 42
+
+
+
+
+
         })
         .then((value) => print("User Added"))
         .catchError((error) => print("Failed to add user: $error"));
