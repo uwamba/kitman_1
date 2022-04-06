@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import 'package:knitman/Database/Db.dart';
 import 'package:place_picker/place_picker.dart';
 
 import 'generated/l10n.dart';
@@ -26,22 +26,44 @@ class _LocationPage extends State<LocationPage> {
   List<String> timeList = DataFile.getTimeList();
   List<String> dateList = DataFile.getDateList();
 
-  TextEditingController pointAddressController = new TextEditingController();
-  TextEditingController pointPhoneController = new TextEditingController();
-  TextEditingController pointCommentController = new TextEditingController();
-  TextEditingController deliveryAddressController = new TextEditingController();
-  TextEditingController deliveryPhoneController = new TextEditingController();
-  TextEditingController deliveryCommentController = new TextEditingController();
+  TextEditingController pointAddressController = TextEditingController();
+  TextEditingController pointPhoneController = TextEditingController();
+  TextEditingController pointCommentController = TextEditingController();
+  TextEditingController receiverAddressController = TextEditingController();
+  TextEditingController receiverPhoneController = TextEditingController();
+  TextEditingController receiverCommentController = TextEditingController();
 
-  String pointTime, pointDate;
-  String deliveryTime, deliveryDate;
+  //DateFormat formatter = DateFormat('yyyyMMddHHmmss');
+  //String pointTime, pointDate;
+  //String deliveryTime, deliveryDate;
 
   String fullName;
   String company;
   int age;
+  String status,
+      deliveryTime,
+      deliveryDate,
+      receivedTime,
+      receivedDate,
+      orderNumber,
+      senderId,
+      senderEmail,
+      receiverId,
+      receiverEmail,
+      pickingLocation,
+      pickingCoordinate,
+      packageType,
+      deliveryType,
+      packageHeight,
+      pointLocation,
+      pointCoordinate,
+      orderType,
+      senderPhone,
+      receiverPhone,
+      senderAddress,
+      receiverAddress;
+  Db db = new Db();
 
-
-  static String userUid;
   //AddUser(this.fullName, this.company, this.age);
 
   Future<bool> _requestPop() {
@@ -50,99 +72,44 @@ class _LocationPage extends State<LocationPage> {
   }
 
   @override
-  Future<void> initState() {
+  initState() {
     // TODO: implement initState
     super.initState();
     //FirebaseFirestore firestore = FirebaseFirestore.instance;
-
     fullName = "dodos";
     company = "pcpcpc";
     age = 40;
-    pointAddressController.text =
-        "Mubarak masjid ,Patakar compound,Glibert Hill Rd,Munshi Nagar,Andheri west.";
-    deliveryAddressController.text =
-        "VRL,Bus Terminal Seshadri Rd,Gandhi Nagar,Bengluru,Karnataka 560009,India.";
+    pointAddressController.text = "Kigali ,Gasabo ,Remera";
+    receiverAddressController.text = "Kigali ,Gasabo ,Bumbogo";
     // pointPhoneController.text="+91 9845632173";
     // deliveryPhoneController.text="+91 9845632173";
     // pointCommentController.text="klfjklgj";
     // deliveryCommentController.text="klfjklgj";
     WidgetsFlutterBinding.ensureInitialized();
     Firebase.initializeApp();
+    // initialise database class
 
     setState(() {
-      pointDate = "Today";
-      pointTime = "13:00-14:00";
+      receivedDate = "Today";
+      receivedTime = "13:00-14:00";
       deliveryDate = "Today";
       deliveryTime = "13:00-14:00";
+      status = "New";
+
+      senderId = "10";
+      senderEmail = "uwambadodo@gmail.com";
+      receiverId = "10";
+      receiverEmail = "uwambadodo@gmail.com";
+      pickingCoordinate = "30.345654, 25.456655";
+      packageType = "Document";
+      deliveryType = "Now";
+      pointCoordinate = "30.345654, 25.456655";
+      orderType = "Customer";
     });
   }
 
   double margin;
   double radius;
-
-  Future<void> newOrder() {
-    String comment=deliveryCommentController.text;
-    String senderAddress=pointAddressController.text;
-    String receiverAddress=deliveryAddressController.text;
-    String phone=deliveryPhoneController.text;
-    String tel=pointPhoneController.text;
-    String pointTime, pointDate;
-    String deliveryTime, deliveryDate;
-    String orderNumber;
-    String senderId;
-    String senderEmail;
-    String receiverId;
-    String receiverEmail;
-    String pickingLocation;
-    String pickingCoordinate;
-    String packageType;
-    String deliveryType;
-    String packageWidth;
-    String packageHeight;
-    String dropLocation;
-    String dropCoordinate;
-    // FirebaseApp knitman = Firebase.app('Knitman');
-    // FirebaseFirestore firestore = FirebaseFirestore.instanceFor(app: knitman);
-    FirebaseFirestore _firestore = FirebaseFirestore.instance;
-    //CollectionReference _mainCollection = _firestore.collection('notes');
-    CollectionReference orders = _firestore.collection("orders");
-    //String date=getTimeAndDateCell(true).text;
-    //Call the user's CollectionReference to add a new user
-    orders
-        .add({
-          'number': comment, // John Doe
-          'delivery_time': pointTime,
-          'delivery_date': pointDate,
-          'received_time': deliveryTime,
-          'received_date': deliveryDate,
-           'order_number': orderNumber,
-           'sender_id': senderId,
-           'sender_email': senderEmail,
-          'receiver_id': receiverId,
-          'receiver_email': receiverEmail,
-          'picking_location': pickingLocation,
-          'picking_coordinate': pickingCoordinate,
-           'package_type': packageType,
-          'delivery_type': deliveryType,
-          'package_width': packageWidth,
-          'package_height': packageHeight,
-          'drop_location': dropLocation,
-          'drop_coordinate': dropCoordinate,
-          'order_type': "company",
-          'phone': phone,// Stokes and Sons
-          'tel': tel,// Stokes and Sons
-          'sender_address': senderAddress,// Stokes and Sons
-          'receiver_address': receiverAddress,// Stokes and Sons
-          'package_size': "43" // 42
-
-
-
-
-
-        })
-        .then((value) => print("Order saved well!!"))
-        .catchError((error) => print("Failed to save order: $error"));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -188,16 +155,41 @@ class _LocationPage extends State<LocationPage> {
                 spaceWidget,
                 getPointCell("2", "Delivery Point"),
                 spaceWidget,
-                getAddressCell(deliveryAddressController),
+                getAddressCell(receiverAddressController),
                 spaceWidget,
-                getPhoneCell(deliveryPhoneController),
+                getPhoneCell(receiverPhoneController),
                 spaceWidget,
                 getTimeAndDateCell(false),
                 spaceWidget,
-                getCommentCell(deliveryCommentController),
+                getCommentCell(receiverCommentController),
                 spaceWidget,
-                ConstantWidget.getBottomText(context, "Add Delivery Point", () {
-                  newOrder();
+                ConstantWidget.getBottomText(context, "Save Order", () {
+                  DateTime now = new DateTime.now();
+                  DateFormat formatter = DateFormat('yyyyMMddHHmmssms');
+                  db.addOrder(
+                      status,
+                      deliveryTime,
+                      deliveryDate,
+                      receivedTime,
+                      receivedDate,
+                      formatter.format(now).toString(),
+                      senderId,
+                      senderEmail,
+                      receiverId,
+                      receiverEmail,
+                      pointAddressController.text,
+                      pickingCoordinate,
+                      packageType,
+                      deliveryType,
+                      receiverCommentController.text,
+                      pointCoordinate,
+                      orderType,
+                      receiverPhoneController.text,
+                      pointPhoneController.text,
+                      receiverAddressController.text,
+                      receiverAddressController.text);
+
+                  // newOrder();
                   //Navigator.push(
                   //context,
                   // MaterialPageRoute(
@@ -423,7 +415,7 @@ class _LocationPage extends State<LocationPage> {
                     onTap: () {
                       setState(() {
                         if (isPoint) {
-                          pointDate = dateList[index];
+                          receivedDate = dateList[index];
                         } else {
                           deliveryDate = dateList[index];
                         }
@@ -478,7 +470,7 @@ class _LocationPage extends State<LocationPage> {
 
                       setState(() {
                         if (isPoint) {
-                          pointTime = dateList[index];
+                          receivedTime = dateList[index];
                         } else {
                           deliveryTime = dateList[index];
                         }
@@ -531,9 +523,9 @@ class _LocationPage extends State<LocationPage> {
   String getString(bool isPoint, bool isDate) {
     if (isPoint) {
       if (isDate) {
-        return pointDate;
+        return receivedDate;
       } else {
-        return pointTime;
+        return receivedTime;
       }
     } else {
       if (isDate) {
