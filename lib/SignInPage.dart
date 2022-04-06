@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -23,8 +24,48 @@ class SignInPage extends StatefulWidget {
 class _SignInPage extends State<SignInPage> {
   bool isRemember = false;
   int themeMode = 0;
+  String signIn;
   TextEditingController textEmailController = new TextEditingController();
   TextEditingController textPasswordController = new TextEditingController();
+
+  Future<void> login() async {
+    signIn = "";
+    FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: textEmailController.text)
+        .where('password', isEqualTo: textPasswordController.text)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        print("email " + doc["email"] + " Password " + doc["password"]);
+        if (doc["email"] == textEmailController.text &&
+            doc["password"] == textPasswordController.text) {
+          signIn = doc["role"];
+          print(signIn);
+          print(doc["role"]);
+          PrefData.setIsSignIn(true);
+          if (signIn == "customer") {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyHomePage(),
+                ));
+          } else if (signIn == "rider") {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyHomePage(),
+                ));
+          }
+        }
+      });
+    });
+    print(signIn);
+    if (signIn.isEmpty) {
+      print("incorrect email or password");
+      setState(() {});
+    }
+  }
 
   Future<bool> _requestPop() {
     Future.delayed(const Duration(milliseconds: 200), () {
@@ -142,12 +183,8 @@ class _SignInPage extends State<SignInPage> {
                   ConstantWidget.getButtonWidget(
                       context, S.of(context).signIn, ConstantData.primaryColor,
                       () {
-                    PrefData.setIsSignIn(true);
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MyHomePage(),
-                        ));
+                    //signIn = "";
+                    login();
                   }),
                   Padding(
                     padding: EdgeInsets.symmetric(
