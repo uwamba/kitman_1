@@ -1,8 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:knitman/Database/Db.dart';
 import 'package:knitman/model/orderList.dart';
 import 'package:timelines/timelines.dart';
 
@@ -56,7 +56,6 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
   List<String> s = ["Orders", "New Order", "Chat", "Profile"];
   List<NewOrderTypeModel> orderTypeList = DataFile.getOrderTypeList();
   List<CompletedOrderModel> completeOrderList = DataFile.getCompleteOrder();
-  List<orderList> completeOrderList_test;
   List<ActiveOrderModel> activeOrderList = DataFile.getActiveOrderList();
 
   bool isAppbarVisible = true;
@@ -83,20 +82,6 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
     getThemeMode();
     _tabController = new MotionTabController(
         initialIndex: _selectedIndex, length: s.length, vsync: this);
-  }
-
-  CollectionReference _collectionRef =
-      FirebaseFirestore.instance.collection('orders');
-  Future<void> getOrders() async {
-    // Get docs from collection reference
-    QuerySnapshot querySnapshot = await _collectionRef.get();
-
-    final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
-
-    completeOrderList_test =
-        parsed.map<orderList>((json) => orderList.fromJson(json)).toList();
-
-    print(completeOrderList_test);
   }
 
   @override
@@ -577,216 +562,210 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
         ]);
   }
 
+  onItemChanged(String value) {
+    Db db = new Db();
+    List<OrderList> newDataList = List.from(db.completeOrderList);
+    setState(() {
+      newDataList = newDataList.where((element) => element.orderNumber.contains(value))
+          .toList();
+    });
+  }
+
   tabCompletedWidget() {
-    getOrders();
+    Db db = new Db();
     double margin = ConstantWidget.getScreenPercentSize(context, 2);
     double height = ConstantWidget.getScreenPercentSize(context, 5);
 
     double fontSize = ConstantWidget.getScreenPercentSize(context, 1.8);
     double defMargin = ConstantWidget.getScreenPercentSize(context, 2);
-
-    if (completeOrderList.length > 0) {
-      return Container(
-        child: Column(
-          children: [
-            Padding(
-                padding: EdgeInsets.only(
-                    bottom: (defMargin / 2),
-                    right: defMargin,
-                    left: defMargin,
-                    top: defMargin),
-                child: Container(
-                    decoration: getDecoration(),
-                    child: Padding(
-                        padding: EdgeInsets.only(left: (defMargin / 2)),
-                        child: TextFormField(
-                            maxLines: 1,
-                            style: TextStyle(
+    return Container(
+      child: Column(
+        children: [
+          Padding(
+              padding: EdgeInsets.only(
+                  bottom: (defMargin / 2),
+                  right: defMargin,
+                  left: defMargin,
+                  top: defMargin),
+              child: Container(
+                  decoration: getDecoration(),
+                  child: Padding(
+                      padding: EdgeInsets.only(left: (defMargin / 2)),
+                      child: TextFormField(
+                          maxLines: 1,
+                          style: TextStyle(
+                              fontFamily: ConstantData.fontFamily,
+                              color: ConstantData.mainTextColor,
+                              fontWeight: FontWeight.w400,
+                              fontSize: fontSize),
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "Search..",
+                            hintStyle: TextStyle(
                                 fontFamily: ConstantData.fontFamily,
                                 color: ConstantData.mainTextColor,
                                 fontWeight: FontWeight.w400,
                                 fontSize: fontSize),
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: "Search..",
-                              hintStyle: TextStyle(
-                                  fontFamily: ConstantData.fontFamily,
-                                  color: ConstantData.mainTextColor,
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: fontSize),
-                            ))))),
-            Expanded(
-              child: ListView.builder(
-                itemCount: completeOrderList_test.length,
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    child: Container(
-                      margin: EdgeInsets.symmetric(
-                          vertical: (margin / 2), horizontal: margin),
-                      padding: EdgeInsets.all((margin / 1.5)),
-                      decoration: getDecoration(),
-                      child: Container(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
+                          ))))),
+          Expanded(
+            child: FutureBuilder<List<OrderList>>(
+              builder: (context, orderSnap) {
+                if (!orderSnap.hasData) {
+                  return Center(child: CircularProgressIndicator());
+                } else {
+                  return ListView.builder(
+                    itemCount: orderSnap.data.length,
+                    itemBuilder: (context, index) {
+                      //OrderList listModel = orderSnap.data[index];
+                      return InkWell(
+                        child: Container(
+                          margin: EdgeInsets.symmetric(
+                              vertical: (margin / 2), horizontal: margin),
+                          padding: EdgeInsets.all((margin / 1.5)),
+                          decoration: getDecoration(),
+                          child: Container(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(
-                                    child: ConstantWidget.getCustomText(
-                                        completeOrderList[index].completedText,
-                                        Colors.grey,
-                                        1,
-                                        TextAlign.start,
-                                        FontWeight.w500,
-                                        ConstantData.font15Px)),
-                                Container(
-                                  color: ConstantData.primaryColor,
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: (margin / 2)),
-                                  child: ConstantWidget.getCustomText(
-                                      completeOrderList_test[index].number,
-                                      Colors.white,
-                                      1,
-                                      TextAlign.start,
-                                      FontWeight.w500,
-                                      ConstantData.font18Px),
-                                )
-                              ],
-                            ),
-                            SizedBox(
-                              height: (margin / 2),
-                            ),
-                            ConstantWidget.getCustomText(
-                                completeOrderList_test[index].package_size,
-                                ConstantData.mainTextColor,
-                                1,
-                                TextAlign.start,
-                                FontWeight.bold,
-                                ConstantData.font22Px),
-                            SizedBox(
-                              height: (margin / 2),
-                            ),
-                            ConstantWidget.getCustomText(
-                                completeOrderList[index].address,
-                                Colors.grey,
-                                2,
-                                TextAlign.start,
-                                FontWeight.w500,
-                                ConstantData.font18Px),
-                            SizedBox(
-                              height: (margin / 2),
-                            ),
-                            Row(
-                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                        child: ConstantWidget.getCustomText(
+                                            orderSnap.data[index].receivedTime,
+                                            Colors.grey,
+                                            2,
+                                            TextAlign.start,
+                                            FontWeight.w500,
+                                            ConstantData.font15Px)),
+                                    Container(
+                                      color: ConstantData.primaryColor,
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: (margin / 2)),
+                                      child: ConstantWidget.getCustomText(
+                                          orderSnap.data[index].status,
+                                          Colors.white,
+                                          1,
+                                          TextAlign.start,
+                                          FontWeight.w500,
+                                          ConstantData.font18Px),
+                                    )
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: (margin / 2),
+                                ),
                                 ConstantWidget.getCustomText(
-                                    completeOrderList[index].rate.toString(),
+                                    orderSnap.data[index].deliveryDate,
                                     ConstantData.mainTextColor,
                                     1,
                                     TextAlign.start,
+                                    FontWeight.bold,
+                                    ConstantData.font22Px),
+                                SizedBox(
+                                  height: (margin / 2),
+                                ),
+                                ConstantWidget.getCustomText(
+                                    orderSnap.data[index].senderAddress,
+                                    Colors.grey,
+                                    2,
+                                    TextAlign.start,
                                     FontWeight.w500,
                                     ConstantData.font18Px),
-                                RatingBar.builder(
-                                  itemSize: 15,
-                                  initialRating: completeOrderList[index].rate,
-                                  minRating: 1,
-                                  direction: Axis.horizontal,
-                                  allowHalfRating: true,
-                                  itemCount: 5,
-                                  tapOnlyMode: true,
-                                  updateOnDrag: true,
-                                  unratedColor: Colors.grey,
-                                  itemPadding:
-                                      EdgeInsets.symmetric(horizontal: 0.0),
-                                  itemBuilder: (context, _) => Icon(
-                                    Icons.star,
-                                    color: Colors.amber,
-                                    size: 10,
+                                SizedBox(
+                                  height: (margin / 2),
+                                ),
+                                Row(
+                                  children: [
+                                    ConstantWidget.getCustomText(
+                                        "5",
+                                        ConstantData.mainTextColor,
+                                        1,
+                                        TextAlign.start,
+                                        FontWeight.w500,
+                                        ConstantData.font18Px),
+                                    RatingBar.builder(
+                                      itemSize: 15,
+                                      initialRating: 5,
+                                      minRating: 1,
+                                      direction: Axis.horizontal,
+                                      allowHalfRating: true,
+                                      itemCount: 5,
+                                      tapOnlyMode: true,
+                                      updateOnDrag: true,
+                                      unratedColor: Colors.grey,
+                                      itemPadding:
+                                          EdgeInsets.symmetric(horizontal: 0.0),
+                                      itemBuilder: (context, _) => Icon(
+                                        Icons.star,
+                                        color: Colors.amber,
+                                        size: 10,
+                                      ),
+                                      onRatingUpdate: (rating) {
+                                        print(rating);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: (margin / 2),
+                                ),
+                                InkWell(
+                                  child: Container(
+                                    height: height,
+                                    width: ConstantWidget.getWidthPercentSize(
+                                        context, 20),
+                                    decoration: BoxDecoration(
+                                        color: ConstantData.accentColor,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(
+                                                ConstantWidget.getPercentSize(
+                                                    height, 30)))),
+                                    child: Center(
+                                      child: ConstantWidget.getCustomText(
+                                          S.of(context).rate,
+                                          Colors.white,
+                                          1,
+                                          TextAlign.center,
+                                          FontWeight.w500,
+                                          ConstantWidget.getPercentSize(
+                                              height, 40)),
+                                    ),
                                   ),
-                                  onRatingUpdate: (rating) {
-                                    print(rating);
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => RatingPage(),
+                                        ));
                                   },
+                                ),
+                                SizedBox(
+                                  height: (margin / 2),
                                 ),
                               ],
                             ),
-                            SizedBox(
-                              height: (margin / 2),
-                            ),
-                            InkWell(
-                              child: Container(
-                                height: height,
-                                width: ConstantWidget.getWidthPercentSize(
-                                    context, 20),
-                                decoration: BoxDecoration(
-                                    color: ConstantData.accentColor,
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(
-                                            ConstantWidget.getPercentSize(
-                                                height, 30)))),
-                                child: Center(
-                                  child: ConstantWidget.getCustomText(
-                                      S.of(context).rate,
-                                      Colors.white,
-                                      1,
-                                      TextAlign.center,
-                                      FontWeight.w500,
-                                      ConstantWidget.getPercentSize(
-                                          height, 40)),
-                                ),
-                              ),
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => RatingPage(),
-                                    ));
-                              },
-                            ),
-                            SizedBox(
-                              height: (margin / 2),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CompleteOrderDetail(
-                                DataFile.getActiveOrderList()[0]),
-                          ));
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CompleteOrderDetail(
+                                    DataFile.getActiveOrderList()[0]),
+                              ));
+                        },
+                      );
                     },
                   );
-                },
-              ),
-            )
-          ],
-        ),
-      );
-    } else {
-      return Container(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Image.asset(
-              ConstantData.assetsPath + "no_data.png",
-              height: ConstantWidget.getScreenPercentSize(context, 17),
+                }
+              },
+              future: db.completedOrderList(),
             ),
-            // SizedBox(height: ConstantWidget.getScreenPercentSize(context, 2),),
-
-            ConstantWidget.getTextWidget(
-                S.of(context).noData,
-                ConstantData.mainTextColor,
-                TextAlign.center,
-                FontWeight.w600,
-                ConstantData.font18Px)
-          ],
-        ),
-      );
-    }
+          )
+        ],
+      ),
+    );
   }
 
   tabActiveWidget() {
@@ -1518,7 +1497,7 @@ class _DeliveryProcesses extends StatelessWidget {
                 );
               }
             },
-            connectorBuilder: (_, index, ___) {
+            connectorBuilder: (_, index, __) {
               if (processes[index].isComplete) {
                 return SolidLineConnector(
                   color: processes[index].isComplete
@@ -1534,4 +1513,20 @@ class _DeliveryProcesses extends StatelessWidget {
       ),
     );
   }
+}
+
+class ProjectModel {
+  String id;
+  String createdOn;
+  String lastModifiedOn;
+  String title;
+  String description;
+
+  ProjectModel({
+    this.id,
+    this.createdOn,
+    this.lastModifiedOn,
+    this.title,
+    this.description,
+  });
 }

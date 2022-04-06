@@ -46,6 +46,7 @@ dependencies:
   firebase_core: ^1.6.0
   cloud_firestore: ^2.5.1
   place_picker: ^0.9.20-nullsafety
+  short_uuids: ^2.0.0
 
 
 
