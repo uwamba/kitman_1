@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:knitman/model/UserlListModel.dart';
 import 'package:knitman/model/orderList.dart';
 
 class Db {
@@ -26,8 +27,12 @@ class Db {
       receiverAddress;
   CollectionReference orders;
   List<OrderList> completeOrderList;
+  List<UserListModel> allUserList;
   CollectionReference _collectionRef =
       FirebaseFirestore.instance.collection('orders');
+
+  CollectionReference _userCollectionRef =
+      FirebaseFirestore.instance.collection('users');
   Db() {
     orders = FirebaseFirestore.instance.collection('orders');
     status = "";
@@ -64,6 +69,19 @@ class Db {
 
     print(completeOrderList);
     return completeOrderList;
+  }
+
+  Future<List<UserListModel>> usersList() async {
+    QuerySnapshot querySnapshot = await _userCollectionRef.get();
+
+    final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+    allUserList = parsed
+        .map<UserListModel>((json) => UserListModel.fromJson(json))
+        .toList();
+
+    print(allUserList);
+    return allUserList;
   }
 
   Future<void> addOrder(

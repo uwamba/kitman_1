@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:knitman/TabWidgetAdmin.dart';
+import 'package:knitman/TabWidgetRider.dart';
 
 import 'ForgotPassword.dart';
 import 'SignUpPage.dart';
@@ -54,7 +56,13 @@ class _SignInPage extends State<SignInPage> {
             Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MyHomePage(),
+                  builder: (context) => TabWidgetRider(true),
+                ));
+          } else if (signIn == "admin") {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TabWidgetadmin(true),
                 ));
           }
         }
