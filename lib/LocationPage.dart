@@ -3,13 +3,16 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:knitman/Database/Db.dart';
-import 'package:place_picker/place_picker.dart';
+//import 'package:knitman/place_picker_custom/entities/location_result.dart';
+//import 'package:knitman/place_picker_custom/widgets/place_picker.dart';
+//import 'package:place_picker/place_picker.dart';
+import 'package:knitman/google_place/place_picker.dart';
+import 'package:knitman/maps.dart';
 
 import 'generated/l10n.dart';
-//import 'place_picker_custom/entities/location_result.dart';
-//import 'place_picker_custom/widgets/place_picker.dart';
 import 'util/ConstantData.dart';
 import 'util/ConstantWidget.dart';
 import 'util/DataFile.dart';
@@ -25,6 +28,9 @@ class LocationPage extends StatefulWidget {
 class _LocationPage extends State<LocationPage> {
   List<String> timeList = DataFile.getTimeList();
   List<String> dateList = DataFile.getDateList();
+  GoogleMapController mapController;
+  static final kInitialPosition = LatLng(-33.8567844, 151.213108);
+  //PickResult selectedPlace;
 
   TextEditingController pointAddressController = TextEditingController();
   TextEditingController pointPhoneController = TextEditingController();
@@ -155,7 +161,7 @@ class _LocationPage extends State<LocationPage> {
                 spaceWidget,
                 getPointCell("2", "Delivery Point"),
                 spaceWidget,
-                getAddressCell(receiverAddressController),
+                getAddressCell2(receiverAddressController),
                 spaceWidget,
                 getPhoneCell(receiverPhoneController),
                 spaceWidget,
@@ -244,30 +250,86 @@ class _LocationPage extends State<LocationPage> {
                 Icons.my_location,
                 color: ConstantData.primaryColor,
               ),
-              hintText: "Address",
+              hintText: "Click To select location",
               hintStyle: TextStyle(
                   fontFamily: ConstantData.fontFamily, color: Colors.grey)),
         ),
       ),
-      onTap: () {
-        showPlacePicker();
+      onTap: () async {
+        var result = await Navigator.push(
+            context,
+            new MaterialPageRoute(
+                builder: (BuildContext context) => new maps()));
+        print(result);
+        setState(() {
+          pointAddressController.text = result;
+        });
+      },
+    );
+  }
+
+  getAddressCell2(TextEditingController textEditingController) {
+    return InkWell(
+      child: Container(
+        padding:
+            EdgeInsets.symmetric(vertical: (margin / 2), horizontal: margin),
+        margin: EdgeInsets.symmetric(horizontal: margin),
+        // color: ConstantData.cellColor,
+        alignment: Alignment.centerLeft,
+
+        decoration: getDecoration(),
+        child: TextField(
+          textAlignVertical: TextAlignVertical.center,
+          enabled: false,
+          maxLines: 2,
+          controller: textEditingController,
+          style: TextStyle(
+              fontFamily: ConstantData.fontFamily,
+              color: ConstantData.mainTextColor),
+          decoration: new InputDecoration(
+              border: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              errorBorder: InputBorder.none,
+              disabledBorder: InputBorder.none,
+              suffixIcon: Icon(
+                Icons.my_location,
+                color: ConstantData.primaryColor,
+              ),
+              hintText: "Click To select location",
+              hintStyle: TextStyle(
+                  fontFamily: ConstantData.fontFamily, color: Colors.grey)),
+        ),
+      ),
+      onTap: () async {
+        var result = await Navigator.push(
+            context,
+            new MaterialPageRoute(
+                builder: (BuildContext context) => new maps()));
+        print(result);
+        setState(() {
+          receiverAddressController.text = result;
+        });
       },
     );
   }
 
   void showPlacePicker() async {
-    //LocationResult result = await Navigator.of(context).push(MaterialPageRoute(
-    // builder: (context) =>
-    // PlacePicker("3f8db118-746d-434c-9c0c-2c135f091100")));
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) =>
+            PlacePicker("AIzaSyC-dIJ5UWH1sd05F8fx4sHhtZZ7hHNwmbo")));
 
     // Handle the result in your way
-    //print(result);
+    //print(result.country);
+  }
 
+  void showPlacePicker2() async {
     LocationResult result = await Navigator.of(context).push(MaterialPageRoute(
         builder: (context) =>
-            PlacePicker("3f8db118-746d-434c-9c0c-2c135f091100")));
+            PlacePicker("AIzaSyC-dIJ5UWH1sd05F8fx4sHhtZZ7hHNwmbopp")));
 
     // Handle the result in your way
+    print("gggggggggggggggggggggggggggg");
     print(result);
   }
 
