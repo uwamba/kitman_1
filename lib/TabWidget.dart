@@ -566,7 +566,8 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
     Db db = new Db();
     List<OrderList> newDataList = List.from(db.completeOrderList);
     setState(() {
-      newDataList = newDataList.where((element) => element.orderNumber.contains(value))
+      newDataList = newDataList
+          .where((element) => element.orderNumber.contains(value))
           .toList();
     });
   }

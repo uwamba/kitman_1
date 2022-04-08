@@ -12,6 +12,7 @@ class OrderList {
       pickingLocation,
       pickingCoordinate,
       packageType,
+      packageWeight,
       deliveryType,
       pointLocation,
       pointCoordinate,
@@ -35,6 +36,7 @@ class OrderList {
       this.pickingLocation,
       this.pickingCoordinate,
       this.packageType,
+      this.packageWeight,
       this.deliveryType,
       this.pointLocation,
       this.pointCoordinate,
@@ -46,6 +48,7 @@ class OrderList {
 
   factory OrderList.fromJson(Map<String, dynamic> json) {
     return OrderList(
+      packageWeight: json['packageWeight'] as String,
       status: json['status'] as String,
       deliveryTime: json['deliveryTime'] as String,
       deliveryDate: json['deliveryDate'] as String,

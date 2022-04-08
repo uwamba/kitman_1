@@ -19,6 +19,9 @@ import 'util/DataFile.dart';
 import 'util/SizeConfig.dart';
 
 class LocationPage extends StatefulWidget {
+  String priority, weight, type;
+  LocationPage(this.priority, this.weight, this.type);
+
   @override
   _LocationPage createState() {
     return _LocationPage();
@@ -60,7 +63,7 @@ class _LocationPage extends State<LocationPage> {
       pickingCoordinate,
       packageType,
       deliveryType,
-      packageHeight,
+      packageWeihgt,
       pointLocation,
       pointCoordinate,
       orderType,
@@ -107,10 +110,11 @@ class _LocationPage extends State<LocationPage> {
       receiverId = "10";
       receiverEmail = "uwambadodo@gmail.com";
       pickingCoordinate = "30.345654, 25.456655";
-      packageType = "Document";
-      deliveryType = "Now";
+      packageType = widget.type;
+      deliveryType = widget.priority;
       pointCoordinate = "30.345654, 25.456655";
       orderType = "Customer";
+      packageWeihgt = widget.weight;
     });
   }
 
@@ -185,8 +189,9 @@ class _LocationPage extends State<LocationPage> {
                       receiverEmail,
                       pointAddressController.text,
                       pickingCoordinate,
-                      packageType,
-                      deliveryType,
+                      widget.type,
+                      widget.priority,
+                      widget.weight,
                       receiverCommentController.text,
                       pointCoordinate,
                       orderType,

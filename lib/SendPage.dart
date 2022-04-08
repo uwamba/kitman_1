@@ -11,7 +11,8 @@ import 'util/ConstantWidget.dart';
 import 'util/DataFile.dart';
 
 class SendPage extends StatefulWidget {
-  SendPage();
+  String priority, weight;
+  SendPage(this.priority, this.weight);
 
   @override
   _SendPage createState() {
@@ -166,7 +167,8 @@ class _SendPage extends State<SendPage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => LocationPage(),
+                          builder: (context) => LocationPage(widget.priority,
+                              widget.weight, orderTypeList[index].title),
                         ));
                   },
                 );
