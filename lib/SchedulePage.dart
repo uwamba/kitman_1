@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:knitman/WeightPage.dart';
 
-import 'NewOrderPage.dart';
 import 'generated/l10n.dart';
 import 'util/ConstantData.dart';
 import 'util/ConstantWidget.dart';
@@ -75,12 +75,10 @@ class _SchedulePage extends State<SchedulePage> {
                   child: ListView(
                     scrollDirection: Axis.horizontal,
                     children: [
-                      getCell(0, CupertinoIcons.timer_fill,
-                          S.of(context).deliverNow, "from RWF40"),
-                      getCell(1, CupertinoIcons.calendar_today,
-                          S.of(context).schedule, "from RWF40"),
-                      getCell(2, CupertinoIcons.calendar_today,
-                          "4-hour interval", "from RWF40"),
+                      getCell(0, CupertinoIcons.timer_fill, "Not Urgent",
+                          "from RWF1000"),
+                      getCell(1, CupertinoIcons.calendar_today, "Urgent",
+                          "from RWF1000"),
                     ],
                   ),
                 ),
@@ -89,7 +87,8 @@ class _SchedulePage extends State<SchedulePage> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => NewOrderPage(),
+                        builder: (context) =>
+                            WeightPage(selectedPosition.toString()),
                       ));
                 }),
                 spaceWidget,
@@ -117,7 +116,7 @@ class _SchedulePage extends State<SchedulePage> {
   getCell(int position, var icon, String s, String s1) {
     bool isSelect = (position == selectedPosition);
     var textColor = (isSelect) ? Colors.white : ConstantData.mainTextColor;
-    double width = ConstantWidget.getWidthPercentSize(context, 35);
+    double width = ConstantWidget.getWidthPercentSize(context, 45);
     return Wrap(
       children: [
         InkWell(
@@ -142,7 +141,7 @@ class _SchedulePage extends State<SchedulePage> {
                   height: (margin / 3),
                 ),
                 ConstantWidget.getTextWidget(s, textColor, TextAlign.start,
-                    FontWeight.w500, ConstantData.font15Px),
+                    FontWeight.w500, ConstantWidget.getPercentSize(width, 9)),
                 SizedBox(
                   height: (margin / 1.2),
                 ),
@@ -166,15 +165,14 @@ class _SchedulePage extends State<SchedulePage> {
           ),
           onTap: () {
             setState(() {
+              selectedPosition = position;
               if (selectedPosition == position) {
                 if (position == 0) {
                   bottomDeliverDialog();
                 } else {
                   bottomScheduleDialog();
                 }
-              } else {
-                selectedPosition = position;
-              }
+              } else {}
             });
           },
         )
@@ -250,7 +248,7 @@ class _SchedulePage extends State<SchedulePage> {
                     ConstantData.font18Px),
                 widget,
                 ConstantWidget.getTextWidget(
-                    "from ₹40",
+                    "from 1000 RWF",
                     ConstantData.mainTextColor,
                     TextAlign.start,
                     FontWeight.w400,
@@ -275,7 +273,7 @@ class _SchedulePage extends State<SchedulePage> {
                   height: (margin / 2),
                 ),
                 ConstantWidget.getCustomText(
-                    "Delivery be 2-wheelers or public transport.",
+                    "Delivery be 2-wheelers",
                     ConstantData.textColor,
                     2,
                     TextAlign.start,
@@ -296,7 +294,7 @@ class _SchedulePage extends State<SchedulePage> {
                   height: (margin / 2),
                 ),
                 ConstantWidget.getCustomText(
-                    "Up to 20 kg",
+                    "Up to 40 kg with package size lot greater than 50CMX50CMx50CM  ",
                     ConstantData.textColor,
                     2,
                     TextAlign.start,
@@ -319,7 +317,7 @@ class _SchedulePage extends State<SchedulePage> {
                   height: (margin / 2),
                 ),
                 ConstantWidget.getCustomText(
-                    "You can choose insurance amount.",
+                    "Call our team for any issue on :078XXXXXXX",
                     ConstantData.textColor,
                     2,
                     TextAlign.start,
@@ -335,7 +333,7 @@ class _SchedulePage extends State<SchedulePage> {
                 widget,
                 widget,
                 widget,
-                ConstantWidget.getBottomText(context, "Confirm", () {
+                ConstantWidget.getBottomText(context, "Ok", () {
                   Navigator.pop(context);
                 })
               ],
@@ -414,7 +412,7 @@ class _SchedulePage extends State<SchedulePage> {
                     ConstantData.font18Px),
                 widget,
                 ConstantWidget.getTextWidget(
-                    "from ₹40",
+                    "from 500 RWF",
                     ConstantData.mainTextColor,
                     TextAlign.start,
                     FontWeight.w400,

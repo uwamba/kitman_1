@@ -8,9 +8,9 @@ import 'util/ConstantWidget.dart';
 import 'util/DataFile.dart';
 
 class WeightPage extends StatefulWidget {
-  final String title;
+  final String priority;
 
-  WeightPage(this.title);
+  WeightPage(this.priority);
 
   @override
   _WeightPage createState() {
@@ -20,7 +20,6 @@ class WeightPage extends StatefulWidget {
 
 class _WeightPage extends State<WeightPage> {
   List<WeightModel> orderTypeList = DataFile.getWeightModel();
-
   Future<bool> _requestPop() {
     Navigator.of(context).pop();
     return new Future.value(true);
@@ -60,7 +59,7 @@ class _WeightPage extends State<WeightPage> {
             elevation: 0,
             centerTitle: true,
             backgroundColor: ConstantData.primaryColor,
-            title: ConstantWidget.getAppBarText(widget.title),
+            title: Text("Address Details"),
             leading: Builder(
               builder: (BuildContext context) {
                 return IconButton(
@@ -257,7 +256,8 @@ class _WeightPage extends State<WeightPage> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SendPage(),
+                            builder: (context) => SendPage(
+                                widget.priority, orderTypeList[index].title),
                           ));
                     });
               },

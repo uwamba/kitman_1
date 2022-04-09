@@ -107,8 +107,7 @@ class _NewOrderPage extends State<NewOrderPage> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    WeightPage(orderTypeList[index].title),
+                                builder: (context) => WeightPage(""),
                               ));
                         },
                       );

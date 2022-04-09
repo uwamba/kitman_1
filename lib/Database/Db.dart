@@ -24,7 +24,8 @@ class Db {
       senderPhone,
       receiverPhone,
       senderAddress,
-      receiverAddress;
+      receiverAddress,
+      packageWeight;
   CollectionReference orders;
   List<OrderList> completeOrderList;
   List<UserListModel> allUserList;
@@ -99,6 +100,7 @@ class Db {
       pickingCoordinate,
       packageType,
       deliveryType,
+      packageWeight,
       pointLocation,
       pointCoordinate,
       orderType,
@@ -119,6 +121,7 @@ class Db {
     this.pickingLocation = pickingLocation;
     this.pickingCoordinate = pickingCoordinate;
     this.packageType = packageType;
+    this.packageWeight = packageWeight;
     this.deliveryType = deliveryType;
     this.pointLocation = pointLocation;
     this.pointCoordinate = pointCoordinate;
@@ -148,8 +151,9 @@ class Db {
           'pickingLocation': pickingLocation, // picking location
           'pickingCoordinate': pickingCoordinate, //picking coordinate
           'packageType': packageType, // pachage type document,key,cake..
-          'deliveryType':
-              deliveryType, //delivery type schelduled or deliver now
+          'deliveryType': deliveryType,
+          'packageWeight':
+              packageWeight, //delivery type schelduled or deliver now
           'pointLocation': pointLocation, // point addres location
           'pointCoordinate': pointCoordinate, //point address coordinate
           'orderType': "coorporate", // coorporate, customer
