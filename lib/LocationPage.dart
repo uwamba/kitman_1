@@ -37,7 +37,9 @@ class _LocationPage extends State<LocationPage> {
 
   TextEditingController pointAddressController = TextEditingController();
   TextEditingController pointPhoneController = TextEditingController();
+  TextEditingController packageValueController = TextEditingController();
   TextEditingController pointCommentController = TextEditingController();
+  TextEditingController priceController = TextEditingController();
   TextEditingController receiverAddressController = TextEditingController();
   TextEditingController receiverPhoneController = TextEditingController();
   TextEditingController receiverCommentController = TextEditingController();
@@ -90,6 +92,7 @@ class _LocationPage extends State<LocationPage> {
     age = 40;
     pointAddressController.text = "Kigali ,Gasabo ,Remera";
     receiverAddressController.text = "Kigali ,Gasabo ,Bumbogo";
+    priceController.text = "5000 RWF";
     // pointPhoneController.text="+91 9845632173";
     // deliveryPhoneController.text="+91 9845632173";
     // pointCommentController.text="klfjklgj";
@@ -173,6 +176,12 @@ class _LocationPage extends State<LocationPage> {
                 spaceWidget,
                 getCommentCell(receiverCommentController),
                 spaceWidget,
+                getPointCell("3", "Package Value"),
+                spaceWidget,
+                getPackageValueCell(packageValueController),
+                spaceWidget,
+                getPriceCell(priceController),
+                spaceWidget,
                 ConstantWidget.getBottomText(context, "Save Order", () {
                   DateTime now = new DateTime.now();
                   DateFormat formatter = DateFormat('yyyyMMddHHmmssms');
@@ -198,7 +207,9 @@ class _LocationPage extends State<LocationPage> {
                       receiverPhoneController.text,
                       pointPhoneController.text,
                       receiverAddressController.text,
-                      receiverAddressController.text);
+                      receiverAddressController.text,
+                      priceController.text,
+                      packageValueController.text);
 
                   // newOrder();
                   //Navigator.push(
@@ -255,7 +266,7 @@ class _LocationPage extends State<LocationPage> {
                 Icons.my_location,
                 color: ConstantData.primaryColor,
               ),
-              hintText: "Click To select location",
+              hintText: "Select location",
               hintStyle: TextStyle(
                   fontFamily: ConstantData.fontFamily, color: Colors.grey)),
         ),
@@ -355,7 +366,7 @@ class _LocationPage extends State<LocationPage> {
             enabledBorder: InputBorder.none,
             errorBorder: InputBorder.none,
             disabledBorder: InputBorder.none,
-            hintText: S.of(context).comment,
+            hintText: "Know address,Street, Ex: Makuza Plaza House",
             hintStyle: TextStyle(
                 fontFamily: ConstantData.fontFamily, color: Colors.grey)),
       ),
@@ -637,6 +648,40 @@ class _LocationPage extends State<LocationPage> {
     );
   }
 
+  getPackageValueCell(TextEditingController textEditingController) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: (margin / 2), horizontal: margin),
+      decoration: getDecoration(),
+      margin: EdgeInsets.symmetric(horizontal: margin),
+      alignment: Alignment.centerLeft,
+      child: TextField(
+        keyboardType: TextInputType.number,
+        enabled: true,
+        inputFormatters: [
+          FilteringTextInputFormatter.digitsOnly,
+        ],
+        textAlignVertical: TextAlignVertical.center,
+        style: TextStyle(
+            fontFamily: ConstantData.fontFamily,
+            color: ConstantData.mainTextColor),
+        controller: textEditingController,
+        decoration: new InputDecoration(
+            border: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            disabledBorder: InputBorder.none,
+            suffixIcon: Icon(
+              Icons.money,
+              color: ConstantData.primaryColor,
+            ),
+            hintText: "Package Value",
+            hintStyle: TextStyle(
+                fontFamily: ConstantData.fontFamily, color: Colors.grey)),
+      ),
+    );
+  }
+
   getPointCell(String s, String s1) {
     double circle = ConstantWidget.getScreenPercentSize(context, 4.5);
 
@@ -670,5 +715,37 @@ class _LocationPage extends State<LocationPage> {
         ],
       ),
     );
+  }
+
+  getPriceCell(TextEditingController textEditingController) {
+    return Container(
+        padding:
+            EdgeInsets.symmetric(vertical: (margin / 2), horizontal: margin),
+        margin: EdgeInsets.symmetric(horizontal: margin),
+        // color: ConstantData.cellColor,
+        alignment: Alignment.centerLeft,
+        decoration: getDecoration(),
+        child: TextField(
+          textAlignVertical: TextAlignVertical.center,
+          enabled: false,
+          maxLines: 2,
+          controller: textEditingController,
+          style: TextStyle(
+              fontFamily: ConstantData.fontFamily,
+              color: ConstantData.mainTextColor),
+          decoration: new InputDecoration(
+              border: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              errorBorder: InputBorder.none,
+              disabledBorder: InputBorder.none,
+              suffixIcon: Icon(
+                Icons.money,
+                color: ConstantData.primaryColor,
+              ),
+              hintText: "Click To select location",
+              hintStyle: TextStyle(
+                  fontFamily: ConstantData.fontFamily, color: Colors.grey)),
+        ));
   }
 }

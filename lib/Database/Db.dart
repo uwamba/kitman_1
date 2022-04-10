@@ -25,7 +25,9 @@ class Db {
       receiverPhone,
       senderAddress,
       receiverAddress,
-      packageWeight;
+      packageWeight,
+      packageValue,
+      price;
   CollectionReference orders;
   List<OrderList> completeOrderList;
   List<UserListModel> allUserList;
@@ -61,7 +63,21 @@ class Db {
   }
 
   Future<List<OrderList>> completedOrderList() async {
-    QuerySnapshot querySnapshot = await _collectionRef.get();
+    QuerySnapshot querySnapshot =
+        await _collectionRef.where('status', isEqualTo: "Completed").get();
+
+    final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+    completeOrderList =
+        parsed.map<OrderList>((json) => OrderList.fromJson(json)).toList();
+
+    print(completeOrderList);
+    return completeOrderList;
+  }
+
+  Future<List<OrderList>> activeOrderList() async {
+    QuerySnapshot querySnapshot =
+        await _collectionRef.where('status', isNotEqualTo: "Completed").get();
 
     final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
 
@@ -86,28 +102,31 @@ class Db {
   }
 
   Future<void> addOrder(
-      String status,
-      deliveryTime,
-      deliveryDate,
-      receivedTime,
-      receivedDate,
-      orderNumber,
-      senderId,
-      senderEmail,
-      receiverId,
-      receiverEmail,
-      pickingLocation,
-      pickingCoordinate,
-      packageType,
-      deliveryType,
-      packageWeight,
-      pointLocation,
-      pointCoordinate,
-      orderType,
-      senderPhone,
-      receiverPhone,
-      senderAddress,
-      receiverAddress) async {
+    String status,
+    deliveryTime,
+    deliveryDate,
+    receivedTime,
+    receivedDate,
+    orderNumber,
+    senderId,
+    senderEmail,
+    receiverId,
+    receiverEmail,
+    pickingLocation,
+    pickingCoordinate,
+    packageType,
+    deliveryType,
+    packageWeight,
+    pointLocation,
+    pointCoordinate,
+    orderType,
+    senderPhone,
+    receiverPhone,
+    senderAddress,
+    receiverAddress,
+    price,
+    packageValue,
+  ) async {
     this.status = status;
     this.deliveryTime = deliveryTime;
     this.deliveryDate = deliveryDate;
@@ -130,6 +149,8 @@ class Db {
     this.receiverPhone = receiverPhone;
     this.senderAddress = senderAddress;
     this.receiverAddress = receiverAddress;
+    this.price = price;
+    this.packageValue = packageValue;
 
     CollectionReference orders =
         FirebaseFirestore.instance.collection('orders');
@@ -161,6 +182,8 @@ class Db {
           'receiverPhone': receiverPhone, // receiver phone number
           'senderAddress': senderAddress, // package sender address
           'receiverAddress': receiverAddress, // receiver address
+          'price': price, // receiver address
+          'packageValue': packageValue, // receiver address
         })
         .then((value) => print("User Added" + orderNumber))
         .catchError((error) => print("Failed to add user: $error"));
