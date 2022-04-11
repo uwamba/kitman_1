@@ -20,7 +20,9 @@ class OrderList {
       senderPhone,
       receiverPhone,
       senderAddress,
-      receiverAddress;
+      receiverAddress,
+      price,
+      packageValue;
 
   const OrderList(
       {this.status,
@@ -44,7 +46,9 @@ class OrderList {
       this.senderPhone,
       this.receiverPhone,
       this.senderAddress,
-      this.receiverAddress});
+      this.receiverAddress,
+      this.price,
+      this.packageValue});
 
   factory OrderList.fromJson(Map<String, dynamic> json) {
     return OrderList(
@@ -70,6 +74,8 @@ class OrderList {
       receiverPhone: json['receiverPhone'] as String,
       senderAddress: json['senderAddress'] as String,
       receiverAddress: json['receiverAddress'] as String,
+      packageValue: json['packageValue'] as String,
+      price: json['price'] as String,
     );
   }
 }
