@@ -1016,13 +1016,13 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
                   //OrderList listModel = orderSnap.data[index];
                   timeLineModel.clear();
                   TimeLineModel model = new TimeLineModel();
-                  model.text = orderSnap.data[index].senderAddress;
-                  model.contact = orderSnap.data[index].senderPhone;
+                  model.text = orderSnap.data[index].pickingLocation;
+                  model.contact = orderSnap.data[index].pointLocation;
                   model.isComplete = true;
                   timeLineModel.add(model);
 
-                  model.text = orderSnap.data[index].receiverAddress;
-                  model.contact = orderSnap.data[index].senderPhone;
+                  model.text = orderSnap.data[index].pickingLocation;
+                  model.contact = orderSnap.data[index].pointLocation;
                   model.isComplete = true;
                   timeLineModel.add(model);
 

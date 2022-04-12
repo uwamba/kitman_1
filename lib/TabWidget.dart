@@ -656,7 +656,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                                   height: (margin / 2),
                                 ),
                                 ConstantWidget.getCustomText(
-                                    orderSnap.data[index].deliveryDate,
+                                    orderSnap.data[index].orderNumber,
                                     ConstantData.mainTextColor,
                                     1,
                                     TextAlign.start,
@@ -666,7 +666,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                                   height: (margin / 2),
                                 ),
                                 ConstantWidget.getCustomText(
-                                    orderSnap.data[index].senderAddress,
+                                    orderSnap.data[index].pointLocation,
                                     Colors.grey,
                                     2,
                                     TextAlign.start,
@@ -678,7 +678,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                                 Row(
                                   children: [
                                     ConstantWidget.getCustomText(
-                                        "5",
+                                        orderSnap.data[index].orderType,
                                         ConstantData.mainTextColor,
                                         1,
                                         TextAlign.start,
@@ -876,7 +876,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                                       Expanded(
                                           child: ConstantWidget.getCustomText(
                                               orderSnap
-                                                  .data[index].receivedTime,
+                                                  .data[index].deliveryDate,
                                               Colors.grey,
                                               2,
                                               TextAlign.start,
@@ -900,7 +900,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                                     height: (margin / 2),
                                   ),
                                   ConstantWidget.getCustomText(
-                                      orderSnap.data[index].deliveryDate,
+                                      orderSnap.data[index].orderNumber,
                                       ConstantData.mainTextColor,
                                       1,
                                       TextAlign.start,
@@ -910,8 +910,8 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                                     height: (margin / 2),
                                   ),
                                   ConstantWidget.getCustomText(
-                                      orderSnap.data[index].senderAddress,
-                                      Colors.grey,
+                                      orderSnap.data[index].packageType,
+                                     Colors.grey,
                                       2,
                                       TextAlign.start,
                                       FontWeight.w500,
@@ -922,7 +922,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                                   Row(
                                     children: [
                                       ConstantWidget.getCustomText(
-                                          "5",
+                                          orderSnap.data[index].price,
                                           ConstantData.mainTextColor,
                                           1,
                                           TextAlign.start,
