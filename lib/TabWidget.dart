@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:knitman/Database/Db.dart';
+import 'package:knitman/OrderDetails.dart';
 import 'package:knitman/model/orderList.dart';
 import 'package:timelines/timelines.dart';
 
 import 'AboutUsPage.dart';
 import 'ChatScreen.dart';
-import 'CompleteOrderDetail.dart';
 import 'EditProfilePage.dart';
 import 'MyVouchers.dart';
 import 'NotificationPage.dart';
@@ -59,7 +59,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
   List<NewOrderTypeModel> orderTypeList = DataFile.getOrderTypeList();
   List<CompletedOrderModel> completeOrderList = DataFile.getCompleteOrder();
   List<ActiveOrderModel> activeOrderList = DataFile.getActiveOrderList();
-
+  List<OrderList> activeOrderListModel;
   bool isAppbarVisible = true;
 
   int themMode;
@@ -804,12 +804,13 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                             ),
                           ),
                         ),
-                        onTap: () {
+                        onTap: () async {
+                          activeOrderListModel = await db.activeOrderList();
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => CompleteOrderDetail(
-                                    DataFile.getActiveOrderList()[0]),
+                                builder: (context) => ActiveOrderDetail(
+                                    activeOrderListModel.elementAt(index)),
                               ));
                         },
                       );
@@ -992,35 +993,74 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                                   SizedBox(
                                     height: (margin / 2),
                                   ),
-                                  InkWell(
-                                    child: Container(
-                                      height: height,
-                                      width: ConstantWidget.getWidthPercentSize(
-                                          context, 20),
-                                      decoration: BoxDecoration(
-                                          color: ConstantData.accentColor,
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(
-                                                  ConstantWidget.getPercentSize(
-                                                      height, 30)))),
-                                      child: Center(
-                                        child: ConstantWidget.getCustomText(
-                                            S.of(context).Cancel,
-                                            Colors.white,
-                                            1,
-                                            TextAlign.center,
-                                            FontWeight.w500,
-                                            ConstantWidget.getPercentSize(
-                                                height, 40)),
+                                  Row(
+                                    children: [
+                                      InkWell(
+                                        child: Container(
+                                          height: height,
+                                          width: ConstantWidget
+                                              .getWidthPercentSize(context, 20),
+                                          decoration: BoxDecoration(
+                                              color: ConstantData.accentColor,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(ConstantWidget
+                                                      .getPercentSize(
+                                                          height, 30)))),
+                                          child: Center(
+                                            child: ConstantWidget.getCustomText(
+                                                S.of(context).Cancel,
+                                                Colors.white,
+                                                1,
+                                                TextAlign.center,
+                                                FontWeight.w500,
+                                                ConstantWidget.getPercentSize(
+                                                    height, 40)),
+                                          ),
+                                        ),
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    RatingPage(),
+                                              ));
+                                        },
                                       ),
-                                    ),
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => RatingPage(),
-                                          ));
-                                    },
+                                      SizedBox(
+                                        width: (margin),
+                                      ),
+                                      InkWell(
+                                        child: Container(
+                                          height: height,
+                                          width: ConstantWidget
+                                              .getWidthPercentSize(context, 20),
+                                          decoration: BoxDecoration(
+                                              color: ConstantData.accentColor,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(ConstantWidget
+                                                      .getPercentSize(
+                                                          height, 30)))),
+                                          child: Center(
+                                            child: ConstantWidget.getCustomText(
+                                                S.of(context).Pay,
+                                                Colors.white,
+                                                1,
+                                                TextAlign.center,
+                                                FontWeight.w500,
+                                                ConstantWidget.getPercentSize(
+                                                    height, 40)),
+                                          ),
+                                        ),
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    RatingPage(),
+                                              ));
+                                        },
+                                      ),
+                                    ],
                                   ),
                                   SizedBox(
                                     height: (margin / 2),
@@ -1029,12 +1069,13 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                               ),
                             ),
                           ),
-                          onTap: () {
+                          onTap: () async {
+                            activeOrderListModel = await db.activeOrderList();
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => CompleteOrderDetail(
-                                      DataFile.getActiveOrderList()[0]),
+                                  builder: (context) => ActiveOrderDetail(
+                                      activeOrderListModel.elementAt(index)),
                                 ));
                           },
                         );
