@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:knitman/Database/Db.dart';
+import 'package:knitman/OrderDetails.dart';
 import 'package:knitman/model/orderList.dart';
 import 'package:timelines/timelines.dart';
 
 import 'AboutUsPage.dart';
 import 'ChatScreen.dart';
-import 'CompleteOrderDetail.dart';
 import 'EditProfilePage.dart';
 import 'MyVouchers.dart';
 import 'NotificationPage.dart';
@@ -59,7 +59,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
   List<NewOrderTypeModel> orderTypeList = DataFile.getOrderTypeList();
   List<CompletedOrderModel> completeOrderList = DataFile.getCompleteOrder();
   List<ActiveOrderModel> activeOrderList = DataFile.getActiveOrderList();
-
+  List<OrderList> activeOrderListModel;
   bool isAppbarVisible = true;
 
   int themMode;
@@ -804,12 +804,13 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                             ),
                           ),
                         ),
-                        onTap: () {
+                        onTap: () async {
+                          activeOrderListModel = await db.activeOrderList();
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => CompleteOrderDetail(
-                                    DataFile.getActiveOrderList()[0]),
+                                builder: (context) => ActiveOrderDetail(
+                                    activeOrderListModel.elementAt(index)),
                               ));
                         },
                       );
@@ -1067,12 +1068,13 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                               ),
                             ),
                           ),
-                          onTap: () {
+                          onTap: () async {
+                            activeOrderListModel = await db.activeOrderList();
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => CompleteOrderDetail(
-                                      DataFile.getActiveOrderList()[0]),
+                                  builder: (context) => ActiveOrderDetail(
+                                      activeOrderListModel.elementAt(index)),
                                 ));
                           },
                         );
