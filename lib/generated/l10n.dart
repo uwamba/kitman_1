@@ -607,10 +607,21 @@ class S {
     );
   }
 
+  ///concel button
   String get Cancel {
     return Intl.message(
       'Cancel',
       name: 'Cancel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  ///pay button
+  String get Pay {
+    return Intl.message(
+      'Pay',
+      name: 'Pay',
       desc: '',
       args: [],
     );

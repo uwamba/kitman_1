@@ -991,35 +991,74 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                                   SizedBox(
                                     height: (margin / 2),
                                   ),
-                                  InkWell(
-                                    child: Container(
-                                      height: height,
-                                      width: ConstantWidget.getWidthPercentSize(
-                                          context, 20),
-                                      decoration: BoxDecoration(
-                                          color: ConstantData.accentColor,
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(
-                                                  ConstantWidget.getPercentSize(
-                                                      height, 30)))),
-                                      child: Center(
-                                        child: ConstantWidget.getCustomText(
-                                            S.of(context).Cancel,
-                                            Colors.white,
-                                            1,
-                                            TextAlign.center,
-                                            FontWeight.w500,
-                                            ConstantWidget.getPercentSize(
-                                                height, 40)),
+                                  Row(
+                                    children: [
+                                      InkWell(
+                                        child: Container(
+                                          height: height,
+                                          width: ConstantWidget
+                                              .getWidthPercentSize(context, 20),
+                                          decoration: BoxDecoration(
+                                              color: ConstantData.accentColor,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(ConstantWidget
+                                                      .getPercentSize(
+                                                          height, 30)))),
+                                          child: Center(
+                                            child: ConstantWidget.getCustomText(
+                                                S.of(context).Cancel,
+                                                Colors.white,
+                                                1,
+                                                TextAlign.center,
+                                                FontWeight.w500,
+                                                ConstantWidget.getPercentSize(
+                                                    height, 40)),
+                                          ),
+                                        ),
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    RatingPage(),
+                                              ));
+                                        },
                                       ),
-                                    ),
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => RatingPage(),
-                                          ));
-                                    },
+                                      SizedBox(
+                                        width: (margin),
+                                      ),
+                                      InkWell(
+                                        child: Container(
+                                          height: height,
+                                          width: ConstantWidget
+                                              .getWidthPercentSize(context, 20),
+                                          decoration: BoxDecoration(
+                                              color: ConstantData.accentColor,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(ConstantWidget
+                                                      .getPercentSize(
+                                                          height, 30)))),
+                                          child: Center(
+                                            child: ConstantWidget.getCustomText(
+                                                S.of(context).Pay,
+                                                Colors.white,
+                                                1,
+                                                TextAlign.center,
+                                                FontWeight.w500,
+                                                ConstantWidget.getPercentSize(
+                                                    height, 40)),
+                                          ),
+                                        ),
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    RatingPage(),
+                                              ));
+                                        },
+                                      ),
+                                    ],
                                   ),
                                   SizedBox(
                                     height: (margin / 2),
