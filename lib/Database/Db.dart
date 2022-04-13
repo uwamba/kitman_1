@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:knitman/model/UserlListModel.dart';
 import 'package:knitman/model/orderList.dart';
 
@@ -31,7 +32,7 @@ class Db {
   CollectionReference orders;
   List<OrderList> completeOrderList;
   List<UserListModel> allUserList;
-  CollectionReference _collectionRef =
+  CollectionReference collectionRef =
       FirebaseFirestore.instance.collection('orders');
 
   CollectionReference _userCollectionRef =
@@ -64,8 +65,7 @@ class Db {
 
   Future<List<OrderList>> completedOrderList() async {
     QuerySnapshot querySnapshot =
-        await _collectionRef.where('status', isEqualTo: "Completed").get();
-
+        await collectionRef.where('status', isEqualTo: "Completed").get();
     final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
 
     completeOrderList =
@@ -77,7 +77,7 @@ class Db {
 
   Future<List<OrderList>> activeOrderList() async {
     QuerySnapshot querySnapshot =
-        await _collectionRef.where('status', isNotEqualTo: "Completed").get();
+        await collectionRef.where('status', isNotEqualTo: "Completed").get();
 
     final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
 
@@ -85,6 +85,21 @@ class Db {
         parsed.map<OrderList>((json) => OrderList.fromJson(json)).toList();
 
     print(completeOrderList);
+    collectionRef.snapshots().listen((querySnapshot) {
+      querySnapshot.docChanges.forEach((change) async {
+        QuerySnapshot querySnapshot = await collectionRef
+            .where('status', isNotEqualTo: "Completed")
+            .get();
+
+        final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+        completeOrderList =
+            parsed.map<OrderList>((json) => OrderList.fromJson(json)).toList();
+
+        print(completeOrderList);
+      });
+    });
+
     return completeOrderList;
   }
 
@@ -151,13 +166,15 @@ class Db {
     this.receiverAddress = receiverAddress;
     this.price = price;
     this.packageValue = packageValue;
-
+    //DatabaseReference orders =
+    //FirebaseDatabase.instance.reference().child("orders");
     CollectionReference orders =
         FirebaseFirestore.instance.collection('orders');
-    //String date=getTimeAndDateCell(true).text;
+    // String date=getTimeAndDateCell(true).text;
     //Call the user's CollectionReference to add a new user
     //orders.doc(orderNumber).set({
     orders
+        //.push()
         .add({
           'status': "new", // new,assigned,picked,intransit,arrived,completed
           'deliveryTime': deliveryTime,
@@ -185,7 +202,52 @@ class Db {
           'price': price, // receiver address
           'packageValue': packageValue, // receiver address
         })
-        .then((value) => print("User Added" + orderNumber))
+        .then((value) => print("User Added"))
         .catchError((error) => print("Failed to add user: $error"));
+    updateUserPresence(senderId);
+  }
+
+  //final DatabaseReference databaseReference = FirebaseDatabase.instance
+  //.ref("https://kitman-3a2d0-default-rtdb.firebaseio.com/");
+  DatabaseReference ref =
+      FirebaseDatabase.instance.reference().child("presence");
+
+  updateUserPresence(String uid) async {
+    Map<String, dynamic> presenceStatusTrue = {
+      'presence': true,
+      'last_seen': DateTime.now().millisecondsSinceEpoch,
+    };
+    Map<String, dynamic> presenceStatusFalse = {
+      'presence': false,
+      'last_seen': DateTime.now().millisecondsSinceEpoch,
+    };
+    await ref.push().set(presenceStatusTrue);
+    ref
+        .child("-N-UCknlRquTcZdKpFFn")
+        .onDisconnect()
+        .update(presenceStatusFalse);
+  }
+}
+
+class UserPresence {
+  final DatabaseReference databaseReference =
+      FirebaseDatabase.instance.reference();
+
+  updateUserPresence() async {
+    Map<String, dynamic> presenceStatusTrue = {
+      'presence': true,
+      'last_seen': DateTime.now().millisecondsSinceEpoch,
+    };
+    Map<String, dynamic> presenceStatusFalse = {
+      'presence': false,
+      'last_seen': DateTime.now().millisecondsSinceEpoch,
+    };
+    await databaseReference
+        .child("uid")
+        .update(presenceStatusTrue)
+        .whenComplete(() => print('Updated your presence.'))
+        .catchError((e) => print(e));
+
+    databaseReference.child("uid").onDisconnect().update(presenceStatusFalse);
   }
 }

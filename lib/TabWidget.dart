@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -50,7 +53,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
   MotionTabController _tabController;
   int _selectedIndex = 0;
   List<ChatModel> chatUserList = DataFile.getChatUserList();
-
+  StreamSubscription<QuerySnapshot> _eventsSubscription;
   int tabPosition = 0;
   List<String> s = ["Orders", "New Order", "Chat", "Profile"];
   List<NewOrderTypeModel> orderTypeList = DataFile.getOrderTypeList();
@@ -76,6 +79,23 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
   @override
   void initState() {
     // TODO: implement initState
+    CollectionReference collectionRef =
+        FirebaseFirestore.instance.collection('orders');
+    Db db = new Db();
+    collectionRef.snapshots().listen((querySnapshot) {
+      setState(() {
+        querySnapshot?.docChanges?.forEach(
+          (docChange) => {
+            // If you need to do something for each document change, do it here.
+          },
+        );
+        // Anything you might do every time you get a fresh snapshot can be done here.
+        db.activeOrderList();
+        print("changeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+      });
+    });
+    //_eventsSubscription =
+    // collectionRef.snapshots().listen((snapshot) => _onEventsSnapshot);
     super.initState();
 
     getThemeMode();
@@ -146,6 +166,42 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
           // ),
         ),
         onWillPop: _requestPop);
+  }
+
+  void _onEventsSnapshot(QuerySnapshot snapshot) {
+    // Remove the setState() call if you don't want to refresh your screen whenever you get a fresh snapshot
+    Db db = new Db();
+    CollectionReference collectionRef =
+        FirebaseFirestore.instance.collection('orders');
+
+    // collectionRef.snapshots().listen((querySnapshot) {
+    //querySnapshot.docChanges.forEach((change) {
+    // setState(() {
+    //Db db2 = new Db();
+    // db2.activeOrderList();
+    // print(change.doc.data());
+    //});
+
+    //});
+    //});
+    setState(() {
+      snapshot?.docChanges?.forEach(
+        (docChange) => {
+          // If you need to do something for each document change, do it here.
+          db.activeOrderList()
+        },
+      );
+      // Anything you might do every time you get a fresh snapshot can be done here.
+
+      print("changeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+    });
+  }
+
+  @override
+  void dispose() {
+    // Cancel your subscription when the screen is disposed
+    _eventsSubscription?.cancel();
+    super.dispose();
   }
 
   getChatPage() {
@@ -578,6 +634,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
 
     double fontSize = ConstantWidget.getScreenPercentSize(context, 1.8);
     double defMargin = ConstantWidget.getScreenPercentSize(context, 2);
+
     return Container(
       child: Column(
         children: [
@@ -911,7 +968,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                                   ),
                                   ConstantWidget.getCustomText(
                                       orderSnap.data[index].packageType,
-                                     Colors.grey,
+                                      Colors.grey,
                                       2,
                                       TextAlign.start,
                                       FontWeight.w500,
@@ -922,33 +979,13 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                                   Row(
                                     children: [
                                       ConstantWidget.getCustomText(
-                                          orderSnap.data[index].price,
+                                          "Price: " +
+                                              orderSnap.data[index].price,
                                           ConstantData.mainTextColor,
                                           1,
                                           TextAlign.start,
                                           FontWeight.w500,
                                           ConstantData.font18Px),
-                                      RatingBar.builder(
-                                        itemSize: 15,
-                                        initialRating: 5,
-                                        minRating: 1,
-                                        direction: Axis.horizontal,
-                                        allowHalfRating: true,
-                                        itemCount: 5,
-                                        tapOnlyMode: true,
-                                        updateOnDrag: true,
-                                        unratedColor: Colors.grey,
-                                        itemPadding: EdgeInsets.symmetric(
-                                            horizontal: 0.0),
-                                        itemBuilder: (context, _) => Icon(
-                                          Icons.star,
-                                          color: Colors.amber,
-                                          size: 10,
-                                        ),
-                                        onRatingUpdate: (rating) {
-                                          print(rating);
-                                        },
-                                      ),
                                     ],
                                   ),
                                   SizedBox(
@@ -967,7 +1004,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                                                       height, 30)))),
                                       child: Center(
                                         child: ConstantWidget.getCustomText(
-                                            S.of(context).rate,
+                                            S.of(context).Cancel,
                                             Colors.white,
                                             1,
                                             TextAlign.center,
