@@ -967,6 +967,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                                     height: (margin / 2),
                                   ),
                                   ConstantWidget.getCustomText(
+                                      "Package type: " +
                                       orderSnap.data[index].packageType,
                                       Colors.grey,
                                       2,

@@ -634,7 +634,8 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
                                   children: [
                                     Expanded(
                                         child: ConstantWidget.getCustomText(
-                                            orderSnap.data[index].packageValue,
+                                            "Price: " +
+                                            orderSnap.data[index].price,
                                             Colors.grey,
                                             2,
                                             TextAlign.start,
@@ -680,6 +681,7 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
                                 Row(
                                   children: [
                                     ConstantWidget.getCustomText(
+                                        "Package type: " +
                                         orderSnap.data[index].packageType,
                                         ConstantData.mainTextColor,
                                         1,
@@ -962,8 +964,7 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
                       ConstantData.accentColor),
                   onTap: () {
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
+                        context,                        MaterialPageRoute(
                           builder: (context) => SchedulePage(false),
                         ));
                   },
