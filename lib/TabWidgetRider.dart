@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:knitman/Database/Db.dart';
+import 'package:knitman/OrderDetails.dart';
 import 'package:knitman/model/orderList.dart';
 import 'package:timelines/timelines.dart';
 
@@ -58,6 +59,7 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
   List<NewOrderTypeModel> orderTypeList = DataFile.getOrderTypeList();
   List<CompletedOrderModel> completeOrderList = DataFile.getCompleteOrder();
   List<ActiveOrderModel> activeOrderList = DataFile.getActiveOrderList();
+  List<OrderList>activeOrderListModel;
   List<TimeLineModel> addressList;
   bool isAppbarVisible = true;
 
@@ -751,12 +753,13 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
                             ),
                           ),
                         ),
-                        onTap: () {
+                        onTap: () async {
+                          activeOrderListModel = await db.activeOrderList();
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => CompleteOrderDetail(
-                                    DataFile.getActiveOrderList()[0]),
+                                builder: (context) => ActiveOrderDetail(
+                                    activeOrderListModel.elementAt(index)),
                               ));
                         },
                       );
@@ -773,6 +776,7 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
   }
 
   oldtabActiveWidget() {
+    Db db = new Db();
     double margin = ConstantWidget.getScreenPercentSize(context, 2);
 
     if (!widget.isDataShow) {
@@ -1092,12 +1096,13 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
                         ],
                       ),
                     ),
-                    onTap: () {
+                    onTap: () async {
+                      activeOrderListModel = await db.activeOrderList();
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                OrderDetail(activeOrderList[index]),
+                            builder: (context) => ActiveOrderDetail(
+                                activeOrderListModel.elementAt(index)),
                           ));
                     },
                   );

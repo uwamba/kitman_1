@@ -13,7 +13,8 @@ import 'CompleteOrderDetail.dart';
 import 'EditProfilePage.dart';
 import 'MyVouchers.dart';
 import 'NotificationPage.dart';
-import 'OrderDetail.dart';
+
+import 'OrderDetails.dart';
 import 'RatingPage.dart';
 import 'ResetPasswordPage.dart';
 import 'SchedulePage.dart';
@@ -58,7 +59,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
   List<NewOrderTypeModel> orderTypeList = DataFile.getOrderTypeList();
   List<CompletedOrderModel> completeOrderList = DataFile.getCompleteOrder();
   List<ActiveOrderModel> activeOrderList = DataFile.getActiveOrderList();
-
+  List<OrderList>activeOrderListModel;
   bool isAppbarVisible = true;
 
   int themMode;
@@ -78,6 +79,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
   @override
   void initState() {
     // TODO: implement initState
+
     super.initState();
 
     getThemeMode();
@@ -764,12 +766,13 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                             ),
                           ),
                         ),
-                        onTap: () {
+                        onTap: () async {
+                          activeOrderListModel = await db.activeOrderList();
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => CompleteOrderDetail(
-                                    DataFile.getActiveOrderList()[0]),
+                                builder: (context) => ActiveOrderDetail(
+                                    activeOrderListModel.elementAt(index)),
                               ));
                         },
                       );
@@ -786,6 +789,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
   }
 
   tabActiveWidget() {
+    Db db = new Db();
     double margin = ConstantWidget.getScreenPercentSize(context, 2);
 
     if (!widget.isDataShow) {
@@ -928,11 +932,14 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                   ],
                 ),
               ),
-              onTap: () {
+              onTap: () async {
+                activeOrderListModel = await db.activeOrderList();
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => OrderDetail(activeOrderList[index]),
+                      //builder: (context) => OrderDetail(activeOrderList[index]),
+                      builder: (context) => ActiveOrderDetail(
+                          activeOrderListModel.elementAt(index)),
                     ));
               },
             );

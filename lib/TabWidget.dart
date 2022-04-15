@@ -59,7 +59,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
   List<NewOrderTypeModel> orderTypeList = DataFile.getOrderTypeList();
   List<CompletedOrderModel> completeOrderList = DataFile.getCompleteOrder();
   List<ActiveOrderModel> activeOrderList = DataFile.getActiveOrderList();
-  List<OrderList> activeOrderListModel;
+  List<OrderList>activeOrderListModel;
   bool isAppbarVisible = true;
 
   int themMode;

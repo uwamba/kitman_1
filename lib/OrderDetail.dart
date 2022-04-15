@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:timelines/timelines.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+
 import 'ChatScreen.dart';
 import 'EditPage.dart';
 import 'generated/l10n.dart';
@@ -297,7 +298,7 @@ class _OrderDetail extends State<OrderDetail> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   ConstantWidget.getCustomText(
-                                      "James King",
+                                      "James Theos",
                                       ConstantData.mainTextColor,
                                       1,
                                       TextAlign.start,
@@ -380,7 +381,8 @@ class _OrderDetail extends State<OrderDetail> {
 
                             getColumnCell(
                               "Created",
-                              "257.05.2021 17:15",
+
+                              widget.activeOrderModel.orderText,
                             ),
 
                             // ConstantWidget.getTextWidget(
