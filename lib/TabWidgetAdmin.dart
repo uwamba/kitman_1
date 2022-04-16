@@ -1,12 +1,9 @@
-import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:knitman/Database/Db.dart';
-import 'package:knitman/Database/UserPresence.dart';
-import 'package:knitman/model/onlineUser.dart';
+import 'package:knitman/model/UserlListModel.dart';
 import 'package:knitman/model/orderList.dart';
 import 'package:timelines/timelines.dart';
 
@@ -63,7 +60,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
   List<ActiveOrderModel> activeOrderList = DataFile.getActiveOrderList();
 
   bool isAppbarVisible = true;
-  String presence;
+
   int themMode;
   bool isFirstTime = false;
 
@@ -78,15 +75,9 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
     setState(() {});
   }
 
-  void setPresence() async {
-    String phone = await PrefData.getPhoneNumber();
-    UserPresence(phone).updateUserPresence();
-  }
-
   @override
   void initState() {
     // TODO: implement initState
-    setPresence();
     super.initState();
 
     getThemeMode();
@@ -163,7 +154,6 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
     double leftMargin = MediaQuery.of(context).size.width * 0.04;
     double height = ConstantWidget.getScreenPercentSize(context, 15);
     double imageSize = ConstantWidget.getPercentSize(height, 60);
-    final usersQuery = FirebaseDatabase.instance.ref('presence');
     Db db = new Db();
     return Container(
       color: ConstantData.bgColor,
@@ -187,30 +177,27 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                   ConstantWidget.getScreenPercentSize(context, 2.5)),
             ),
             Expanded(
-              child: FirebaseAnimatedList(
-                shrinkWrap: true,
-                query: usersQuery,
-                itemBuilder: (BuildContext context, DataSnapshot snapshot,
-                    Animation<double> animation, int index) {
-                  List<onlineUser> ls;
-                  final parsed =
-                      snapshot.children.map((doc) => doc.value).toList();
-
-                  List lis = parsed.toList();
-
-                  return chatCellUser(lis, index);
+              child: FutureBuilder<List<UserListModel>>(
+                builder: (context, orderSnap) {
+                  if (!orderSnap.hasData) {
+                    return Center(child: CircularProgressIndicator());
+                  } else {
+                    return ListView.builder(
+                      itemCount: orderSnap.data.length,
+                      itemBuilder: (context, index) {
+                        //OrderList listModel = orderSnap.data[index];
+                        return chatCellUser(orderSnap.data[index], index);
+                      },
+                    );
+                  }
                 },
+                future: db.usersList(),
               ),
             )
           ],
         ),
       ),
     );
-  }
-
-  DateTime convertToTime(int time) {
-    //DateFormat formatter = DateFormat('yyyyMMddHHmmssms');
-    return DateTime.fromMillisecondsSinceEpoch(time);
   }
 
   Widget chatCell(ChatModel chatModel, int index) {
@@ -342,11 +329,12 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
     );
   }
 
-  Widget chatCellUser(List users, int index) {
+  Widget chatCellUser(UserListModel userModel, int index) {
     double allMargin = ConstantWidget.getScreenPercentSize(context, 1);
     double height = ConstantWidget.getScreenPercentSize(context, 13);
 
     double imageSize = ConstantWidget.getPercentSize(height, 60);
+
     return InkWell(
       child: Container(
         height: height,
@@ -392,13 +380,12 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                           height: double.infinity,
                           width: double.infinity,
                           decoration: BoxDecoration(
-                              color: (true) ? Colors.green : Colors.red,
-                              shape: BoxShape.circle),
+                              color: Colors.green, shape: BoxShape.circle),
                         ),
                       ),
                     ),
                   )),
-                  visible: (users[2]),
+                  visible: (true),
                 )
               ],
             ),
@@ -416,7 +403,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                       Row(
                         children: [
                           ConstantWidget.getCustomText(
-                              users[0].toString(),
+                              userModel.firstName + " " + userModel.lastName,
                               ConstantData.mainTextColor,
                               1,
                               TextAlign.start,
@@ -424,7 +411,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                               ConstantWidget.getPercentSize(height, 16)),
                           new Spacer(),
                           ConstantWidget.getCustomText(
-                              convertToTime(users[1]).toString(),
+                              userModel.created,
                               ConstantData.textColor,
                               1,
                               TextAlign.start,
@@ -436,7 +423,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                         height: ConstantWidget.getPercentSize(height, 6),
                       ),
                       ConstantWidget.getCustomText(
-                          users[0].toString(),
+                          userModel.email,
                           ConstantData.textColor,
                           2,
                           TextAlign.start,
@@ -456,12 +443,12 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
         ),
       ),
       onTap: () {
-        // Navigator.push(
-        //   context,
-        //  MaterialPageRoute(
-        //    builder: (context) => ChatScreen(
-        //   user: chats[0].sender,
-        //  chatModel: chatModel,
+        //Navigator.push(
+        //context,
+        // MaterialPageRoute(
+        // builder: (context) => ChatScreen(
+        //user: chats[0].sender,
+        //chatModel: userModel,
         // ),
         //));
       },

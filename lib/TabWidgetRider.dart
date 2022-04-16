@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:knitman/Database/Db.dart';
-import 'package:knitman/Database/UserPresence.dart';
 import 'package:knitman/model/orderList.dart';
 import 'package:timelines/timelines.dart';
 
@@ -76,14 +75,8 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
     setState(() {});
   }
 
-  void setPresence() async {
-    String phone = await PrefData.getPhoneNumber();
-    UserPresence(phone).updateUserPresence();
-  }
-
   @override
   void initState() {
-    setPresence();
     // TODO: implement initState
     super.initState();
 

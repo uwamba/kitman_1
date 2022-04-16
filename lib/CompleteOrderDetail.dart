@@ -68,7 +68,7 @@ class _CompleteOrderDetail extends State<CompleteOrderDetail> {
                   color: Colors.green,
                   padding: EdgeInsets.all(margin),
                   child: ConstantWidget.getTextWidget(
-                      "Complete Order",
+                      "Complete Oder",
                       Colors.white,
                       TextAlign.start,
                       FontWeight.w500,
@@ -91,7 +91,7 @@ class _CompleteOrderDetail extends State<CompleteOrderDetail> {
                               height: (margin / 2),
                             ),
                             ConstantWidget.getTextWidget(
-                                widget.activeOrderModel.price,
+                                widget.activeOrderModel.deliveryDate,
                                 ConstantData.mainTextColor,
                                 TextAlign.start,
                                 FontWeight.w400,
@@ -152,7 +152,7 @@ class _CompleteOrderDetail extends State<CompleteOrderDetail> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   ConstantWidget.getCustomText(
-                                      "James King",
+                                      "James Theo",
                                       ConstantData.mainTextColor,
                                       1,
                                       TextAlign.start,
