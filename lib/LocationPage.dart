@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:knitman/Database/Db.dart';
+import 'package:knitman/PreferencePage.dart';
 //import 'package:knitman/place_picker_custom/entities/location_result.dart';
 //import 'package:knitman/place_picker_custom/widgets/place_picker.dart';
 //import 'package:place_picker/place_picker.dart';
@@ -212,11 +213,11 @@ class _LocationPage extends State<LocationPage> {
                       packageValueController.text);
 
                   // newOrder();
-                  //Navigator.push(
-                  //context,
-                  // MaterialPageRoute(
-                  //builder: (context) => PreferencePage(),
-                  // ));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PreferencePage(),
+                      ));
                 })
               ],
             ),

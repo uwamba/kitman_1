@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:knitman/model/UserlListModel.dart';
+import 'package:knitman/model/onlineUser.dart';
 import 'package:knitman/model/orderList.dart';
 
 class Db {
@@ -34,7 +35,8 @@ class Db {
   List<UserListModel> allUserList;
   CollectionReference collectionRef =
       FirebaseFirestore.instance.collection('orders');
-
+  List<onlineUser> listuser;
+  bool avail;
   CollectionReference _userCollectionRef =
       FirebaseFirestore.instance.collection('users');
   Db() {
@@ -101,6 +103,27 @@ class Db {
     });
 
     return completeOrderList;
+  }
+
+  Future<List> userOnline() async {
+    List lis;
+    List<onlineUser> lst;
+    final usersQuery = FirebaseDatabase.instance.ref('presence');
+    usersQuery.once().then((event) {
+      final dataSnapshot = event.snapshot;
+
+      DataSnapshot snap = event.snapshot.value;
+      //final parsed = snap.children.map((doc) => doc.value).toList();
+
+      Map<dynamic, dynamic> values = snap.value;
+      values.forEach((key, values) {
+        lst.add(values);
+      });
+
+      //lis = parsed.toList();
+    });
+    print(lis);
+    return lis;
   }
 
   Future<List<UserListModel>> usersList() async {
@@ -202,52 +225,11 @@ class Db {
           'price': price, // receiver address
           'packageValue': packageValue, // receiver address
         })
-        .then((value) => print("User Added"))
-        .catchError((error) => print("Failed to add user: $error"));
-    updateUserPresence(senderId);
+        .then((value) => print("Order Added"))
+        .catchError((error) => print("Failed to add Order: $error"));
   }
 
   //final DatabaseReference databaseReference = FirebaseDatabase.instance
   //.ref("https://kitman-3a2d0-default-rtdb.firebaseio.com/");
-  DatabaseReference ref =
-      FirebaseDatabase.instance.reference().child("presence");
 
-  updateUserPresence(String uid) async {
-    Map<String, dynamic> presenceStatusTrue = {
-      'presence': true,
-      'last_seen': DateTime.now().millisecondsSinceEpoch,
-    };
-    Map<String, dynamic> presenceStatusFalse = {
-      'presence': false,
-      'last_seen': DateTime.now().millisecondsSinceEpoch,
-    };
-    await ref.push().set(presenceStatusTrue);
-    ref
-        .child("-N-UCknlRquTcZdKpFFn")
-        .onDisconnect()
-        .update(presenceStatusFalse);
-  }
-}
-
-class UserPresence {
-  final DatabaseReference databaseReference =
-      FirebaseDatabase.instance.reference();
-
-  updateUserPresence() async {
-    Map<String, dynamic> presenceStatusTrue = {
-      'presence': true,
-      'last_seen': DateTime.now().millisecondsSinceEpoch,
-    };
-    Map<String, dynamic> presenceStatusFalse = {
-      'presence': false,
-      'last_seen': DateTime.now().millisecondsSinceEpoch,
-    };
-    await databaseReference
-        .child("uid")
-        .update(presenceStatusTrue)
-        .whenComplete(() => print('Updated your presence.'))
-        .catchError((e) => print(e));
-
-    databaseReference.child("uid").onDisconnect().update(presenceStatusFalse);
-  }
 }

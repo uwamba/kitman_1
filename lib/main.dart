@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:knitman/util/PrefData.dart';
 
 import 'IntroPage.dart';
 import 'SignUpPage.dart';
@@ -12,11 +13,11 @@ import 'TabWidget.dart';
 import 'generated/l10n.dart';
 import 'util/ConstantData.dart';
 import 'util/ConstantWidget.dart';
-import 'util/PrefData.dart';
 
 Future<void> main() {
   WidgetsFlutterBinding.ensureInitialized();
   Firebase.initializeApp();
+
   //await Firebase.initializeApp();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitDown,

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:knitman/Database/Db.dart';
+import 'package:knitman/Database/UserPresence.dart';
 import 'package:knitman/OrderDetails.dart';
 import 'package:knitman/model/orderList.dart';
 import 'package:timelines/timelines.dart';
@@ -76,9 +77,15 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
     setState(() {});
   }
 
+  void setPresence() async {
+    String phone = await PrefData.getPhoneNumber();
+    UserPresence(phone).updateUserPresence();
+  }
+
   @override
   void initState() {
     // TODO: implement initState
+    setPresence();
     CollectionReference collectionRef =
         FirebaseFirestore.instance.collection('orders');
     Db db = new Db();

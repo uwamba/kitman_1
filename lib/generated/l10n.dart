@@ -77,6 +77,16 @@ class S {
     );
   }
 
+  /// `Your phone`
+  String get yourPhone {
+    return Intl.message(
+      'Your Phone Number',
+      name: 'yourPhone',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Phone number`
   String get phoneNumber {
     return Intl.message(

@@ -19,7 +19,6 @@ class ActiveOrderDetail extends StatefulWidget {
   //final ActiveOrderModel activeOrderModel;
   final OrderList activeOrderModel;
   ActiveOrderDetail(this.activeOrderModel);
-
   @override
   _ActiveOrderDetail createState() {
     return _ActiveOrderDetail();

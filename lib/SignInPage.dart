@@ -27,25 +27,32 @@ class _SignInPage extends State<SignInPage> {
   bool isRemember = false;
   int themeMode = 0;
   String signIn;
-  TextEditingController textEmailController = new TextEditingController();
+  TextEditingController textPhoneController = new TextEditingController();
   TextEditingController textPasswordController = new TextEditingController();
 
   Future<void> login() async {
     signIn = "";
     FirebaseFirestore.instance
         .collection('users')
-        .where('email', isEqualTo: textEmailController.text)
+        .where('phone', isEqualTo: textPhoneController.text)
         .where('password', isEqualTo: textPasswordController.text)
         .get()
         .then((QuerySnapshot querySnapshot) {
       querySnapshot.docs.forEach((doc) {
-        print("email " + doc["email"] + " Password " + doc["password"]);
-        if (doc["email"] == textEmailController.text &&
+        print("email " + doc["phone"] + " Password " + doc["password"]);
+        if (doc["phone"] == textPhoneController.text &&
             doc["password"] == textPasswordController.text) {
           signIn = doc["role"];
           print(signIn);
           print(doc["role"]);
+
           PrefData.setIsSignIn(true);
+          PrefData.setPhoneNumber(doc["phone"]);
+          PrefData.setEmail(doc["email"]);
+          PrefData.setFirstName(doc["firstName"]);
+          PrefData.setLastName(doc["lastName"]);
+          PrefData.setUserId(doc["phone"]);
+
           if (signIn == "customer") {
             Navigator.pushReplacement(
                 context,
@@ -133,7 +140,7 @@ class _SignInPage extends State<SignInPage> {
                     height: ConstantWidget.getScreenPercentSize(context, 2.5),
                   ),
                   ConstantWidget.getDefaultTextFiledWidget(
-                      context, S.of(context).yourEmail, textEmailController),
+                      context, S.of(context).yourPhone, textPhoneController),
                   ConstantWidget.getPasswordTextFiled(
                       context, S.of(context).password, textPasswordController),
                   Row(

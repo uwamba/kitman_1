@@ -36,11 +36,11 @@ class ConstantWidget {
     return ConstantWidget.getCustomTextWithoutAlign(
         s, Colors.white, FontWeight.bold, ConstantData.font22Px);
   }
+
   static Widget getAppBarText1(String s) {
     return ConstantWidget.getCustomTextWithoutAlign(
         s, ConstantData.mainTextColor, FontWeight.bold, ConstantData.font22Px);
   }
-
 
   static Widget getBottomText(
       BuildContext context, String s, Function function) {
@@ -90,7 +90,6 @@ class ConstantWidget {
     );
   }
 
-
   static Widget getDrawerItem(
       BuildContext context, String s, var icon, Function function) {
     return ListTile(
@@ -106,6 +105,14 @@ class ConstantWidget {
     );
   }
 
+  static Widget getContainer(Color color) {
+    return new Container(
+      height: 60,
+      width: 90,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+    );
+  }
+
   static Widget getCustomIcon(BuildContext context, var icon) {
     return Icon(
       icon,
@@ -114,7 +121,7 @@ class ConstantWidget {
     );
   }
 
-  static getDecoration(double radius){
+  static getDecoration(double radius) {
     return BoxDecoration(
         color: ConstantData.cellColor,
         borderRadius: BorderRadius.circular(radius),
@@ -486,7 +493,7 @@ class ConstantWidget {
     );
   }
 
-  static Widget getLineTextView(String s,var color,var fontSize){
+  static Widget getLineTextView(String s, var color, var fontSize) {
     return Text(
       s,
       maxLines: 1,
@@ -494,64 +501,67 @@ class ConstantWidget {
         color: color,
         fontFamily: ConstantData.fontFamily,
         fontWeight: FontWeight.w400,
-        decorationColor: (s.isNotEmpty || s!=null)?color:Colors.transparent,
+        decorationColor:
+            (s.isNotEmpty || s != null) ? color : Colors.transparent,
         decorationStyle: TextDecorationStyle.solid,
-        decoration:
-        TextDecoration.lineThrough,
+        decoration: TextDecoration.lineThrough,
         fontSize: fontSize,
       ),
     );
   }
 
-   static Widget getPrescriptionTextFiled(BuildContext context,var icon, String s,
-      TextEditingController textEditingController,Function function) {
+  static Widget getPrescriptionTextFiled(
+      BuildContext context,
+      var icon,
+      String s,
+      TextEditingController textEditingController,
+      Function function) {
     double height = ConstantWidget.getScreenPercentSize(context, 8.5);
 
     double radius = ConstantWidget.getPercentSize(height, 20);
     double fontSize = ConstantWidget.getPercentSize(height, 25);
 
-    return InkWell(child: Container(
-      height: height,
-      margin: EdgeInsets.symmetric(
-          vertical: ConstantWidget.getScreenPercentSize(context, 1.2)),
-      padding: EdgeInsets.symmetric(
-          horizontal: ConstantWidget.getWidthPercentSize(context, 2)),
-      alignment: Alignment.centerLeft,
-      decoration: BoxDecoration(
-        color: ConstantData.cellColor,
-        borderRadius: BorderRadius.all(
-          Radius.circular(radius),
+    return InkWell(
+      child: Container(
+        height: height,
+        margin: EdgeInsets.symmetric(
+            vertical: ConstantWidget.getScreenPercentSize(context, 1.2)),
+        padding: EdgeInsets.symmetric(
+            horizontal: ConstantWidget.getWidthPercentSize(context, 2)),
+        alignment: Alignment.centerLeft,
+        decoration: BoxDecoration(
+          color: ConstantData.cellColor,
+          borderRadius: BorderRadius.all(
+            Radius.circular(radius),
+          ),
+        ),
+        child: TextField(
+          maxLines: 1,
+          controller: textEditingController,
+          enabled: false,
+          style: TextStyle(
+              fontFamily: ConstantData.fontFamily,
+              color: ConstantData.textColor,
+              fontWeight: FontWeight.w400,
+              fontSize: fontSize),
+          decoration: InputDecoration(
+              contentPadding: EdgeInsets.only(top: height / 3.5),
+              border: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              errorBorder: InputBorder.none,
+              disabledBorder: InputBorder.none,
+              prefixIcon: Icon(icon, color: ConstantData.textColor),
+              hintText: s,
+              hintStyle: TextStyle(
+                  fontFamily: ConstantData.fontFamily,
+                  color: ConstantData.textColor,
+                  fontWeight: FontWeight.w400,
+                  fontSize: fontSize)),
         ),
       ),
-      child: TextField(
-        maxLines: 1,
-        controller: textEditingController,
-        enabled: false,
-        style: TextStyle(
-            fontFamily: ConstantData.fontFamily,
-            color: ConstantData.textColor,
-            fontWeight: FontWeight.w400,
-            fontSize: fontSize),
-        decoration: InputDecoration(
-            contentPadding: EdgeInsets.only(
-                top: height/3.5),
-            border: InputBorder.none,
-
-
-
-            focusedBorder: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            errorBorder: InputBorder.none,
-            disabledBorder: InputBorder.none,
-            prefixIcon: Icon(icon, color: ConstantData.textColor),
-            hintText: s,
-            hintStyle: TextStyle(
-                fontFamily: ConstantData.fontFamily,
-                color: ConstantData.textColor,
-                fontWeight: FontWeight.w400,
-                fontSize: fontSize)),
-      ),
-    ),onTap: function,);
+      onTap: function,
+    );
   }
 
   static Widget getPrescriptionDesc(BuildContext context, String s,
@@ -582,18 +592,12 @@ class ConstantWidget {
             fontWeight: FontWeight.w400,
             fontSize: fontSize),
         decoration: InputDecoration(
-            contentPadding: EdgeInsets.only(
-                top: height/3.1),
+            contentPadding: EdgeInsets.only(top: height / 3.1),
             border: InputBorder.none,
-
-
-
             focusedBorder: InputBorder.none,
             enabledBorder: InputBorder.none,
             errorBorder: InputBorder.none,
             disabledBorder: InputBorder.none,
-
-
             hintText: s,
             hintStyle: TextStyle(
                 fontFamily: ConstantData.fontFamily,
@@ -603,9 +607,6 @@ class ConstantWidget {
       ),
     );
   }
-
-
-
 
   static Widget getPasswordTextFiled(BuildContext context, String s,
       TextEditingController textEditingController) {
@@ -701,8 +702,6 @@ class ConstantWidget {
       onTap: function,
     );
   }
-
-
 
   static Widget getButtonWidget(
       BuildContext context, String s, var color, Function function) {
