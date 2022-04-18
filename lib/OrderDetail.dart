@@ -6,7 +6,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:timelines/timelines.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
 import 'ChatScreen.dart';
 import 'EditPage.dart';
 import 'generated/l10n.dart';
@@ -41,7 +40,6 @@ class _OrderDetail extends State<OrderDetail> {
     zoom: 12.0,
   );
   List listMarkerIds = [];
-
   BitmapDescriptor customIcon1;
 
   createMarker(context) {
@@ -381,7 +379,6 @@ class _OrderDetail extends State<OrderDetail> {
 
                             getColumnCell(
                               "Created",
-
                               widget.activeOrderModel.orderText,
                             ),
 

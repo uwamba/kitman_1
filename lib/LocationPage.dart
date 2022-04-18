@@ -44,7 +44,9 @@ class _LocationPage extends State<LocationPage> {
   TextEditingController receiverAddressController = TextEditingController();
   TextEditingController receiverPhoneController = TextEditingController();
   TextEditingController receiverCommentController = TextEditingController();
-
+  LatLng startLocation;
+  LatLng endLocation;
+  LatLng initialLocation = LatLng(-2.5825288719982, 29.01545043904463);
   //DateFormat formatter = DateFormat('yyyyMMddHHmmss');
   //String pointTime, pointDate;
   //String deliveryTime, deliveryDate;
@@ -91,8 +93,9 @@ class _LocationPage extends State<LocationPage> {
     fullName = "dodos";
     company = "pcpcpc";
     age = 40;
-    pointAddressController.text = "Kigali ,Gasabo ,Remera";
-    receiverAddressController.text = "Kigali ,Gasabo ,Bumbogo";
+
+    pointAddressController.text = initialLocation.toString();
+    receiverAddressController.text = initialLocation.toString();
     priceController.text = "5000 RWF";
     // pointPhoneController.text="+91 9845632173";
     // deliveryPhoneController.text="+91 9845632173";
@@ -181,8 +184,6 @@ class _LocationPage extends State<LocationPage> {
                 spaceWidget,
                 getPackageValueCell(packageValueController),
                 spaceWidget,
-                getPriceCell(priceController),
-                spaceWidget,
                 ConstantWidget.getBottomText(context, "Save Order", () {
                   DateTime now = new DateTime.now();
                   DateFormat formatter = DateFormat('yyyyMMddHHmmssms');
@@ -216,7 +217,29 @@ class _LocationPage extends State<LocationPage> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => PreferencePage(),
+                        builder: (context) => PreferencePage(
+                            status,
+                            deliveryTime,
+                            deliveryDate,
+                            receivedTime,
+                            receivedDate,
+                            formatter.format(now).toString(),
+                            senderId,
+                            senderEmail,
+                            receiverId,
+                            receiverEmail,
+                            pointAddressController.text,
+                            pickingCoordinate,
+                            widget.type,
+                            widget.priority,
+                            widget.weight,
+                            receiverCommentController.text,
+                            pointCoordinate,
+                            orderType,
+                            receiverPhoneController.text,
+                            pointPhoneController.text,
+                            receiverAddressController.text,
+                            packageValueController.text),
                       ));
                 })
               ],
@@ -273,13 +296,14 @@ class _LocationPage extends State<LocationPage> {
         ),
       ),
       onTap: () async {
-        var result = await Navigator.push(
+        startLocation = await Navigator.push(
             context,
             new MaterialPageRoute(
-                builder: (BuildContext context) => new maps()));
-        print(result);
+                builder: (BuildContext context) =>
+                    new maps(initialLocation, true)));
+        print(startLocation);
         setState(() {
-          pointAddressController.text = result;
+          pointAddressController.text = startLocation.toString();
         });
       },
     );
@@ -319,13 +343,14 @@ class _LocationPage extends State<LocationPage> {
         ),
       ),
       onTap: () async {
-        var result = await Navigator.push(
+        endLocation = await Navigator.push(
             context,
             new MaterialPageRoute(
-                builder: (BuildContext context) => new maps()));
-        print(result);
+                builder: (BuildContext context) =>
+                    new maps(startLocation, false)));
+        print(endLocation.toString());
         setState(() {
-          receiverAddressController.text = result;
+          receiverAddressController.text = endLocation.toString();
         });
       },
     );

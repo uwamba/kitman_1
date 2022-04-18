@@ -7,6 +7,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
 class maps extends StatefulWidget {
+  LatLng pickingPoint;
+  bool isPickingLocation;
+  maps(this.pickingPoint, this.isPickingLocation);
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -14,15 +18,19 @@ class maps extends StatefulWidget {
 class _HomePageState extends State<maps> {
   double _lat = 13.0827;
   double _lng = 80.2707;
+  String distanceText = "Location";
+
   Completer<GoogleMapController> _controller = Completer();
   final Completer<GoogleMapController> mapController = Completer();
   Location location = new Location();
-  String loc = "";
+  LatLng loc;
   bool _serviceEnabled;
   PermissionStatus _permissionGranted;
   CameraPosition _currentPosition;
   Marker marker;
+  PolylineId polylineId = PolylineId("order");
   final Set<Marker> markers = Set();
+  final Set<Polyline> polys = Set();
 
   PolylinePoints polylinePoints = PolylinePoints();
 
@@ -33,7 +41,7 @@ class _HomePageState extends State<maps> {
 
   LatLng startLocation = LatLng(-2.5825288719982, 29.01545043904463);
   LatLng endLocation = LatLng(-2.6115797815698643, 29.01829060711035);
-
+  Widget position;
   double distance = 0.0;
   @override
   initState() {
@@ -43,16 +51,44 @@ class _HomePageState extends State<maps> {
       target: LatLng(-2.5825288719982, 29.01545043904463),
       zoom: 12,
     );
-    markers.add(Marker(
-      icon: BitmapDescriptor.defaultMarker,
-      position: startLocation,
-      markerId: MarkerId("start location"),
-    ));
-    markers.add(Marker(
-      icon: BitmapDescriptor.defaultMarker,
-      position: endLocation,
-      markerId: MarkerId("end location"),
-    ));
+    if (widget.isPickingLocation == true) {
+      position = Positioned(
+          top: 30,
+          left: 20,
+          child: Container(
+              child: Card(
+            child: Container(
+                padding: EdgeInsets.all(20),
+                child: Text("Picking Location",
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
+          )));
+    } else {
+      position = Positioned(
+          top: 30,
+          left: 20,
+          child: Container(
+              child: Card(
+            child: Container(
+                padding: EdgeInsets.all(20),
+                child: Text(distanceText,
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
+          )));
+
+      markers.add(Marker(
+        icon: BitmapDescriptor.defaultMarker,
+        position: widget.pickingPoint,
+        markerId: MarkerId("Picking Location"),
+      ));
+      polys.add(Polyline(
+          polylineId: polylineId,
+          points: getPoints(widget.pickingPoint, widget.pickingPoint),
+          width: 5,
+          color: Colors.green,
+          visible: true));
+    }
+
     getDirections();
   }
 
@@ -145,7 +181,9 @@ class _HomePageState extends State<maps> {
     var a = 0.5 -
         cos((lat2 - lat1) * p) / 2 +
         cos(lat1 * p) * cos(lat2 * p) * (1 - cos((lon2 - lon1) * p)) / 2;
-    return 12742 * asin(sqrt(a));
+    setState(() {
+      return 12742 * asin(sqrt(a));
+    });
   }
 
   setUpMarker() async {
@@ -161,26 +199,21 @@ class _HomePageState extends State<maps> {
 
   void setMarker(LatLng latLng) {
     // markers.clear();
-    setState(() {
-      markers.clear();
 
+    setState(() {
+      // markers.clear();
+      if (widget.isPickingLocation == true) {
+        markers.clear();
+      } else {}
       markers.add(Marker(
           draggable: true,
           icon: BitmapDescriptor.defaultMarker,
           infoWindow: const InfoWindow(
-            title: 'Kigali',
+            title: 'Delivery Point',
           ),
-          markerId: MarkerId("selected-location"),
+          markerId: MarkerId("Delivery Point"),
           position: latLng));
     });
-  }
-
-  _mapTapped(location) {
-    print(location);
-    // Location currentLatitude = location.latitude;
-    //Location currentLongitude = location.longitude;
-    //Show only one marker
-    setMarker(location);
   }
 
   void onMapCreated(GoogleMapController controller) {
@@ -199,9 +232,16 @@ class _HomePageState extends State<maps> {
     });
   }
 
+  getPoints(LatLng a, LatLng b) {
+    return [
+      a,
+      b,
+    ];
+  }
+
   void moveToLocation(LatLng latLng) {
     this.mapController.future.then((controller) {
-      loc = latLng.toString();
+      loc = latLng;
       print(
           "lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll" +
               latLng.toString());
@@ -212,6 +252,31 @@ class _HomePageState extends State<maps> {
     });
 
     setMarker(latLng);
+    if (widget.isPickingLocation == false) {
+      setState(() {
+        polys.clear();
+        polys.add(Polyline(
+            polylineId: polylineId,
+            points: getPoints(widget.pickingPoint, latLng),
+            width: 5,
+            color: Colors.green,
+            visible: true));
+        print(calculateDistance(
+                    widget.pickingPoint.latitude,
+                    widget.pickingPoint.longitude,
+                    widget.pickingPoint.latitude,
+                    widget.pickingPoint.longitude)
+                .toStringAsFixed(2) +
+            " KM");
+        distanceText = "Total Distance: " +
+            calculateDistance(
+                    widget.pickingPoint.latitude,
+                    widget.pickingPoint.longitude,
+                    widget.pickingPoint.latitude,
+                    widget.pickingPoint.longitude)
+                .toString();
+      });
+    }
   }
 
   @override
@@ -230,7 +295,7 @@ class _HomePageState extends State<maps> {
               myLocationEnabled: true,
               mapType: MapType.normal, //map type
               onMapCreated: onMapCreated,
-
+              polylines: polys,
               onTap: (latLng) {
                 //clearOverlay();
                 moveToLocation(latLng);
@@ -238,20 +303,7 @@ class _HomePageState extends State<maps> {
               },
               markers: markers,
             ),
-            // Positioned(
-            // bottom: 200,
-            // left: 50,
-            // child: Container(
-            //child: Card(
-            //child: Container(
-            //padding: EdgeInsets.all(20),
-            //child: Text(
-            // "Total Distance: " +
-            // distance.toStringAsFixed(2) +
-            //  " KM",
-            // style: TextStyle(
-            // fontSize: 20, fontWeight: FontWeight.bold))),
-            //)))
+            position,
           ])),
       floatingActionButton: FloatingActionButton.extended(
         label: Text('Select Location'),

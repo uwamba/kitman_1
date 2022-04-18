@@ -77,6 +77,23 @@ class Db {
     return completeOrderList;
   }
 
+  Future<List<OrderList>> updateOrder(String orderId) async {
+    CollectionReference orders;
+    Map<String, dynamic> presenceStatusTrue = {
+      'UID': "userId",
+      'presence': true,
+      'last_seen': DateTime.now().millisecondsSinceEpoch,
+    };
+
+    QuerySnapshot querySnapshot =
+        await collectionRef.where('orderId', isEqualTo: orderId).get();
+    //db.collection("cities").doc("LA").set({
+    //name: "Los Angeles",
+    // state: "CA",
+    // country: "USA"
+    //})
+  }
+
   Future<List<OrderList>> activeOrderList() async {
     QuerySnapshot querySnapshot =
         await collectionRef.where('status', isNotEqualTo: "Completed").get();

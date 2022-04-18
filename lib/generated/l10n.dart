@@ -657,6 +657,16 @@ class S {
     );
   }
 
+  /// `Pay Now`
+  String get payNow {
+    return Intl.message(
+      'Pay Now',
+      name: 'payNow',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Schedule`
   String get schedule {
     return Intl.message(

@@ -3,10 +3,9 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:knitman/TabWidget.dart';
 
-import 'AddNewCardPage.dart';
 import 'MyVouchers.dart';
-import 'SubmitOrderPage.dart';
 import 'generated/l10n.dart';
 import 'model/AddressModel.dart';
 import 'model/PaymentCardModel.dart';
@@ -17,6 +16,52 @@ import 'util/DataFile.dart';
 import 'util/SizeConfig.dart';
 
 class PreferencePage extends StatefulWidget {
+  final status,
+      deliveryTime,
+      deliveryDate,
+      receivedTime,
+      receivedDate,
+      orderNumber,
+      senderId,
+      senderEmail,
+      receiverId,
+      receiverEmail,
+      pointAddress,
+      pickingCoordinate,
+      type,
+      priority,
+      weight,
+      receiverComment,
+      pointCoordinate,
+      orderType,
+      receiverPhone,
+      pointPhone,
+      receiverAddress,
+      packageValue;
+  PreferencePage(
+      this.status,
+      this.deliveryTime,
+      this.deliveryDate,
+      this.receivedTime,
+      this.receivedDate,
+      this.orderNumber,
+      this.senderId,
+      this.senderEmail,
+      this.receiverId,
+      this.receiverEmail,
+      this.pointAddress,
+      this.pickingCoordinate,
+      this.type,
+      this.priority,
+      this.weight,
+      this.receiverComment,
+      this.pointCoordinate,
+      this.orderType,
+      this.receiverPhone,
+      this.pointPhone,
+      this.receiverAddress,
+      this.packageValue);
+
   @override
   _PreferencePage createState() {
     return _PreferencePage();
@@ -33,6 +78,8 @@ class _PreferencePage extends State<PreferencePage> {
 
   String pointTime, pointDate;
   String deliveryTime, deliveryDate;
+  String price;
+  String bottomButton = "Continue";
 
   List<PaymentSelectModel> list = DataFile.getPaymentSelect();
 
@@ -101,14 +148,6 @@ class _PreferencePage extends State<PreferencePage> {
                     child: ListView(
                       children: [
                         spaceWidget,
-                        getParcelCell(parcelController),
-                        spaceWidget,
-                        getPhoneCell(phoneController),
-                        spaceWidget,
-                        getNotifyCell(),
-                        spaceWidget,
-                        getPromoCodeCell(),
-                        spaceWidget,
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: margin),
                           child: Row(
@@ -117,25 +156,9 @@ class _PreferencePage extends State<PreferencePage> {
                                   S.of(context).paymentMode,
                                   ConstantData.textColor,
                                   TextAlign.start,
-                                  FontWeight.w500,
+                                  FontWeight.bold,
                                   ConstantData.font18Px),
                               new Spacer(),
-                              InkWell(
-                                child: ConstantWidget.getUnderlineText(
-                                    S.of(context).newCard,
-                                    ConstantData.accentColor,
-                                    1,
-                                    TextAlign.start,
-                                    FontWeight.w500,
-                                    ConstantData.font18Px),
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => AddNewCardPage(),
-                                      ));
-                                },
-                              )
                             ],
                           ),
                         ),
@@ -231,8 +254,10 @@ class _PreferencePage extends State<PreferencePage> {
                                     list[index].select = 1;
                                     if (index == 0) {
                                       list[1].select = 0;
+                                      bottomButton = "Finish";
                                     } else {
                                       list[0].select = 0;
+                                      bottomButton = "Pay";
                                     }
                                     if (list[0].select == 1) {
                                       isCash = true;
@@ -254,7 +279,7 @@ class _PreferencePage extends State<PreferencePage> {
                                 ListView.builder(
                                     shrinkWrap: true,
                                     physics: NeverScrollableScrollPhysics(),
-                                    itemCount: paymentModelList.length,
+                                    itemCount: 1,
                                     itemBuilder: (context, index) {
                                       return InkWell(
                                         child: Container(
@@ -321,9 +346,7 @@ class _PreferencePage extends State<PreferencePage> {
                                                                       .start,
                                                               children: [
                                                                 ConstantWidget.getCustomTextWithoutAlign(
-                                                                    paymentModelList[
-                                                                            index]
-                                                                        .name,
+                                                                    "Momo Pay",
                                                                     ConstantData
                                                                         .mainTextColor,
                                                                     FontWeight
@@ -336,9 +359,7 @@ class _PreferencePage extends State<PreferencePage> {
                                                                           context,
                                                                           0.5)),
                                                                   child: ConstantWidget.getCustomTextWithoutAlign(
-                                                                      paymentModelList[
-                                                                              index]
-                                                                          .desc,
+                                                                      "+25078XXXXXXX",
                                                                       ConstantData
                                                                           .textColor,
                                                                       FontWeight
@@ -375,38 +396,14 @@ class _PreferencePage extends State<PreferencePage> {
                                                             // )
                                                           ],
                                                         ),
-                                                        Align(
-                                                          alignment: Alignment
-                                                              .centerRight,
-                                                          child: Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    right: 3),
-                                                            child: Icon(
-                                                              (index ==
-                                                                      _selectedCard)
-                                                                  ? Icons
-                                                                      .radio_button_checked
-                                                                  : Icons
-                                                                      .radio_button_unchecked,
-                                                              color: (index ==
-                                                                      _selectedCard)
-                                                                  ? ConstantData
-                                                                      .primaryColor
-                                                                  : Colors.grey,
-                                                              size: ConstantWidget
-                                                                  .getPercentSize(
-                                                                      cellHeight,
-                                                                      30),
-                                                            ),
-                                                          ),
-                                                        )
                                                       ],
                                                     ),
                                                     flex: 1,
                                                   )
                                                 ],
                                               ),
+                                              spaceWidget,
+                                              getPhoneCell(phoneController),
                                             ],
                                           ),
                                         ),
@@ -427,136 +424,6 @@ class _PreferencePage extends State<PreferencePage> {
                             ),
                           ),
                           visible: (!isCash),
-                        ),
-                        spaceWidget,
-                        Container(
-                          margin: EdgeInsets.symmetric(horizontal: margin),
-                          child: ListView.builder(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemCount: addressList.length,
-                              itemBuilder: (context, index) {
-                                return InkWell(
-                                  child: Container(
-                                    margin: EdgeInsets.only(
-                                        bottom:
-                                            ConstantWidget.getWidthPercentSize(
-                                                context, 3)),
-                                    padding: EdgeInsets.all(
-                                        ConstantWidget.getPercentSize(
-                                            cellHeight, 10)),
-
-                                    decoration: getDecoration(),
-                                    // decoration: BoxDecoration(
-                                    //     color: ConstantData.bgColor,
-                                    //     borderRadius: BorderRadius.circular(ConstantWidget.getPercentSize(
-                                    //         cellHeight,10 )),
-                                    //     border: Border.all(
-                                    //         color: ConstantData.borderColor,
-                                    //         width: ConstantWidget.getWidthPercentSize(
-                                    //             context, 0.08)),
-                                    //     boxShadow: [
-                                    //       BoxShadow(
-                                    //         color: Colors.grey.shade200,
-                                    //       )
-                                    //     ]),
-
-                                    height: cellHeight,
-
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      ConstantWidget
-                                                          .getCustomTextWithoutAlign(
-                                                              addressList[index]
-                                                                  .name,
-                                                              ConstantData
-                                                                  .mainTextColor,
-                                                              FontWeight.w700,
-                                                              ConstantWidget
-                                                                  .getPercentSize(
-                                                                      cellHeight,
-                                                                      20)),
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                top:
-                                                                    (topMargin /
-                                                                        2)),
-                                                        child: ConstantWidget
-                                                            .getCustomTextWithoutAlign(
-                                                                addressList[
-                                                                        index]
-                                                                    .location,
-                                                                ConstantData
-                                                                    .textColor,
-                                                                FontWeight.w500,
-                                                                ConstantWidget
-                                                                    .getPercentSize(
-                                                                        cellHeight,
-                                                                        15)),
-                                                      )
-                                                    ],
-                                                  ),
-                                                  new Spacer(),
-                                                  Align(
-                                                    alignment:
-                                                        Alignment.centerRight,
-                                                    child: Padding(
-                                                      padding: EdgeInsets.only(
-                                                          right: 3),
-                                                      child: Icon(
-                                                        (index ==
-                                                                _selectedAddress)
-                                                            ? Icons
-                                                                .radio_button_checked
-                                                            : Icons
-                                                                .radio_button_unchecked,
-                                                        color: (index ==
-                                                                _selectedAddress)
-                                                            ? ConstantData
-                                                                .primaryColor
-                                                            : Colors.grey,
-                                                        size: ConstantWidget
-                                                            .getPercentSize(
-                                                                cellHeight, 30),
-                                                      ),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                              flex: 1,
-                                            )
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  onTap: () {
-                                    _selectedAddress = index;
-                                    setState(() {});
-                                  },
-                                );
-                              }),
                         ),
                         spaceWidget,
 
@@ -580,7 +447,10 @@ class _PreferencePage extends State<PreferencePage> {
                           Expanded(
                             child: InkWell(
                               child: ConstantWidget.getTextWidget(
-                                  "₹40",
+                                  "RWF " +
+                                      priceCalculator(
+                                              "Document", 20, 0, 50000, 20, 25)
+                                          .toString(),
                                   Colors.white,
                                   TextAlign.start,
                                   FontWeight.w700,
@@ -592,19 +462,42 @@ class _PreferencePage extends State<PreferencePage> {
                             ),
                           ),
                           InkWell(
-                            child: ConstantWidget.getTextWidget(
-                                S.of(context).done,
-                                Colors.white,
-                                TextAlign.start,
-                                FontWeight.w700,
-                                ConstantWidget.getPercentSize(
-                                    bottomHeight, 35)),
+                            child: Container(
+                              height: bottomHeight,
+                              width: ConstantWidget.getWidthPercentSize(
+                                  context, 40),
+                              decoration: BoxDecoration(
+                                  color: ConstantData.accentColor,
+                                  borderRadius: BorderRadius.all(
+                                      Radius.circular(
+                                          ConstantWidget.getPercentSize(
+                                              bottomHeight, 30)))),
+                              child: Center(
+                                child: ConstantWidget.getCustomText(
+                                    bottomButton,
+                                    Colors.white,
+                                    1,
+                                    TextAlign.center,
+                                    FontWeight.w500,
+                                    ConstantWidget.getPercentSize(
+                                        bottomHeight, 40)),
+                              ),
+                            ),
                             onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => SubmitOrderPage(),
-                                  ));
+                              // Navigator.push(
+                              //context,
+                              // MaterialPageRoute(
+                              // builder: (context) => SubmitOrderPage(),
+                              // ));
+                              if (isCash == true) {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => TabWidget(true),
+                                    ));
+                              } else {
+                                bottomDeliverDialog();
+                              }
                             },
                           )
                         ],
@@ -618,6 +511,303 @@ class _PreferencePage extends State<PreferencePage> {
               )),
         ),
         onWillPop: _requestPop);
+  }
+
+  double priceCalculator(String packageType, double distance, double orderType,
+      double packageValue, double price, double weight) {
+    double newPrice;
+
+    switch (packageType) {
+      case "Document":
+        {
+          if (orderType == 0) {
+            newPrice = price * distance * weight;
+            newPrice = newPrice + newPrice * 1.5;
+            if (newPrice < 100) {
+              newPrice = 100;
+            } else if (newPrice > 5000) {
+              newPrice = 5000;
+            }
+          } else {
+            newPrice = price * distance * weight;
+            if (newPrice < 500) {
+              newPrice = 500;
+            } else if (newPrice > 3000) {
+              newPrice = 3000;
+            }
+          }
+        }
+        break;
+
+      case "Food Or Meal":
+        {
+          if (orderType == 0) {
+            newPrice = price * distance * weight;
+            newPrice = newPrice + newPrice * 1.5;
+            if (newPrice < 100) {
+              newPrice = 100;
+            } else if (newPrice > 5000) {
+              newPrice = 5000;
+            }
+          } else {
+            newPrice = price * distance * weight;
+            if (newPrice < 500) {
+              newPrice = 500;
+            } else if (newPrice > 3000) {
+              newPrice = 3000;
+            }
+          }
+        }
+        break;
+
+      case "Cloths":
+        {
+          if (orderType == 0) {
+            newPrice = price * distance * weight;
+            newPrice = newPrice + newPrice * 1.5;
+            if (newPrice < 100) {
+              newPrice = 100;
+            } else if (newPrice > 5000) {
+              newPrice = 5000;
+            }
+          } else {
+            newPrice = price * distance * weight;
+            if (newPrice < 500) {
+              newPrice = 500;
+            } else if (newPrice > 3000) {
+              newPrice = 3000;
+            }
+          }
+        }
+        break;
+
+      case "Groceries":
+        {
+          if (orderType == 0) {
+            newPrice = price * distance * weight;
+            newPrice = newPrice + newPrice * 1.5;
+            if (newPrice < 100) {
+              newPrice = 100;
+            } else if (newPrice > 5000) {
+              newPrice = 5000;
+            }
+          } else {
+            newPrice = price * distance * weight;
+            if (newPrice < 500) {
+              newPrice = 500;
+            } else if (newPrice > 3000) {
+              newPrice = 3000;
+            }
+          }
+        }
+        break;
+      case "Flowers":
+        {
+          if (orderType == 0) {
+            newPrice = price * distance * weight;
+            newPrice = newPrice + newPrice * 1.5;
+            if (newPrice < 100) {
+              newPrice = 100;
+            } else if (newPrice > 5000) {
+              newPrice = 5000;
+            }
+          } else {
+            newPrice = price * distance * weight;
+            if (newPrice < 500) {
+              newPrice = 500;
+            } else if (newPrice > 3000) {
+              newPrice = 3000;
+            }
+          }
+        }
+        break;
+      case "Cake":
+        {
+          if (orderType == 0) {
+            newPrice = price * distance * weight;
+            newPrice = newPrice + newPrice * 1.5;
+            if (newPrice < 100) {
+              newPrice = 100;
+            } else if (newPrice > 5000) {
+              newPrice = 5000;
+            }
+          } else {
+            newPrice = price * distance * weight;
+            if (newPrice < 500) {
+              newPrice = 500;
+            } else if (newPrice > 3000) {
+              newPrice = 3000;
+            }
+          }
+        }
+        break;
+      case "Spare part":
+        {
+          if (orderType == 0) {
+            newPrice = price * distance * weight;
+            newPrice = newPrice + newPrice * 1.5;
+            if (newPrice < 100) {
+              newPrice = 100;
+            } else if (newPrice > 5000) {
+              newPrice = 5000;
+            }
+          } else {
+            newPrice = price * distance * weight;
+            if (newPrice < 500) {
+              newPrice = 500;
+            } else if (newPrice > 3000) {
+              newPrice = 3000;
+            }
+          }
+        }
+        break;
+      case "other":
+        {
+          if (orderType == 0) {
+            newPrice = price * distance * weight;
+            newPrice = newPrice + newPrice * 1.5;
+            if (newPrice < 100) {
+              newPrice = 100;
+            } else if (newPrice > 5000) {
+              newPrice = 5000;
+            }
+          } else {
+            newPrice = price * distance * weight;
+            if (newPrice < 500) {
+              newPrice = 500;
+            } else if (newPrice > 3000) {
+              newPrice = 3000;
+            }
+          }
+        }
+        break;
+
+      default:
+        {
+          print("Invalid choice");
+        }
+        break;
+    }
+    this.price = newPrice.toString();
+    return newPrice;
+  }
+
+  void bottomDeliverDialog() {
+    var widget = SizedBox(
+      height: (margin * 1.2),
+    );
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Wrap(
+        children: [
+          Container(
+            padding:
+                EdgeInsets.all(ConstantWidget.getScreenPercentSize(context, 2)),
+            // height: MediaQuery.of(context).size.height * 0.85,
+            decoration: new BoxDecoration(
+              color: ConstantData.cellColor,
+              borderRadius: new BorderRadius.only(
+                topLeft: Radius.circular(
+                    ConstantWidget.getScreenPercentSize(context, 5)),
+                topRight: Radius.circular(
+                    ConstantWidget.getScreenPercentSize(context, 5)),
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    new Spacer(),
+                    InkWell(
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.grey,
+                        size: ConstantWidget.getScreenPercentSize(context, 3),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                    )
+                  ],
+                ),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Icon(
+                    CupertinoIcons.timer_fill,
+                    size: ConstantWidget.getScreenPercentSize(context, 6),
+                    color: ConstantData.primaryColor,
+                  ),
+                ),
+                widget,
+                ConstantWidget.getTextWidget(
+                    S.of(context).payNow,
+                    ConstantData.mainTextColor,
+                    TextAlign.start,
+                    FontWeight.w700,
+                    ConstantWidget.getScreenPercentSize(context, 3)),
+                widget,
+                ConstantWidget.getCustomText(
+                    "Dial *182*7*1# and flow instructions",
+                    Colors.grey,
+                    2,
+                    TextAlign.start,
+                    FontWeight.w500,
+                    ConstantData.font18Px),
+                widget,
+                SizedBox(
+                  height: (margin / 2),
+                ),
+                ConstantWidget.getCustomText(
+                    "The order will be assigned to the nearest courier as soon as possible",
+                    ConstantData.textColor,
+                    2,
+                    TextAlign.start,
+                    FontWeight.w500,
+                    ConstantData.font18Px),
+                SizedBox(
+                  height: (margin / 2),
+                ),
+                Divider(
+                  height: ConstantWidget.getScreenPercentSize(context, 0.02),
+                ),
+                SizedBox(
+                  height: (margin / 2),
+                ),
+                ConstantWidget.getCustomText(
+                    "After payment click on continue or Call our team for any issue on :078XXXXXXX",
+                    ConstantData.textColor,
+                    2,
+                    TextAlign.start,
+                    FontWeight.w500,
+                    ConstantData.font18Px),
+                SizedBox(
+                  height: (margin / 2),
+                ),
+                Divider(
+                  height: ConstantWidget.getScreenPercentSize(context, 0.02),
+                ),
+                widget,
+                widget,
+                widget,
+                widget,
+                ConstantWidget.getBottomText(context, "Continue", () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TabWidget(true),
+                      ));
+                })
+              ],
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   void bottomDialog() {
@@ -646,12 +836,8 @@ class _PreferencePage extends State<PreferencePage> {
                       FontWeight.w400,
                       ConstantData.font22Px),
                   new Spacer(),
-                  ConstantWidget.getTextWidget(
-                      "₹10",
-                      ConstantData.mainTextColor,
-                      TextAlign.start,
-                      FontWeight.w400,
-                      ConstantData.font22Px),
+                  ConstantWidget.getTextWidget("", ConstantData.mainTextColor,
+                      TextAlign.start, FontWeight.w400, ConstantData.font22Px),
                 ],
               ),
               SizedBox(
@@ -666,12 +852,8 @@ class _PreferencePage extends State<PreferencePage> {
                       FontWeight.w400,
                       ConstantData.font22Px),
                   new Spacer(),
-                  ConstantWidget.getTextWidget(
-                      "₹30",
-                      ConstantData.mainTextColor,
-                      TextAlign.start,
-                      FontWeight.w400,
-                      ConstantData.font22Px),
+                  ConstantWidget.getTextWidget("", ConstantData.mainTextColor,
+                      TextAlign.start, FontWeight.w400, ConstantData.font22Px),
                 ],
               ),
               SizedBox(
@@ -686,7 +868,7 @@ class _PreferencePage extends State<PreferencePage> {
                       FontWeight.w400,
                       ConstantData.font22Px),
                   new Spacer(),
-                  ConstantWidget.getTextWidget("₹5", ConstantData.mainTextColor,
+                  ConstantWidget.getTextWidget("", ConstantData.mainTextColor,
                       TextAlign.start, FontWeight.w400, ConstantData.font22Px),
                 ],
               ),
