@@ -76,6 +76,7 @@ class _LocationPage extends State<LocationPage> {
       receiverPhone,
       senderAddress,
       receiverAddress;
+
   Db db = new Db();
 
   //AddUser(this.fullName, this.company, this.age);
@@ -211,6 +212,7 @@ class _LocationPage extends State<LocationPage> {
                       receiverAddressController.text,
                       receiverAddressController.text,
                       priceController.text,
+                      servicePhoneController.text,
                       packageValueController.text);
 
                   // newOrder();
@@ -238,6 +240,7 @@ class _LocationPage extends State<LocationPage> {
                             orderType,
                             receiverPhoneController.text,
                             pointPhoneController.text,
+                            servicePhoneController.text,
                             receiverAddressController.text,
                             packageValueController.text),
                       ));

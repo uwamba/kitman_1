@@ -29,6 +29,7 @@ class Db {
       receiverAddress,
       packageWeight,
       packageValue,
+      servicePhone,
       price;
   CollectionReference orders;
   List<OrderList> completeOrderList;
@@ -63,6 +64,8 @@ class Db {
     receiverPhone = "";
     senderAddress = "";
     receiverAddress = "";
+    servicePhone = "";
+
   }
 
   Future<List<OrderList>> completedOrderList() async {
@@ -179,8 +182,10 @@ class Db {
     receiverPhone,
     senderAddress,
     receiverAddress,
+      servicePhone,
     price,
     packageValue,
+
   ) async {
     this.status = status;
     this.deliveryTime = deliveryTime;
@@ -204,6 +209,7 @@ class Db {
     this.receiverPhone = receiverPhone;
     this.senderAddress = senderAddress;
     this.receiverAddress = receiverAddress;
+    this.servicePhone = servicePhone;
     this.price = price;
     this.packageValue = packageValue;
     //DatabaseReference orders =
@@ -239,6 +245,7 @@ class Db {
           'receiverPhone': receiverPhone, // receiver phone number
           'senderAddress': senderAddress, // package sender address
           'receiverAddress': receiverAddress, // receiver address
+          'servicePhone': servicePhone, // receiver address
           'price': price, // receiver address
           'packageValue': packageValue, // receiver address
         })

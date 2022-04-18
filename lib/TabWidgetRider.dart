@@ -13,6 +13,7 @@ import 'EditProfilePage.dart';
 import 'MyVouchers.dart';
 import 'NotificationPage.dart';
 import 'OrderDetail.dart';
+import 'OrderDetails.dart';
 import 'RatingPage.dart';
 import 'ResetPasswordPage.dart';
 import 'SchedulePage.dart';
@@ -59,6 +60,7 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
   List<CompletedOrderModel> completeOrderList = DataFile.getCompleteOrder();
   List<ActiveOrderModel> activeOrderList = DataFile.getActiveOrderList();
   List<TimeLineModel> addressList;
+  List<OrderList>activeOrderListModel;
   bool isAppbarVisible = true;
 
   int themMode;
@@ -749,12 +751,13 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
                             ),
                           ),
                         ),
-                        onTap: () {
+                        onTap: () async {
+                          activeOrderListModel = await db.activeOrderList();
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => CompleteOrderDetail(
-                                    DataFile.getActiveOrderList()[0]),
+                                builder: (context) => ActiveOrderDetail(
+                                    activeOrderListModel.elementAt(index)),
                               ));
                         },
                       );
@@ -1091,12 +1094,13 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
                         ],
                       ),
                     ),
-                    onTap: () {
+                    onTap: () async {
+                      activeOrderListModel = await db.activeOrderList();
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                OrderDetail(activeOrderList[index]),
+                            builder: (context) => ActiveOrderDetail(
+                                activeOrderListModel.elementAt(index)),
                           ));
                     },
                   );

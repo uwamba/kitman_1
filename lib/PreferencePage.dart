@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -72,6 +73,7 @@ class _PreferencePage extends State<PreferencePage> {
   bool isNotify = false;
   List<AddressModel> addressList = DataFile.getAddressList();
   List<PaymentCardModel> paymentModelList = DataFile.getPaymentCardList();
+  double servicePrice;
 
   TextEditingController parcelController = new TextEditingController();
   TextEditingController phoneController = new TextEditingController();
@@ -490,6 +492,7 @@ class _PreferencePage extends State<PreferencePage> {
                               // builder: (context) => SubmitOrderPage(),
                               // ));
                               if (isCash == true) {
+
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -689,6 +692,7 @@ class _PreferencePage extends State<PreferencePage> {
         break;
     }
     this.price = newPrice.toString();
+    servicePrice=newPrice;
     return newPrice;
   }
 
@@ -796,6 +800,7 @@ class _PreferencePage extends State<PreferencePage> {
                 widget,
                 widget,
                 ConstantWidget.getBottomText(context, "Continue", () {
+
                   Navigator.push(
                       context,
                       MaterialPageRoute(
