@@ -242,9 +242,7 @@ class _HomePageState extends State<maps> {
   void moveToLocation(LatLng latLng) {
     this.mapController.future.then((controller) {
       loc = latLng;
-      print(
-          "lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll" +
-              latLng.toString());
+
       controller.animateCamera(
         CameraUpdate.newCameraPosition(
             CameraPosition(target: latLng, zoom: 12.0)),
