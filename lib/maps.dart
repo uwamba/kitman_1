@@ -301,7 +301,6 @@ class _HomePageState extends State<maps> {
               },
               markers: markers,
             ),
-            position,
           ])),
       floatingActionButton: FloatingActionButton.extended(
         label: Text('Select Location'),

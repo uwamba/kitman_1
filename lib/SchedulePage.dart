@@ -75,9 +75,9 @@ class _SchedulePage extends State<SchedulePage> {
                   child: ListView(
                     scrollDirection: Axis.horizontal,
                     children: [
-                      getCell(0, CupertinoIcons.timer_fill, "Not Urgent",
-                          "from RWF1000"),
-                      getCell(1, CupertinoIcons.calendar_today, "Urgent",
+                      getCell(0, CupertinoIcons.calendar_today, "Schedule",
+                          "from RWF500"),
+                      getCell(1, CupertinoIcons.timer_fill, "Urgent",
                           "from RWF1000"),
                     ],
                   ),
@@ -294,7 +294,7 @@ class _SchedulePage extends State<SchedulePage> {
                   height: (margin / 2),
                 ),
                 ConstantWidget.getCustomText(
-                    "Up to 40 kg with package size lot greater than 50CMX50CMx50CM  ",
+                    "Up to 50 kg with package size lot greater than 50CMX50CMx50CM  ",
                     ConstantData.textColor,
                     2,
                     TextAlign.start,
