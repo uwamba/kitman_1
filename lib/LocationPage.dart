@@ -188,31 +188,7 @@ class _LocationPage extends State<LocationPage> {
                 ConstantWidget.getBottomText(context, "Save Order", () {
                   DateTime now = new DateTime.now();
                   DateFormat formatter = DateFormat('yyyyMMddHHmmssms');
-                  db.addOrder(
-                      status,
-                      deliveryTime,
-                      deliveryDate,
-                      receivedTime,
-                      receivedDate,
-                      formatter.format(now).toString(),
-                      senderId,
-                      senderEmail,
-                      receiverId,
-                      receiverEmail,
-                      pointAddressController.text,
-                      pickingCoordinate,
-                      widget.type,
-                      widget.priority,
-                      widget.weight,
-                      receiverCommentController.text,
-                      pointCoordinate,
-                      orderType,
-                      receiverPhoneController.text,
-                      pointPhoneController.text,
-                      receiverAddressController.text,
-                      receiverAddressController.text,
-                      priceController.text
-                      packageValueController.text);
+
 
                   // newOrder();
                   Navigator.push(
@@ -239,6 +215,7 @@ class _LocationPage extends State<LocationPage> {
                             orderType,
                             receiverPhoneController.text,
                             pointPhoneController.text,
+                            receiverAddressController.text,
                             receiverAddressController.text,
                             packageValueController.text),
                       ));

@@ -518,7 +518,6 @@ class _PreferencePage extends State<PreferencePage> {
                                     widget.pointAddress,
                                     widget.pointCoordinate,
                                     widget.orderType,
-
                                     widget.pointPhone,
                                     widget.receiverPhone,
                                     widget.senderAddress,
