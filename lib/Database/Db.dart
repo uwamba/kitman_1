@@ -30,7 +30,8 @@ class Db {
       packageWeight,
       packageValue,
       servicePhone,
-      price;
+      price,
+     paymentMethod;
   CollectionReference orders;
   List<OrderList> completeOrderList;
   List<UserListModel> allUserList;
@@ -170,6 +171,7 @@ class Db {
     senderEmail,
     receiverId,
     receiverEmail,
+    paymentMethod,
     pickingLocation,
     pickingCoordinate,
     packageType,
@@ -210,6 +212,7 @@ class Db {
     this.senderAddress = senderAddress;
     this.receiverAddress = receiverAddress;
     this.servicePhone = servicePhone;
+    this.paymentMethod=paymentMethod;
     this.price = price;
     this.packageValue = packageValue;
     //DatabaseReference orders =
@@ -247,7 +250,8 @@ class Db {
           'receiverAddress': receiverAddress, // receiver address
           'servicePhone': servicePhone, // receiver address
           'price': price, // receiver address
-          'packageValue': packageValue, // receiver address
+          'packageValue': packageValue,
+          'paymentMethod': packageValue,// receiver address
         })
         .then((value) => print("Order Added"))
         .catchError((error) => print("Failed to add Order: $error"));

@@ -211,8 +211,7 @@ class _LocationPage extends State<LocationPage> {
                       pointPhoneController.text,
                       receiverAddressController.text,
                       receiverAddressController.text,
-                      priceController.text,
-                      servicePhoneController.text,
+                      priceController.text
                       packageValueController.text);
 
                   // newOrder();
@@ -240,7 +239,6 @@ class _LocationPage extends State<LocationPage> {
                             orderType,
                             receiverPhoneController.text,
                             pointPhoneController.text,
-                            servicePhoneController.text,
                             receiverAddressController.text,
                             packageValueController.text),
                       ));

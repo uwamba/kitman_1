@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:knitman/TabWidget.dart';
 
+import 'Database/Db.dart';
 import 'MyVouchers.dart';
 import 'generated/l10n.dart';
 import 'model/AddressModel.dart';
@@ -17,6 +18,7 @@ import 'util/DataFile.dart';
 import 'util/SizeConfig.dart';
 
 class PreferencePage extends StatefulWidget {
+
   final status,
       deliveryTime,
       deliveryDate,
@@ -38,6 +40,7 @@ class PreferencePage extends StatefulWidget {
       receiverPhone,
       pointPhone,
       receiverAddress,
+      senderAddress,
       packageValue;
   PreferencePage(
       this.status,
@@ -61,6 +64,7 @@ class PreferencePage extends StatefulWidget {
       this.receiverPhone,
       this.pointPhone,
       this.receiverAddress,
+      this.senderAddress,
       this.packageValue);
 
   @override
@@ -70,6 +74,7 @@ class PreferencePage extends StatefulWidget {
 }
 
 class _PreferencePage extends State<PreferencePage> {
+  Db db=new Db();
   bool isNotify = false;
   List<AddressModel> addressList = DataFile.getAddressList();
   List<PaymentCardModel> paymentModelList = DataFile.getPaymentCardList();
@@ -492,6 +497,36 @@ class _PreferencePage extends State<PreferencePage> {
                               // builder: (context) => SubmitOrderPage(),
                               // ));
                               if (isCash == true) {
+                                db.addOrder(
+
+                                    widget.status,
+                                    widget.deliveryTime,
+                                    widget.deliveryDate,
+                                    widget.receivedTime,
+                                    widget.receivedDate,
+                                    widget.orderNumber,
+                                    widget.senderId,
+                                    widget.senderEmail,
+                                    widget.receiverId,
+                                    widget.receiverEmail,
+                                    "Cash",
+                                    widget. pickingCoordinate,
+                                    widget.receiverComment,
+                                    widget.priority,
+                                    widget.type,
+                                    widget.weight,
+                                    widget.pointAddress,
+                                    widget.pointCoordinate,
+                                    widget.orderType,
+
+                                    widget.pointPhone,
+                                    widget.receiverPhone,
+                                    widget.senderAddress,
+                                    widget.receiverAddress,
+                                    phoneController.text,
+                                    servicePrice,
+                                    widget.packageValue,
+                                );
 
                                 Navigator.push(
                                     context,
