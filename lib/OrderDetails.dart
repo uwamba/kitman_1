@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:knitman/model/orderList.dart';
 import 'package:knitman/place_picker_custom/place_picker.dart';
 import 'package:timelines/timelines.dart';
@@ -31,14 +32,40 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
     return new Future.value(true);
   }
 
+  Completer _controller = Completer();
+  Map<MarkerId, Marker> markers = {};
+  static final CameraPosition _kGooglePlex = CameraPosition(
+    target: LatLng(40.65790014590701, -73.77194564694435),
+    zoom: 12.0,
+  );
+  List listMarkerIds = [];
+  BitmapDescriptor customIcon1;
+
+  createMarker(context) {
+    if (customIcon1 == null) {
+      ImageConfiguration configuration = createLocalImageConfiguration(context);
+
+      BitmapDescriptor.fromAssetImage(
+              configuration, ConstantData.assetsPath + 'food-delivery.png')
+          .then((icon) {
+        setState(() {
+          customIcon1 = icon;
+        });
+      });
+    }
+  }
+
   List<TimeLineModel> timeLineModel = [];
   @override
   Widget build(BuildContext context) {
+    PolylineId polylineId = PolylineId("area");
     SizeConfig().init(context);
     double margin = ConstantWidget.getScreenPercentSize(context, 2);
+    double height = ConstantWidget.getScreenPercentSize(context, 40);
     double bottomHeight = SizeConfig.safeBlockVertical * 20;
 
     double bottomImageHeight = ConstantWidget.getPercentSize(bottomHeight, 50);
+    SizeConfig().init(context);
 
     timeLineModel.clear();
     TimeLineModel model = new TimeLineModel();
@@ -76,15 +103,78 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
             child: ListView(
               children: [
                 Container(
-                  width: double.infinity,
-                  color: Colors.green,
-                  padding: EdgeInsets.all(margin),
-                  child: ConstantWidget.getTextWidget(
-                      "Complete Order",
-                      Colors.white,
-                      TextAlign.start,
-                      FontWeight.w500,
-                      ConstantData.font18Px),
+                  height: height,
+                  child: Stack(
+                    children: [
+                      Container(
+                        height: height,
+                        width: double.infinity,
+                        child: GoogleMap(
+                          initialCameraPosition: _kGooglePlex,
+                          onTap: (_) {},
+                          markers: Set.of(markers.values),
+                          polylines: Set<Polyline>.of(<Polyline>[
+                            Polyline(
+                                polylineId: polylineId,
+                                points: getPoints(),
+                                width: 5,
+                                color: Colors.green,
+                                visible: true),
+                          ]),
+                          onMapCreated: (GoogleMapController controler) {
+                            print("complete-----true");
+                            _controller.complete(controler);
+
+                            MarkerId markerId1 = MarkerId("1");
+                            MarkerId markerId2 = MarkerId("2");
+                            MarkerId markerId3 = MarkerId("3");
+                            MarkerId markerId4 = MarkerId("4");
+                            MarkerId markerId5 = MarkerId("5");
+                            MarkerId markerId6 = MarkerId("6");
+
+                            listMarkerIds.add(markerId1);
+                            listMarkerIds.add(markerId2);
+                            listMarkerIds.add(markerId3);
+                            listMarkerIds.add(markerId4);
+                            listMarkerIds.add(markerId5);
+                            listMarkerIds.add(markerId6);
+
+                            Marker marker1 = Marker(
+                                markerId: markerId1,
+                                position: LatLng(
+                                    40.65790014590701, -73.77194564694435),
+                                icon: customIcon1
+                                // LatLng(21.214571209464843, 72.88491829958917),
+                                );
+
+                            Marker marker2 = Marker(
+                              markerId: markerId2,
+                              position:
+                                  LatLng(40.65214565261112, -73.8060743777546),
+
+                              // LatLng(21.21103054325307, 72.89371594512971),
+                            );
+
+                            setState(() {
+                              markers[markerId1] = marker1;
+                              markers[markerId2] = marker2;
+                            });
+                          },
+                        ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        color: Colors.green,
+                        padding: EdgeInsets.all(margin),
+                        child: ConstantWidget.getTextWidget(
+                            widget.activeOrderModel.deliveryDate,
+                            Colors.white,
+                            TextAlign.start,
+                            FontWeight.w500,
+                            ConstantData.font18Px),
+                      )
+                    ],
+                  ),
                 ),
                 Container(
                   child: Column(

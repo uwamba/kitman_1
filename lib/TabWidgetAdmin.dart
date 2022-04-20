@@ -1,9 +1,13 @@
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:knitman/Database/Db.dart';
-import 'package:knitman/model/UserlListModel.dart';
+import 'package:knitman/Database/UserPresence.dart';
+import 'package:knitman/OrderDetails.dart';
+import 'package:knitman/model/onlineUser.dart';
 import 'package:knitman/model/orderList.dart';
 import 'package:timelines/timelines.dart';
 
@@ -13,8 +17,6 @@ import 'CompleteOrderDetail.dart';
 import 'EditProfilePage.dart';
 import 'MyVouchers.dart';
 import 'NotificationPage.dart';
-import 'OrderDetail.dart';
-import 'OrderDetails.dart';
 import 'RatingPage.dart';
 import 'ResetPasswordPage.dart';
 import 'SchedulePage.dart';
@@ -52,16 +54,17 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
   MotionTabBar motionTabBar;
   MotionTabController _tabController;
   int _selectedIndex = 0;
+  List<OrderList> activeOrderListModel;
   List<ChatModel> chatUserList = DataFile.getChatUserList();
-
+  List<TimeLineModel> timeLineModel = [];
   int tabPosition = 0;
   List<String> s = ["Orders", "New Order", "Chat", "Profile"];
   List<NewOrderTypeModel> orderTypeList = DataFile.getOrderTypeList();
   List<CompletedOrderModel> completeOrderList = DataFile.getCompleteOrder();
   List<ActiveOrderModel> activeOrderList = DataFile.getActiveOrderList();
-  List<OrderList>activeOrderListModel;
-  bool isAppbarVisible = true;
 
+  bool isAppbarVisible = true;
+  String presence;
   int themMode;
   bool isFirstTime = false;
 
@@ -76,9 +79,16 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
     setState(() {});
   }
 
+  void setPresence() async {
+    String phone = await PrefData.getPhoneNumber();
+    String email = await PrefData.getEmail();
+    UserPresence(phone, email).updateUserPresence();
+  }
+
   @override
   void initState() {
     // TODO: implement initState
+    setPresence();
     super.initState();
 
     getThemeMode();
@@ -86,6 +96,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
         initialIndex: _selectedIndex, length: s.length, vsync: this);
   }
 
+  List<TimeLineModel> processes;
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
@@ -155,6 +166,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
     double leftMargin = MediaQuery.of(context).size.width * 0.04;
     double height = ConstantWidget.getScreenPercentSize(context, 15);
     double imageSize = ConstantWidget.getPercentSize(height, 60);
+    final usersQuery = FirebaseDatabase.instance.ref('presence');
     Db db = new Db();
     return Container(
       color: ConstantData.bgColor,
@@ -171,34 +183,37 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
             Padding(
               padding: EdgeInsets.only(left: leftMargin, bottom: leftMargin),
               child: ConstantWidget.getTextWidget(
-                  S.of(context).online,
+                  S.of(context).drivers,
                   ConstantData.mainTextColor,
                   TextAlign.start,
                   FontWeight.w800,
                   ConstantWidget.getScreenPercentSize(context, 2.5)),
             ),
             Expanded(
-              child: FutureBuilder<List<UserListModel>>(
-                builder: (context, orderSnap) {
-                  if (!orderSnap.hasData) {
-                    return Center(child: CircularProgressIndicator());
-                  } else {
-                    return ListView.builder(
-                      itemCount: orderSnap.data.length,
-                      itemBuilder: (context, index) {
-                        //OrderList listModel = orderSnap.data[index];
-                        return chatCellUser(orderSnap.data[index], index);
-                      },
-                    );
-                  }
+              child: FirebaseAnimatedList(
+                shrinkWrap: true,
+                query: usersQuery,
+                itemBuilder: (BuildContext context, DataSnapshot snapshot,
+                    Animation<double> animation, int index) {
+                  List<onlineUser> ls;
+                  final parsed =
+                      snapshot.children.map((doc) => doc.value).toList();
+
+                  List lis = parsed.toList();
+
+                  return chatCellUser(lis, index);
                 },
-                future: db.usersList(),
               ),
             )
           ],
         ),
       ),
     );
+  }
+
+  DateTime convertToTime(int time) {
+    //DateFormat formatter = DateFormat('yyyyMMddHHmmssms');
+    return DateTime.fromMillisecondsSinceEpoch(time);
   }
 
   Widget chatCell(ChatModel chatModel, int index) {
@@ -330,12 +345,11 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
     );
   }
 
-  Widget chatCellUser(UserListModel userModel, int index) {
+  Widget chatCellUser(List users, int index) {
     double allMargin = ConstantWidget.getScreenPercentSize(context, 1);
     double height = ConstantWidget.getScreenPercentSize(context, 13);
 
     double imageSize = ConstantWidget.getPercentSize(height, 60);
-
     return InkWell(
       child: Container(
         height: height,
@@ -381,12 +395,13 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                           height: double.infinity,
                           width: double.infinity,
                           decoration: BoxDecoration(
-                              color: Colors.green, shape: BoxShape.circle),
+                              color: (true) ? Colors.green : Colors.red,
+                              shape: BoxShape.circle),
                         ),
                       ),
                     ),
                   )),
-                  visible: (true),
+                  visible: (users[2]),
                 )
               ],
             ),
@@ -404,7 +419,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                       Row(
                         children: [
                           ConstantWidget.getCustomText(
-                              userModel.firstName + " " + userModel.lastName,
+                              users[0].toString(),
                               ConstantData.mainTextColor,
                               1,
                               TextAlign.start,
@@ -412,7 +427,29 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                               ConstantWidget.getPercentSize(height, 16)),
                           new Spacer(),
                           ConstantWidget.getCustomText(
-                              userModel.created,
+                              convertToTime(users[1]).toString(),
+                              ConstantData.textColor,
+                              1,
+                              TextAlign.start,
+                              FontWeight.w700,
+                              ConstantWidget.getPercentSize(height, 14)),
+                        ],
+                      ),
+                      SizedBox(
+                        height: ConstantWidget.getPercentSize(height, 6),
+                      ),
+                      Row(
+                        children: [
+                          ConstantWidget.getCustomText(
+                              users[0].toString(),
+                              ConstantData.mainTextColor,
+                              1,
+                              TextAlign.start,
+                              FontWeight.bold,
+                              ConstantWidget.getPercentSize(height, 16)),
+                          new Spacer(),
+                          ConstantWidget.getCustomText(
+                              convertToTime(users[1]).toString(),
                               ConstantData.textColor,
                               1,
                               TextAlign.start,
@@ -424,7 +461,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                         height: ConstantWidget.getPercentSize(height, 6),
                       ),
                       ConstantWidget.getCustomText(
-                          userModel.email,
+                          users[0].toString(),
                           ConstantData.textColor,
                           2,
                           TextAlign.start,
@@ -444,12 +481,12 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
         ),
       ),
       onTap: () {
-        //Navigator.push(
-        //context,
-        // MaterialPageRoute(
-        // builder: (context) => ChatScreen(
-        //user: chats[0].sender,
-        //chatModel: userModel,
+        // Navigator.push(
+        //   context,
+        //  MaterialPageRoute(
+        //    builder: (context) => ChatScreen(
+        //   user: chats[0].sender,
+        //  chatModel: chatModel,
         // ),
         //));
       },
@@ -765,13 +802,12 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                             ),
                           ),
                         ),
-                        onTap: () async {
-                          activeOrderListModel = await db.activeOrderList();
+                        onTap: () {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => ActiveOrderDetail(
-                                    activeOrderListModel.elementAt(index)),
+                                builder: (context) => CompleteOrderDetail(
+                                    DataFile.getActiveOrderList()[0]),
                               ));
                         },
                       );
@@ -788,11 +824,11 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
   }
 
   tabActiveWidget() {
-    Db db = new Db();
     double margin = ConstantWidget.getScreenPercentSize(context, 2);
+    Db db = new Db();
+    PrefData.setIsFirstTime(false);
 
     if (!widget.isDataShow) {
-      PrefData.setIsFirstTime(false);
       return Container(
         width: double.infinity,
         margin:
@@ -865,83 +901,107 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
       return Container(
         color: ConstantData.bgColor,
         width: double.infinity,
-        child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: activeOrderList.length,
-          itemBuilder: (context, index) {
-            return InkWell(
-              child: Container(
-                padding: EdgeInsets.all(margin),
-                color: ConstantData.cellColor,
-                margin: EdgeInsets.only(
-                    bottom: ConstantWidget.getScreenPercentSize(context, 1)),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        ConstantWidget.getTextWidget(
-                            activeOrderList[index].price,
-                            ConstantData.mainTextColor,
-                            TextAlign.start,
-                            FontWeight.w400,
-                            ConstantData.font22Px),
-                        new Spacer(),
-                        ConstantWidget.getTextWidget(
-                            activeOrderList[index].orderNumber,
-                            Colors.grey,
-                            TextAlign.start,
-                            FontWeight.w400,
-                            ConstantData.font15Px),
-                      ],
-                    ),
-                    SizedBox(
-                      height: (margin / 1.5),
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ConstantWidget.getTextWidget(
-                              activeOrderList[index].orderText,
-                              Colors.green,
-                              TextAlign.start,
-                              FontWeight.w400,
-                              ConstantData.font18Px),
-                        ),
-                        InkWell(
-                          child: Icon(
-                            Icons.notifications,
-                            size: (margin * 1.5),
-                            color: ConstantData.primaryColor,
+        child: FutureBuilder<List<OrderList>>(
+          builder: (context, orderSnap) {
+            if (!orderSnap.hasData) {
+              return Center(child: CircularProgressIndicator());
+            } else {
+              return ListView.builder(
+                itemCount: orderSnap.data.length,
+                itemBuilder: (context, index) {
+                  //OrderList listModel = orderSnap.data[index];
+                  timeLineModel.clear();
+                  TimeLineModel model = new TimeLineModel();
+                  model.text = orderSnap.data[index].pickingLocation;
+                  model.contact = orderSnap.data[index].pointLocation;
+                  model.isComplete = true;
+                  timeLineModel.add(model);
+
+                  model.text = orderSnap.data[index].pickingLocation;
+                  model.contact = orderSnap.data[index].pointLocation;
+                  model.isComplete = true;
+                  timeLineModel.add(model);
+
+                  return InkWell(
+                    child: Container(
+                      padding: EdgeInsets.all(margin),
+                      color: ConstantData.cellColor,
+                      margin: EdgeInsets.only(
+                          bottom:
+                              ConstantWidget.getScreenPercentSize(context, 1)),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              ConstantWidget.getTextWidget(
+                                  orderSnap.data[index].senderId,
+                                  ConstantData.mainTextColor,
+                                  TextAlign.start,
+                                  FontWeight.w400,
+                                  ConstantData.font22Px),
+                              new Spacer(),
+                              ConstantWidget.getTextWidget(
+                                  orderSnap.data[index].deliveryDate,
+                                  Colors.grey,
+                                  TextAlign.start,
+                                  FontWeight.w400,
+                                  ConstantData.font15Px),
+                            ],
                           ),
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => NotificationPage(),
-                                ));
-                          },
-                        )
-                      ],
+                          SizedBox(
+                            height: (margin / 1.5),
+                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ConstantWidget.getTextWidget(
+                                    orderSnap.data[index].status,
+                                    Colors.green,
+                                    TextAlign.start,
+                                    FontWeight.w400,
+                                    ConstantData.font18Px),
+                              ),
+                              InkWell(
+                                child: Icon(
+                                  Icons.notifications,
+                                  size: (margin * 1.5),
+                                  color: ConstantData.primaryColor,
+                                ),
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            NotificationPage(),
+                                      ));
+                                },
+                              )
+                            ],
+                          ),
+                          SizedBox(
+                            height: (margin / 1.5),
+                          ),
+                          _DeliveryProcesses(
+                            processes: timeLineModel,
+                          )
+                        ],
+                      ),
                     ),
-                    SizedBox(
-                      height: (margin / 1.5),
-                    ),
-                    _DeliveryProcesses(
-                        processes: activeOrderList[index].modelList),
-                  ],
-                ),
-              ),
-              onTap: () async {
-                activeOrderListModel = await db.activeOrderList();
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ActiveOrderDetail(
-                          activeOrderListModel.elementAt(index)),
-                    ));
-              },
-            );
+                    onTap: () async {
+                      activeOrderListModel = await db.activeOrderList();
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ActiveOrderDetail(
+                                activeOrderListModel.elementAt(index)),
+                          ));
+                    },
+                  );
+                },
+              );
+            }
           },
+          future: db.completedOrderList(),
         ),
       );
     }

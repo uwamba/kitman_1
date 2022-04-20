@@ -31,7 +31,7 @@ class Db {
       packageValue,
       servicePhone,
       price,
-     paymentMethod;
+      paymentMethod;
   CollectionReference orders;
   List<OrderList> completeOrderList;
   List<UserListModel> allUserList;
@@ -66,7 +66,6 @@ class Db {
     senderAddress = "";
     receiverAddress = "";
     servicePhone = "";
-
   }
 
   Future<List<OrderList>> completedOrderList() async {
@@ -184,10 +183,9 @@ class Db {
     receiverPhone,
     senderAddress,
     receiverAddress,
-      servicePhone,
+    servicePhone,
     price,
     packageValue,
-
   ) async {
     this.status = status;
     this.deliveryTime = deliveryTime;
@@ -212,7 +210,7 @@ class Db {
     this.senderAddress = senderAddress;
     this.receiverAddress = receiverAddress;
     this.servicePhone = servicePhone;
-    this.paymentMethod=paymentMethod;
+    this.paymentMethod = paymentMethod;
     this.price = price;
     this.packageValue = packageValue;
     //DatabaseReference orders =
@@ -251,7 +249,7 @@ class Db {
           'servicePhone': servicePhone, // receiver address
           'price': price, // receiver address
           'packageValue': packageValue,
-          'paymentMethod': packageValue,// receiver address
+          'paymentMethod': paymentMethod, // receiver address
         })
         .then((value) => print("Order Added"))
         .catchError((error) => print("Failed to add Order: $error"));

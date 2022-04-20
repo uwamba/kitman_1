@@ -717,6 +717,16 @@ class S {
     );
   }
 
+  /// `driver`
+  String get drivers {
+    return Intl.message(
+      'Drivers',
+      name: 'Drivers',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Chat`
   String get chat {
     return Intl.message(

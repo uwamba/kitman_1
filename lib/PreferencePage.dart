@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'dart:ffi';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:knitman/TabWidget.dart';
+import 'package:knitman/util/PrefData.dart';
 
 import 'Database/Db.dart';
 import 'MyVouchers.dart';
@@ -18,7 +18,6 @@ import 'util/DataFile.dart';
 import 'util/SizeConfig.dart';
 
 class PreferencePage extends StatefulWidget {
-
   final status,
       deliveryTime,
       deliveryDate,
@@ -74,7 +73,7 @@ class PreferencePage extends StatefulWidget {
 }
 
 class _PreferencePage extends State<PreferencePage> {
-  Db db=new Db();
+  Db db = new Db();
   bool isNotify = false;
   List<AddressModel> addressList = DataFile.getAddressList();
   List<PaymentCardModel> paymentModelList = DataFile.getPaymentCardList();
@@ -89,8 +88,11 @@ class _PreferencePage extends State<PreferencePage> {
   String bottomButton = "Continue";
 
   List<PaymentSelectModel> list = DataFile.getPaymentSelect();
-
+  String userId;
   bool isCash = true;
+  void getUser() async {
+    userId = await PrefData.getPhoneNumber();
+  }
 
   Future<bool> _requestPop() {
     Navigator.of(context).pop();
@@ -115,7 +117,9 @@ class _PreferencePage extends State<PreferencePage> {
 
   double margin;
   double radius;
-
+  @override
+  // TODO: implement widget
+  PreferencePage get widget => super.widget;
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
@@ -497,41 +501,40 @@ class _PreferencePage extends State<PreferencePage> {
                               // builder: (context) => SubmitOrderPage(),
                               // ));
                               if (isCash == true) {
-                                db.addOrder(
-
-                                    widget.status,
-                                    widget.deliveryTime,
-                                    widget.deliveryDate,
-                                    widget.receivedTime,
-                                    widget.receivedDate,
-                                    widget.orderNumber,
-                                    widget.senderId,
-                                    widget.senderEmail,
-                                    widget.receiverId,
-                                    widget.receiverEmail,
-                                    "Cash",
-                                    widget. pickingCoordinate,
-                                    widget.receiverComment,
-                                    widget.priority,
-                                    widget.type,
-                                    widget.weight,
-                                    widget.pointAddress,
-                                    widget.pointCoordinate,
-                                    widget.orderType,
-                                    widget.pointPhone,
-                                    widget.receiverPhone,
-                                    widget.senderAddress,
-                                    widget.receiverAddress,
-                                    phoneController.text,
-                                    servicePrice,
-                                    widget.packageValue,
-                                );
-
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => TabWidget(true),
-                                    ));
+                                db
+                                    .addOrder(
+                                      widget.status,
+                                      widget.deliveryTime,
+                                      widget.deliveryDate,
+                                      widget.receivedTime,
+                                      widget.receivedDate,
+                                      widget.orderNumber,
+                                      widget.senderId,
+                                      widget.senderEmail,
+                                      widget.receiverId,
+                                      widget.receiverEmail,
+                                      "Cash",
+                                      widget.pickingCoordinate,
+                                      widget.receiverComment,
+                                      widget.type,
+                                      widget.priority,
+                                      widget.weight,
+                                      widget.pointCoordinate,
+                                      widget.pointAddress,
+                                      widget.orderType,
+                                      widget.pointPhone,
+                                      widget.receiverPhone,
+                                      widget.senderAddress,
+                                      widget.receiverAddress,
+                                      phoneController.text,
+                                      servicePrice.toString(),
+                                      widget.packageValue,
+                                    )
+                                    .whenComplete(() => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => TabWidget(true),
+                                        )));
                               } else {
                                 bottomDeliverDialog();
                               }
@@ -726,7 +729,7 @@ class _PreferencePage extends State<PreferencePage> {
         break;
     }
     this.price = newPrice.toString();
-    servicePrice=newPrice;
+    servicePrice = newPrice;
     return newPrice;
   }
 
@@ -734,7 +737,6 @@ class _PreferencePage extends State<PreferencePage> {
     var widget = SizedBox(
       height: (margin * 1.2),
     );
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -834,12 +836,42 @@ class _PreferencePage extends State<PreferencePage> {
                 widget,
                 widget,
                 ConstantWidget.getBottomText(context, "Continue", () {
-
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => TabWidget(true),
-                      ));
+                  if (isCash == false) {
+                    db
+                        .addOrder(
+                          super.widget.status,
+                          super.widget.deliveryTime,
+                          super.widget.deliveryDate,
+                          super.widget.receivedTime,
+                          super.widget.receivedDate,
+                          super.widget.orderNumber,
+                          userId,
+                          super.widget.senderEmail,
+                          super.widget.receiverId,
+                          super.widget.receiverEmail,
+                          "Momo",
+                          super.widget.pickingCoordinate,
+                          super.widget.receiverComment,
+                          super.widget.type,
+                          super.widget.priority,
+                          super.widget.weight,
+                          super.widget.pointCoordinate,
+                          super.widget.pointAddress,
+                          super.widget.orderType,
+                          super.widget.pointPhone,
+                          super.widget.receiverPhone,
+                          super.widget.senderAddress,
+                          super.widget.receiverAddress,
+                          phoneController.text,
+                          servicePrice.toString(),
+                          super.widget.packageValue,
+                        )
+                        .whenComplete(() => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TabWidget(true),
+                            )));
+                  }
                 })
               ],
             ),
