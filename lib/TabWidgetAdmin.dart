@@ -82,7 +82,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
   void setPresence() async {
     String phone = await PrefData.getPhoneNumber();
     String email = await PrefData.getEmail();
-    String lastName= await PrefData.getLastName();
+    String lastName = await PrefData.getLastName();
     String firstName = await PrefData.getFirstName();
     UserPresence(phone, email, lastName, firstName).updateUserPresence();
   }
@@ -427,7 +427,6 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                               TextAlign.start,
                               FontWeight.bold,
                               ConstantWidget.getPercentSize(height, 13)),
-
                         ],
                       ),
                       SizedBox(
@@ -436,8 +435,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                       Row(
                         children: [
                           ConstantWidget.getCustomText(
-
-                              users[3].toString()+ "  " + users[1].toString(),
+                              users[3].toString() + "  " + users[1].toString(),
                               ConstantData.mainTextColor,
                               1,
                               TextAlign.start,
@@ -445,13 +443,9 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                               ConstantWidget.getPercentSize(height, 13)),
                         ],
                       ),
-
-
-
                       SizedBox(
                         height: ConstantWidget.getPercentSize(height, 6),
                       ),
-
                       ConstantWidget.getCustomText(
                           convertToTime(users[4]).toString(),
                           ConstantData.textColor,
@@ -462,22 +456,17 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                       SizedBox(
                         height: ConstantWidget.getPercentSize(height, 6),
                       ),
-                         Row(
-                           children: [
-                             ConstantWidget.getCustomText(
-
-                                 users[2].toString(),
-                                 ConstantData.mainTextColor,
-                                 1,
-                                 TextAlign.start,
-                                 FontWeight.bold,
-                                 ConstantWidget.getPercentSize(height, 13)),
-
-
-                           ],
-
-
-                         )
+                      Row(
+                        children: [
+                          ConstantWidget.getCustomText(
+                              users[2].toString(),
+                              ConstantData.mainTextColor,
+                              1,
+                              TextAlign.start,
+                              FontWeight.bold,
+                              ConstantWidget.getPercentSize(height, 13)),
+                        ],
+                      )
                     ],
                   )),
                   Column(
@@ -732,7 +721,8 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                                   height: (margin / 2),
                                 ),
                                 ConstantWidget.getCustomText(
-                                    orderSnap.data[index].senderAddress,
+                                    orderSnap.data[index].senderAddress
+                                        .toString(),
                                     Colors.grey,
                                     2,
                                     TextAlign.start,
@@ -923,8 +913,8 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                   //OrderList listModel = orderSnap.data[index];
                   timeLineModel.clear();
                   TimeLineModel model = new TimeLineModel();
-                  model.text = orderSnap.data[index].pickingLocation;
-                  model.contact = orderSnap.data[index].pointLocation;
+                  model.text = orderSnap.data[index].senderAddress;
+                  model.contact = orderSnap.data[index].receiverAddress;
                   model.isComplete = true;
                   timeLineModel.add(model);
 
@@ -945,7 +935,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                           Row(
                             children: [
                               ConstantWidget.getTextWidget(
-                                  orderSnap.data[index].senderId,
+                                  orderSnap.data[index].price,
                                   ConstantData.mainTextColor,
                                   TextAlign.start,
                                   FontWeight.w400,
@@ -966,7 +956,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                             children: [
                               Expanded(
                                 child: ConstantWidget.getTextWidget(
-                                    orderSnap.data[index].status,
+                                    orderSnap.data[index].packageWeight,
                                     Colors.green,
                                     TextAlign.start,
                                     FontWeight.w400,

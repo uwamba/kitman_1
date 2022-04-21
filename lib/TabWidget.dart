@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:knitman/Database/Db.dart';
-import 'package:knitman/Database/UserPresence.dart';
 import 'package:knitman/OrderDetails.dart';
 import 'package:knitman/model/orderList.dart';
 import 'package:timelines/timelines.dart';
@@ -60,7 +59,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
   List<NewOrderTypeModel> orderTypeList = DataFile.getOrderTypeList();
   List<CompletedOrderModel> completeOrderList = DataFile.getCompleteOrder();
   List<ActiveOrderModel> activeOrderList = DataFile.getActiveOrderList();
-  List<OrderList>activeOrderListModel;
+  List<OrderList> activeOrderListModel;
   bool isAppbarVisible = true;
 
   int themMode;
@@ -76,8 +75,6 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
     ConstantData.setThemePosition();
     setState(() {});
   }
-
-
 
   @override
   void initState() {
@@ -973,7 +970,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                                   ),
                                   ConstantWidget.getCustomText(
                                       "Package type: " +
-                                      orderSnap.data[index].packageType,
+                                          orderSnap.data[index].packageType,
                                       Colors.grey,
                                       2,
                                       TextAlign.start,

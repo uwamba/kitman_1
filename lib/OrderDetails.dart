@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:knitman/model/orderList.dart';
 import 'package:knitman/place_picker_custom/place_picker.dart';
+import 'package:location/location.dart';
 import 'package:timelines/timelines.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -33,8 +34,10 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
   }
 
   Completer _controller = Completer();
-  Map<MarkerId, Marker> markers = {};
-  static final CameraPosition _kGooglePlex = CameraPosition(
+  CameraPosition _currentPosition;
+  final Set<Marker> markers = Set();
+  final Completer<GoogleMapController> mapController = Completer();
+  static CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(40.65790014590701, -73.77194564694435),
     zoom: 12.0,
   );
@@ -59,6 +62,8 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
   @override
   Widget build(BuildContext context) {
     PolylineId polylineId = PolylineId("area");
+    final Set<Polyline> polys = Set();
+    moveToSenderLocation();
     SizeConfig().init(context);
     double margin = ConstantWidget.getScreenPercentSize(context, 2);
     double height = ConstantWidget.getScreenPercentSize(context, 40);
@@ -78,6 +83,10 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
     model.contact = widget.activeOrderModel.pointLocation;
     model.isComplete = true;
     timeLineModel.add(model);
+
+    print(widget.activeOrderModel.receiverAddress +
+        "sssssssssssssssssssss" +
+        widget.activeOrderModel.senderAddress);
 
     return WillPopScope(
         child: Scaffold(
@@ -111,53 +120,41 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
                         width: double.infinity,
                         child: GoogleMap(
                           initialCameraPosition: _kGooglePlex,
-                          onTap: (_) {},
-                          markers: Set.of(markers.values),
-                          polylines: Set<Polyline>.of(<Polyline>[
-                            Polyline(
-                                polylineId: polylineId,
-                                points: getPoints(),
-                                width: 5,
-                                color: Colors.green,
-                                visible: true),
-                          ]),
+                          onTap: (latLng) {
+                            moveToLocation(latLng);
+                          },
+                          mapType: MapType.normal,
+                          markers: markers,
+                          myLocationButtonEnabled: true,
+                          myLocationEnabled: true,
+                          polylines: polys,
                           onMapCreated: (GoogleMapController controler) {
                             print("complete-----true");
                             _controller.complete(controler);
-
-                            MarkerId markerId1 = MarkerId("1");
-                            MarkerId markerId2 = MarkerId("2");
-                            MarkerId markerId3 = MarkerId("3");
-                            MarkerId markerId4 = MarkerId("4");
-                            MarkerId markerId5 = MarkerId("5");
-                            MarkerId markerId6 = MarkerId("6");
-
-                            listMarkerIds.add(markerId1);
-                            listMarkerIds.add(markerId2);
-                            listMarkerIds.add(markerId3);
-                            listMarkerIds.add(markerId4);
-                            listMarkerIds.add(markerId5);
-                            listMarkerIds.add(markerId6);
-
-                            Marker marker1 = Marker(
-                                markerId: markerId1,
-                                position: LatLng(
-                                    40.65790014590701, -73.77194564694435),
-                                icon: customIcon1
-                                // LatLng(21.214571209464843, 72.88491829958917),
-                                );
-
-                            Marker marker2 = Marker(
-                              markerId: markerId2,
-                              position:
-                                  LatLng(40.65214565261112, -73.8060743777546),
-
-                              // LatLng(21.21103054325307, 72.89371594512971),
-                            );
-
+                            moveToSenderLocation();
                             setState(() {
-                              markers[markerId1] = marker1;
-                              markers[markerId2] = marker2;
+                              polys.add(Polyline(
+                                  polylineId: polylineId,
+                                  points: getPoints(
+                                      widget.activeOrderModel.senderAddress
+                                          as LatLng,
+                                      widget.activeOrderModel.receiverAddress
+                                          as LatLng),
+                                  width: 5,
+                                  color: Colors.green,
+                                  visible: true));
+                              markers.add(Marker(
+                                icon: BitmapDescriptor.defaultMarker,
+                                position: widget
+                                    .activeOrderModel.receiverAddress as LatLng,
+                                markerId: MarkerId("Delivery Location"),
+                              ));
+                              markers.add(Marker(
+                                icon: BitmapDescriptor.defaultMarker,
+                                position: widget.activeOrderModel.senderAddress
+                                    as LatLng,
+                                markerId: MarkerId("Picking Location"),
+                              ));
                             });
                           },
                         ),
@@ -439,15 +436,6 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
         onWillPop: _requestPop);
   }
 
-  getPoints() {
-    return [
-      LatLng(40.65790014590701, -73.77194564694435),
-      // LatLng(21.214571209464843, 72.88491829958917),
-      LatLng(40.65214565261112, -73.8060743777546),
-      // LatLng(21.21103054325307, 72.89371594512971),
-    ];
-  }
-
   getColumnCell(String s, String s1) {
     double margin = ConstantWidget.getScreenPercentSize(context, 2);
 
@@ -466,12 +454,48 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
     );
   }
 
-  void _callNumber() async {
-    String s = "89898989";
-
-    String url = "tel:" + s;
-    await launch(url);
+  void onMapCreated(GoogleMapController controller) {
+    this.mapController.complete(controller);
+    moveToSenderLocation();
+    //getDirections();
   }
+
+  void moveToSenderLocation() {
+    Location().getLocation().then((locationData) {
+      LatLng target = LatLng(locationData.latitude, locationData.longitude);
+      _kGooglePlex = CameraPosition(
+        target: widget.activeOrderModel.senderAddress as LatLng,
+        zoom: 12,
+      );
+      moveToLocation(target);
+    }).catchError((error) {
+      // TODO: Handle the exception here
+      print(error);
+    });
+  }
+
+  void moveToLocation(LatLng latLng) {
+    this.mapController.future.then((controller) {
+      controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+            CameraPosition(target: latLng, zoom: 12.0)),
+      );
+    });
+  }
+}
+
+getPoints(LatLng a, LatLng b) {
+  return [
+    a,
+    b,
+  ];
+}
+
+void _callNumber() async {
+  String s = "89898989";
+
+  String url = "tel:" + s;
+  await launch(url);
 }
 
 class _DeliveryProcesses extends StatelessWidget {
