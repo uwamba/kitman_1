@@ -2,9 +2,11 @@ import 'package:firebase_database/firebase_database.dart';
 
 class UserPresence {
   String userId;
+  String firstName;
+  String lastName;
   String email;
 
-  UserPresence(this.userId, this.email);
+  UserPresence(this.userId,this.firstName,this.lastName,this.email);
   void updateUserPresence() async {
     // userId = PrefData.getPhoneNumber();
     DatabaseReference ref =
@@ -12,11 +14,12 @@ class UserPresence {
 
     Map<String, dynamic> presenceStatusTrue = {
       'UID': userId,
-      'presence': true,
+      'firstName': firstName,
+      'lastName': lastName,
       'email': email,
+      'presence': true,
       'last_seen': DateTime.now().millisecondsSinceEpoch,
     };
-
     Map<String, dynamic> presenceStatusFalse = {
       'UID': userId,
       'presence': false,

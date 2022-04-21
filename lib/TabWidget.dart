@@ -77,15 +77,12 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
     setState(() {});
   }
 
-  void setPresence() async {
-    String phone = await PrefData.getPhoneNumber();
-    UserPresence(phone).updateUserPresence();
-  }
+
 
   @override
   void initState() {
     // TODO: implement initState
-    setPresence();
+    //setPresence();
     CollectionReference collectionRef =
         FirebaseFirestore.instance.collection('orders');
     Db db = new Db();

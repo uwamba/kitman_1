@@ -82,7 +82,9 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
   void setPresence() async {
     String phone = await PrefData.getPhoneNumber();
     String email = await PrefData.getEmail();
-    UserPresence(phone, email).updateUserPresence();
+    String lastName= await PrefData.getLastName();
+    String firstName = await PrefData.getFirstName();
+    UserPresence(phone, email, lastName, firstName).updateUserPresence();
   }
 
   @override
@@ -401,7 +403,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                       ),
                     ),
                   )),
-                  visible: (users[2]),
+                  visible: (users[5]),
                 )
               ],
             ),
@@ -424,15 +426,8 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                               1,
                               TextAlign.start,
                               FontWeight.bold,
-                              ConstantWidget.getPercentSize(height, 16)),
-                          new Spacer(),
-                          ConstantWidget.getCustomText(
-                              convertToTime(users[1]).toString(),
-                              ConstantData.textColor,
-                              1,
-                              TextAlign.start,
-                              FontWeight.w700,
-                              ConstantWidget.getPercentSize(height, 14)),
+                              ConstantWidget.getPercentSize(height, 13)),
+
                         ],
                       ),
                       SizedBox(
@@ -441,32 +436,48 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                       Row(
                         children: [
                           ConstantWidget.getCustomText(
-                              users[0].toString(),
+
+                              users[3].toString()+ "  " + users[1].toString(),
                               ConstantData.mainTextColor,
                               1,
                               TextAlign.start,
                               FontWeight.bold,
-                              ConstantWidget.getPercentSize(height, 16)),
-                          new Spacer(),
-                          ConstantWidget.getCustomText(
-                              convertToTime(users[1]).toString(),
-                              ConstantData.textColor,
-                              1,
-                              TextAlign.start,
-                              FontWeight.w700,
-                              ConstantWidget.getPercentSize(height, 14)),
+                              ConstantWidget.getPercentSize(height, 13)),
                         ],
                       ),
+
+
+
                       SizedBox(
                         height: ConstantWidget.getPercentSize(height, 6),
                       ),
+
                       ConstantWidget.getCustomText(
-                          users[0].toString(),
+                          convertToTime(users[4]).toString(),
                           ConstantData.textColor,
                           2,
                           TextAlign.start,
                           FontWeight.w400,
-                          ConstantWidget.getPercentSize(height, 14)),
+                          ConstantWidget.getPercentSize(height, 13)),
+                      SizedBox(
+                        height: ConstantWidget.getPercentSize(height, 6),
+                      ),
+                         Row(
+                           children: [
+                             ConstantWidget.getCustomText(
+
+                                 users[2].toString(),
+                                 ConstantData.mainTextColor,
+                                 1,
+                                 TextAlign.start,
+                                 FontWeight.bold,
+                                 ConstantWidget.getPercentSize(height, 13)),
+
+
+                           ],
+
+
+                         )
                     ],
                   )),
                   Column(
