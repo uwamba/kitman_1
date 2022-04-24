@@ -23,7 +23,7 @@ class DataFile {
 
     PaymentCardModel mainModel = new PaymentCardModel();
     mainModel.id = 1;
-    mainModel.name = "Credit Card";
+    mainModel.name = "Mobile Money";
     mainModel.image = "assets/images/visa.png";
     mainModel.desc = "XXXX XXXX XXXX 1234";
     subCatList.add(mainModel);
@@ -260,7 +260,7 @@ class DataFile {
     List<PaymentSelectModel> introList = [];
     introList.add(PaymentSelectModel("Cash", Icons.attach_money, 1));
     introList
-        .add(PaymentSelectModel("Pay via Card", Icons.credit_card_outlined, 0));
+        .add(PaymentSelectModel("Pay with MOMO", Icons.mobile_friendly, 0));
 
     return introList;
   }

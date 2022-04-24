@@ -1,14 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:knitman/Database/Db.dart';
+import 'package:knitman/Database/UserPresence.dart';
 import 'package:knitman/model/orderList.dart';
 import 'package:timelines/timelines.dart';
 
 import 'AboutUsPage.dart';
 import 'ChatScreen.dart';
-import 'CompleteOrderDetail.dart';
 import 'EditProfilePage.dart';
 import 'MyVouchers.dart';
 import 'NotificationPage.dart';
@@ -60,12 +61,12 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
   List<CompletedOrderModel> completeOrderList = DataFile.getCompleteOrder();
   List<ActiveOrderModel> activeOrderList = DataFile.getActiveOrderList();
   List<TimeLineModel> addressList;
-  List<OrderList>activeOrderListModel;
+  List<OrderList> activeOrderListModel;
   bool isAppbarVisible = true;
 
   int themMode;
   bool isFirstTime = false;
-
+  String phone;
   getThemeMode() async {
     isFirstTime = await PrefData.getIsFirstTime();
 
@@ -77,14 +78,39 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
     setState(() {});
   }
 
+  void setPresence() async {
+    phone = await PrefData.getPhoneNumber();
+    String email = await PrefData.getEmail();
+    String lastName = await PrefData.getLastName();
+    String firstName = await PrefData.getFirstName();
+    UserPresence(phone, email, lastName, firstName).updateUserPresence();
+  }
+
   @override
   void initState() {
     // TODO: implement initState
-    super.initState();
 
+    setPresence();
     getThemeMode();
+
+    CollectionReference collectionRef =
+        FirebaseFirestore.instance.collection('orders');
+    Db db = new Db();
+    collectionRef.snapshots().listen((querySnapshot) {
+      setState(() {
+        querySnapshot?.docChanges?.forEach(
+          (docChange) => {
+            // If you need to do something for each document change, do it here.
+          },
+        );
+        // Anything you might do every time you get a fresh snapshot can be done here.
+        db.activeOrderList();
+        print("changeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+      });
+    });
     _tabController = new MotionTabController(
         initialIndex: _selectedIndex, length: s.length, vsync: this);
+    super.initState();
   }
 
   @override
@@ -1019,15 +1045,15 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
                   //OrderList listModel = orderSnap.data[index];
                   timeLineModel.clear();
                   TimeLineModel model = new TimeLineModel();
-                  model.text = orderSnap.data[index].pickingLocation;
-                  model.contact = orderSnap.data[index].pointLocation;
+                  model.text = orderSnap.data[index].senderLocation;
+                  model.contact = orderSnap.data[index].senderPhone;
                   model.isComplete = true;
                   timeLineModel.add(model);
-
-                  model.text = orderSnap.data[index].pickingLocation;
-                  model.contact = orderSnap.data[index].pointLocation;
-                  model.isComplete = true;
-                  timeLineModel.add(model);
+                  TimeLineModel model2 = new TimeLineModel();
+                  model2.text = orderSnap.data[index].receiverLocation;
+                  model2.contact = orderSnap.data[index].receiverPhone;
+                  model2.isComplete = true;
+                  timeLineModel.add(model2);
 
                   return InkWell(
                     child: Container(
@@ -1041,7 +1067,7 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
                           Row(
                             children: [
                               ConstantWidget.getTextWidget(
-                                  orderSnap.data[index].senderId,
+                                  orderSnap.data[index].orderNumber,
                                   ConstantData.mainTextColor,
                                   TextAlign.start,
                                   FontWeight.w400,
@@ -1108,7 +1134,7 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
               );
             }
           },
-          future: db.completedOrderList(),
+          future: db.orderListWhere("driverNumber", phone),
         ),
       );
     }

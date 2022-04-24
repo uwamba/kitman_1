@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +13,7 @@ import 'package:knitman/PreferencePage.dart';
 //import 'package:place_picker/place_picker.dart';
 import 'package:knitman/google_place/place_picker.dart';
 import 'package:knitman/maps.dart';
+import 'package:knitman/util/PrefData.dart';
 
 import 'generated/l10n.dart';
 import 'util/ConstantData.dart';
@@ -36,14 +38,15 @@ class _LocationPage extends State<LocationPage> {
   static final kInitialPosition = LatLng(-33.8567844, 151.213108);
   //PickResult selectedPlace;
 
-  TextEditingController pointAddressController = TextEditingController();
-  TextEditingController pointPhoneController = TextEditingController();
-  TextEditingController packageValueController = TextEditingController();
-  TextEditingController pointCommentController = TextEditingController();
-  TextEditingController priceController = TextEditingController();
-  TextEditingController receiverAddressController = TextEditingController();
+  TextEditingController senderCoordinatesController = TextEditingController();
+  TextEditingController senderLocationController = TextEditingController();
+  TextEditingController senderPhoneController = TextEditingController();
+  TextEditingController receiverCoordinatesController = TextEditingController();
   TextEditingController receiverPhoneController = TextEditingController();
-  TextEditingController receiverCommentController = TextEditingController();
+  TextEditingController receiverLocationController = TextEditingController();
+  TextEditingController packageValueController = TextEditingController();
+  TextEditingController priceController = TextEditingController();
+
   LatLng startLocation;
   LatLng endLocation;
   LatLng initialLocation = LatLng(-2.5825288719982, 29.01545043904463);
@@ -61,21 +64,16 @@ class _LocationPage extends State<LocationPage> {
       receivedDate,
       orderNumber,
       senderId,
-      senderEmail,
-      receiverId,
-      receiverEmail,
-      pickingLocation,
-      pickingCoordinate,
+      senderLocation,
+      senderCoordinate,
       packageType,
       deliveryType,
       packageWeihgt,
-      pointLocation,
-      pointCoordinate,
+      receiverLocation,
+      receiverCoordinate,
       orderType,
       senderPhone,
-      receiverPhone,
-      senderAddress,
-      receiverAddress;
+      receiverPhone;
 
   Db db = new Db();
 
@@ -86,22 +84,31 @@ class _LocationPage extends State<LocationPage> {
     return new Future.value(true);
   }
 
+  GeoPoint stringToLatLng(String text) {
+    String splitted1 = text.split('LatLng(').toString();
+    splitted = splitted1.split(')').toString();
+    splitted = splitted.substring(3, splitted.length - 3);
+    List<String> latlgn = splitted.split(',');
+    double lat = double.parse(latlgn[0]);
+    double lng = double.parse(latlgn[1]);
+    // print(LatLng(lat, lng));
+    return GeoPoint(lat, lng);
+  }
+
+  void getphone() async {
+    senderId = await PrefData.getPhoneNumber();
+  }
+
   @override
   initState() {
     // TODO: implement initState
     super.initState();
     //FirebaseFirestore firestore = FirebaseFirestore.instance;
-    fullName = "dodos";
-    company = "pcpcpc";
-    age = 40;
+    getphone();
 
-    pointAddressController.text = initialLocation.toString();
-    receiverAddressController.text = initialLocation.toString();
-    priceController.text = "5000 RWF";
-    // pointPhoneController.text="+91 9845632173";
-    // deliveryPhoneController.text="+91 9845632173";
-    // pointCommentController.text="klfjklgj";
-    // deliveryCommentController.text="klfjklgj";
+    //senderCoordinatesController.text = initialLocation.toString();
+    //receiverCoordinatesController.text = initialLocation.toString();
+    //stringToLatLng(senderCoordinatesController.text);
     WidgetsFlutterBinding.ensureInitialized();
     Firebase.initializeApp();
     // initialise database class
@@ -112,20 +119,14 @@ class _LocationPage extends State<LocationPage> {
       deliveryDate = "Today";
       deliveryTime = "13:00-14:00";
       status = "New";
-
-      senderId = "10";
-      senderEmail = "uwambadodo@gmail.com";
-      receiverId = "10";
-      receiverEmail = "uwambadodo@gmail.com";
-      pickingCoordinate = "30.345654, 25.456655";
       packageType = widget.type;
       deliveryType = widget.priority;
-      pointCoordinate = "30.345654, 25.456655";
       orderType = "Customer";
       packageWeihgt = widget.weight;
     });
   }
 
+  String splitted = "";
   double margin;
   double radius;
 
@@ -163,23 +164,23 @@ class _LocationPage extends State<LocationPage> {
                 spaceWidget,
                 getPointCell("1", "Pickup Point"),
                 spaceWidget,
-                getAddressCell(pointAddressController),
+                getAddressCell(senderCoordinatesController),
                 spaceWidget,
-                getPhoneCell(pointPhoneController),
+                getPhoneCell(senderPhoneController),
                 spaceWidget,
                 getTimeAndDateCell(true),
                 spaceWidget,
-                getCommentCell(pointCommentController),
+                getCommentCell(senderLocationController),
                 spaceWidget,
                 getPointCell("2", "Delivery Point"),
                 spaceWidget,
-                getAddressCell2(receiverAddressController),
+                getAddressCell2(receiverCoordinatesController),
                 spaceWidget,
                 getPhoneCell(receiverPhoneController),
                 spaceWidget,
                 getTimeAndDateCell(false),
                 spaceWidget,
-                getCommentCell(receiverCommentController),
+                getCommentCell(receiverLocationController),
                 spaceWidget,
                 getPointCell("3", "Package Value"),
                 spaceWidget,
@@ -188,7 +189,7 @@ class _LocationPage extends State<LocationPage> {
                 ConstantWidget.getBottomText(context, "Save Order", () {
                   DateTime now = new DateTime.now();
                   DateFormat formatter = DateFormat('yyyyMMddHHmmssms');
-
+                  int number = int.parse(formatter.format(now));
 
                   // newOrder();
                   Navigator.push(
@@ -200,23 +201,18 @@ class _LocationPage extends State<LocationPage> {
                             deliveryDate,
                             receivedTime,
                             receivedDate,
-                            formatter.format(now).toString(),
+                            number.toRadixString(36).toUpperCase(),
+                            receiverPhoneController.text,
+                            receiverLocationController.text,
+                            stringToLatLng(receiverCoordinatesController.text),
                             senderId,
-                            senderEmail,
-                            receiverId,
-                            receiverEmail,
-                            pointAddressController.text,
-                            pickingCoordinate,
+                            senderPhoneController.text,
+                            stringToLatLng(senderCoordinatesController.text),
+                            senderLocationController.text,
                             widget.type,
                             widget.priority,
                             widget.weight,
-                            receiverCommentController.text,
-                            pointCoordinate,
                             orderType,
-                            receiverPhoneController.text,
-                            pointPhoneController.text,
-                            receiverAddressController.text,
-                            receiverAddressController.text,
                             packageValueController.text),
                       ));
                 })
@@ -281,7 +277,7 @@ class _LocationPage extends State<LocationPage> {
                     new maps(initialLocation, true)));
         print(startLocation);
         setState(() {
-          pointAddressController.text = startLocation.toString();
+          senderCoordinatesController.text = startLocation.toString();
         });
       },
     );
@@ -328,7 +324,7 @@ class _LocationPage extends State<LocationPage> {
                     new maps(startLocation, false)));
         print(endLocation.toString());
         setState(() {
-          receiverAddressController.text = endLocation.toString();
+          receiverCoordinatesController.text = endLocation.toString();
         });
       },
     );

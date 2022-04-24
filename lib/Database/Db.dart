@@ -12,26 +12,19 @@ class Db {
       receivedDate,
       orderNumber,
       senderId,
-      senderEmail,
-      receiverId,
-      receiverEmail,
-      pickingLocation,
-      pickingCoordinate,
+      senderPhone,
+      senderLocation,
+      receiverPhone,
+      receiverLocation,
       packageType,
       deliveryType,
-      packageHeight,
-      pointLocation,
-      pointCoordinate,
       orderType,
-      senderPhone,
-      receiverPhone,
-      senderAddress,
-      receiverAddress,
       packageWeight,
       packageValue,
       servicePhone,
       price,
       paymentMethod;
+  GeoPoint senderCoordinates, receiverCoordinates;
   CollectionReference orders;
   List<OrderList> completeOrderList;
   List<UserListModel> allUserList;
@@ -43,29 +36,27 @@ class Db {
       FirebaseFirestore.instance.collection('users');
   Db() {
     orders = FirebaseFirestore.instance.collection('orders');
-    status = "";
-    deliveryTime = "";
-    deliveryDate = "";
-    receivedTime = "";
-    receivedDate = "";
-    orderNumber = "";
-    senderId = "";
-    senderEmail = "";
-    receiverId = "";
-    receiverEmail = "";
-    pickingLocation = "";
-    pickingCoordinate = "";
-    packageType = "";
-    deliveryType = "";
-    packageHeight = "";
-    pointLocation = "";
-    pointCoordinate = "";
-    orderType = "";
-    senderPhone = "";
-    receiverPhone = "";
-    senderAddress = "";
-    receiverAddress = "";
-    servicePhone = "";
+  }
+
+  Future updateOrder(id, driver) async {
+    QuerySnapshot querySnapshot;
+    await collectionRef
+        .where('orderNumber', isEqualTo: id)
+        .get()
+        .then((value) => value.docs.forEach((doc) {
+              doc.reference.update({'status': 'assigned'});
+              doc.reference.update({'driverNumber': driver});
+            }));
+
+    // CollectionReference collectionRef3;
+    //collectionRef3
+    // .doc(id)
+    // .collection('orders')
+    // .where('orderId', isEqualTo: id)
+    // .get()
+    //  .then((value) => value.docs.forEach((doc) {
+    //   doc.reference.update({'answer': ''});
+    // }));
   }
 
   Future<List<OrderList>> completedOrderList() async {
@@ -80,26 +71,9 @@ class Db {
     return completeOrderList;
   }
 
-  Future<List<OrderList>> updateOrder(String orderId) async {
-    CollectionReference orders;
-    Map<String, dynamic> presenceStatusTrue = {
-      'UID': "userId",
-      'presence': true,
-      'last_seen': DateTime.now().millisecondsSinceEpoch,
-    };
-
-    QuerySnapshot querySnapshot =
-        await collectionRef.where('orderId', isEqualTo: orderId).get();
-    //db.collection("cities").doc("LA").set({
-    //name: "Los Angeles",
-    // state: "CA",
-    // country: "USA"
-    //})
-  }
-
   Future<List<OrderList>> activeOrderList() async {
     QuerySnapshot querySnapshot =
-        await collectionRef.where('status', isNotEqualTo: "Completed").get();
+        await collectionRef.where('status', isEqualTo: "new").get();
 
     final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
 
@@ -109,9 +83,8 @@ class Db {
     print(completeOrderList);
     collectionRef.snapshots().listen((querySnapshot) {
       querySnapshot.docChanges.forEach((change) async {
-        QuerySnapshot querySnapshot = await collectionRef
-            .where('status', isNotEqualTo: "Completed")
-            .get();
+        QuerySnapshot querySnapshot =
+            await collectionRef.where('status', isEqualTo: "new").get();
 
         final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
 
@@ -122,6 +95,86 @@ class Db {
       });
     });
 
+    return completeOrderList;
+  }
+
+  Future<List<OrderList>> unassignedList() async {
+    QuerySnapshot querySnapshot =
+        await collectionRef.where('status', isEqualTo: "new").get();
+
+    final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+    completeOrderList =
+        parsed.map<OrderList>((json) => OrderList.fromJson(json)).toList();
+
+    print(completeOrderList);
+    collectionRef.snapshots().listen((querySnapshot) {
+      querySnapshot.docChanges.forEach((change) async {
+        QuerySnapshot querySnapshot =
+            await collectionRef.where('status', isEqualTo: "new").get();
+
+        final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+        completeOrderList =
+            parsed.map<OrderList>((json) => OrderList.fromJson(json)).toList();
+
+        print(completeOrderList);
+      });
+    });
+    return completeOrderList;
+  }
+
+  Future<List<OrderList>> assignedList() async {
+    QuerySnapshot querySnapshot =
+        await collectionRef.where('status', isEqualTo: "assigned").get();
+
+    final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+    completeOrderList =
+        parsed.map<OrderList>((json) => OrderList.fromJson(json)).toList();
+
+    print(completeOrderList);
+    collectionRef.snapshots().listen((querySnapshot) {
+      querySnapshot.docChanges.forEach((change) async {
+        QuerySnapshot querySnapshot =
+            await collectionRef.where('status', isEqualTo: "assigned").get();
+
+        final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+        completeOrderList =
+            parsed.map<OrderList>((json) => OrderList.fromJson(json)).toList();
+
+        print(completeOrderList);
+      });
+    });
+    return completeOrderList;
+  }
+
+  Future<List<OrderList>> orderListWhere(String key, String value) async {
+    QuerySnapshot querySnapshot =
+        await collectionRef.where(key, isEqualTo: value).get();
+
+    final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+    completeOrderList =
+        parsed.map<OrderList>((json) => OrderList.fromJson(json)).toList();
+
+    print(completeOrderList);
+    collectionRef.snapshots().listen((querySnapshot) {
+      querySnapshot.docChanges.forEach((change) async {
+        QuerySnapshot querySnapshot = await collectionRef
+            .where(key, isEqualTo: value)
+            .where("status", isEqualTo: "assigned")
+            .get();
+
+        final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+        completeOrderList =
+            parsed.map<OrderList>((json) => OrderList.fromJson(json)).toList();
+
+        print(completeOrderList);
+      });
+    });
     return completeOrderList;
   }
 
@@ -159,33 +212,46 @@ class Db {
     return allUserList;
   }
 
+  Future<void> signUp(String userId, String email, String firstName,
+      String lastName, String role, String date, String password) {
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
+    //var newFormat = DateFormat("yy-MM-dd");
+    //String updatedDt = newFormat.format(dt);
+
+    Map<String, dynamic> userData = {
+      'UID': userId,
+      'firstName': firstName,
+      'lastName': lastName,
+      'email': email,
+      'role': role,
+      'created': date,
+      'password': password
+    };
+    users.add(userData);
+  }
+
   Future<void> addOrder(
     String status,
-    deliveryTime,
-    deliveryDate,
-    receivedTime,
-    receivedDate,
-    orderNumber,
-    senderId,
-    senderEmail,
-    receiverId,
-    receiverEmail,
-    paymentMethod,
-    pickingLocation,
-    pickingCoordinate,
-    packageType,
-    deliveryType,
-    packageWeight,
-    pointLocation,
-    pointCoordinate,
-    orderType,
-    senderPhone,
-    receiverPhone,
-    senderAddress,
-    receiverAddress,
-    servicePhone,
-    price,
-    packageValue,
+    String deliveryTime,
+    String deliveryDate,
+    String receivedTime,
+    String receivedDate,
+    String orderNumber,
+    String senderId,
+    String senderPhone,
+    String senderLocation,
+    String receiverPhone,
+    String receiverLocation,
+    String packageType,
+    String deliveryType,
+    String orderType,
+    String packageWeight,
+    String packageValue,
+    String servicePhone,
+    String price,
+    String paymentMethod,
+    GeoPoint senderCoordinates,
+    GeoPoint receiverCoordinates,
   ) async {
     this.status = status;
     this.deliveryTime = deliveryTime;
@@ -194,25 +260,20 @@ class Db {
     this.receivedDate = receivedDate;
     this.orderNumber = orderNumber;
     this.senderId = senderId;
-    this.senderEmail = senderEmail;
-    this.receiverId = receiverId;
-    this.receiverEmail = receiverEmail;
-    this.pickingLocation = pickingLocation;
-    this.pickingCoordinate = pickingCoordinate;
-    this.packageType = packageType;
-    this.packageWeight = packageWeight;
-    this.deliveryType = deliveryType;
-    this.pointLocation = pointLocation;
-    this.pointCoordinate = pointCoordinate;
-    this.orderType = orderType;
     this.senderPhone = senderPhone;
+    this.senderLocation = senderLocation;
     this.receiverPhone = receiverPhone;
-    this.senderAddress = senderAddress;
-    this.receiverAddress = receiverAddress;
-    this.servicePhone = servicePhone;
-    this.paymentMethod = paymentMethod;
-    this.price = price;
+    this.receiverLocation = receiverLocation;
+    this.packageType = packageType;
+    this.deliveryType = deliveryType;
+    this.orderType = orderType;
+    this.packageWeight = packageWeight;
     this.packageValue = packageValue;
+    this.servicePhone = servicePhone;
+    this.price = price;
+    this.paymentMethod = paymentMethod;
+    this.senderCoordinates = senderCoordinates;
+    this.receiverCoordinates = receiverCoordinates;
     //DatabaseReference orders =
     //FirebaseDatabase.instance.reference().child("orders");
     CollectionReference orders =
@@ -230,26 +291,21 @@ class Db {
           'receivedTime': deliveryTime, // delievry time
           'receivedDate': deliveryDate, // deleivert date
           'senderId': senderId, // sender user id
-          'senderEmail': senderEmail, // sender user email
-          'receiverId': receiverId, // receiver user id
-          'receiverEmail': receiverEmail, //receiver email address
-          'pickingLocation': pickingLocation, // picking location
-          'pickingCoordinate': pickingCoordinate, //picking coordinate
-          'packageType': packageType, // pachage type document,key,cake..
+          'senderPhone': senderPhone,
+          'senderLocation': senderLocation,
+          'receiverPhone': receiverPhone,
+          'receiverLocation': receiverLocation,
+          'packageType': packageType,
           'deliveryType': deliveryType,
-          'packageWeight':
-              packageWeight, //delivery type schelduled or deliver now
-          'pointLocation': pointLocation, // point addres location
-          'pointCoordinate': pointCoordinate, //point address coordinate
-          'orderType': "coorporate", // coorporate, customer
-          'senderPhone': senderPhone, // sender phone number
-          'receiverPhone': receiverPhone, // receiver phone number
-          'senderAddress': senderAddress, // package sender address
-          'receiverAddress': receiverAddress, // receiver address
-          'servicePhone': servicePhone, // receiver address
-          'price': price, // receiver address
+          'orderType': orderType,
+          'packageWeight': packageWeight,
           'packageValue': packageValue,
-          'paymentMethod': paymentMethod, // receiver address
+          'servicePhone': servicePhone,
+          'price': price,
+          'paymentMethod': paymentMethod,
+          'driverNumber': "",
+          'senderCoordinates': senderCoordinates,
+          'receiverCoordinates': receiverCoordinates
         })
         .then((value) => print("Order Added"))
         .catchError((error) => print("Failed to add Order: $error"));

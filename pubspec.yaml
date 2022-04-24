@@ -48,6 +48,8 @@ dependencies:
   short_uuids: ^2.0.0
   flutter_polyline_points: ^1.0.0
   firebase_database: ^9.0.10
+  firebase_messaging: ^11.2.11
+  overlay_support: ^1.2.1
 
 
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,23 +25,17 @@ class PreferencePage extends StatefulWidget {
       receivedTime,
       receivedDate,
       orderNumber,
+      receiverPhone,
+      receiverLocation,
+      senderLocation,
+      senderPhone,
       senderId,
-      senderEmail,
-      receiverId,
-      receiverEmail,
-      pointAddress,
-      pickingCoordinate,
       type,
       priority,
       weight,
-      receiverComment,
-      pointCoordinate,
       orderType,
-      receiverPhone,
-      pointPhone,
-      receiverAddress,
-      senderAddress,
       packageValue;
+  GeoPoint receiverCoordinates, senderCoordinates;
   PreferencePage(
       this.status,
       this.deliveryTime,
@@ -48,22 +43,17 @@ class PreferencePage extends StatefulWidget {
       this.receivedTime,
       this.receivedDate,
       this.orderNumber,
+      this.receiverPhone,
+      this.receiverLocation,
+      this.receiverCoordinates,
       this.senderId,
-      this.senderEmail,
-      this.receiverId,
-      this.receiverEmail,
-      this.pointAddress,
-      this.pickingCoordinate,
+      this.senderPhone,
+      this.senderCoordinates,
+      this.senderLocation,
       this.type,
       this.priority,
       this.weight,
-      this.receiverComment,
-      this.pointCoordinate,
       this.orderType,
-      this.receiverPhone,
-      this.pointPhone,
-      this.receiverAddress,
-      this.senderAddress,
       this.packageValue);
 
   @override
@@ -79,7 +69,7 @@ class _PreferencePage extends State<PreferencePage> {
   List<PaymentCardModel> paymentModelList = DataFile.getPaymentCardList();
   double servicePrice;
 
-  TextEditingController parcelController = new TextEditingController();
+  //TextEditingController parcelController = new TextEditingController();
   TextEditingController phoneController = new TextEditingController();
 
   String pointTime, pointDate;
@@ -510,25 +500,20 @@ class _PreferencePage extends State<PreferencePage> {
                                       widget.receivedDate,
                                       widget.orderNumber,
                                       widget.senderId,
-                                      widget.senderEmail,
-                                      widget.receiverId,
-                                      widget.receiverEmail,
-                                      "Cash",
-                                      widget.pickingCoordinate,
-                                      widget.receiverComment,
+                                      widget.senderPhone,
+                                      widget.senderLocation,
+                                      widget.receiverPhone,
+                                      widget.receiverLocation,
                                       widget.type,
                                       widget.priority,
-                                      widget.weight,
-                                      widget.pointCoordinate,
-                                      widget.pointAddress,
                                       widget.orderType,
-                                      widget.pointPhone,
-                                      widget.receiverPhone,
-                                      widget.senderAddress,
-                                      widget.receiverAddress,
+                                      widget.weight,
+                                      widget.packageValue,
                                       phoneController.text,
                                       servicePrice.toString(),
-                                      widget.packageValue,
+                                      "Cash",
+                                      widget.receiverCoordinates,
+                                      widget.senderCoordinates,
                                     )
                                     .whenComplete(() => Navigator.push(
                                         context,
@@ -845,26 +830,21 @@ class _PreferencePage extends State<PreferencePage> {
                           super.widget.receivedTime,
                           super.widget.receivedDate,
                           super.widget.orderNumber,
-                          userId,
-                          super.widget.senderEmail,
-                          super.widget.receiverId,
-                          super.widget.receiverEmail,
-                          "Momo",
-                          super.widget.pickingCoordinate,
-                          super.widget.receiverComment,
+                          super.widget.senderId,
+                          super.widget.senderPhone,
+                          super.widget.senderLocation,
+                          super.widget.receiverPhone,
+                          super.widget.receiverLocation,
                           super.widget.type,
                           super.widget.priority,
-                          super.widget.weight,
-                          super.widget.pointCoordinate,
-                          super.widget.pointAddress,
                           super.widget.orderType,
-                          super.widget.pointPhone,
-                          super.widget.receiverPhone,
-                          super.widget.senderAddress,
-                          super.widget.receiverAddress,
+                          super.widget.weight,
+                          super.widget.packageValue,
                           phoneController.text,
                           servicePrice.toString(),
-                          super.widget.packageValue,
+                          "MOMO",
+                          super.widget.senderCoordinates,
+                          super.widget.receiverCoordinates,
                         )
                         .whenComplete(() => Navigator.push(
                             context,
@@ -988,7 +968,7 @@ class _PreferencePage extends State<PreferencePage> {
               Icons.phone_android,
               color: Colors.grey,
             ),
-            hintText: "Phone",
+            hintText: "MoMo Number",
             hintStyle: TextStyle(
                 fontFamily: ConstantData.fontFamily, color: Colors.grey)),
       ),

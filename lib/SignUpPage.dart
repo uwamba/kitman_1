@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:country_code_picker/country_code_picker.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -22,13 +23,55 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPage extends State<SignUpPage> {
+  FirebaseMessaging _messaging = FirebaseMessaging.instance;
   bool isRemember = false;
   int themeMode = 0;
+  int _totalNotifications;
+  PushNotification _notificationInfo;
   TextEditingController textEmailController = new TextEditingController();
-  TextEditingController textNameController = new TextEditingController();
+  TextEditingController textFirstNameController = new TextEditingController();
   TextEditingController textPasswordController = new TextEditingController();
+  TextEditingController textPasswordConfirmController =
+      new TextEditingController();
+  TextEditingController textPhoneController = new TextEditingController();
+  TextEditingController textLastNameController = new TextEditingController();
 
   bool isCheck = false;
+
+  void registerNotification() async {
+    await Firebase.initializeApp();
+
+    // 2. Instantiate Firebase Messaging
+    _messaging = FirebaseMessaging.instance;
+
+    // 3. On iOS, this helps to take the user permissions
+    NotificationSettings settings = await _messaging.requestPermission(
+      alert: true,
+      badge: true,
+      provisional: false,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print('User granted permission');
+
+      // For handling the received notifications
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        // Parse the message received
+        PushNotification notification = PushNotification(
+          title: message.notification?.title,
+          body: message.notification?.body,
+        );
+
+        setState(() {
+          _notificationInfo = notification;
+          _totalNotifications++;
+        });
+      });
+    } else {
+      print('User declined or has not accepted permission');
+    }
+  }
 
   Future<bool> _requestPop() {
     Future.delayed(const Duration(milliseconds: 200), () {
@@ -90,123 +133,20 @@ class _SignUpPage extends State<SignUpPage> {
                   SizedBox(
                     height: ConstantWidget.getScreenPercentSize(context, 2.5),
                   ),
-                  ConstantWidget.getDefaultTextFiledWidget(
-                      context, S.of(context).yourName, textNameController),
-                  ConstantWidget.getDefaultTextFiledWidget(
+                  ConstantWidget.getDefaultTextFiledWidget(context,
+                      S.of(context).yourPhoneNumber, textPhoneController),
+                  ConstantWidget.getTextFiledWidget(
                       context, S.of(context).yourEmail, textEmailController),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        vertical:
-                            ConstantWidget.getScreenPercentSize(context, 1.2)),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Container(
-                          height: subHeight,
-                          margin: EdgeInsets.only(right: 7),
-                          padding: EdgeInsets.symmetric(horizontal: 5),
-                          decoration: BoxDecoration(
-                            color: ConstantData.cellColor,
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(radius),
-                            ),
-                          ),
-                          child: CountryCodePicker(
-                            boxDecoration: BoxDecoration(
-                              color: ConstantData.cellColor,
-                            ),
-                            closeIcon: Icon(Icons.close,
-                                size: ConstantWidget.getScreenPercentSize(
-                                    context, 3),
-                                color: ConstantData.mainTextColor),
-
-                            onChanged: (value) {
-                              // countryCode = value.dialCode;
-                              // print("changeval===$countryCode");
-                            },
-                            // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
-                            initialSelection: 'IN',
-                            searchStyle: TextStyle(
-                                color: ConstantData.mainTextColor,
-                                fontFamily: ConstantData.fontFamily),
-                            searchDecoration: InputDecoration(
-                                border: UnderlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: ConstantData.textColor),
-                                ),
-                                hintStyle: TextStyle(
-                                    color: ConstantData.mainTextColor,
-                                    fontFamily: ConstantData.fontFamily)),
-                            textStyle: TextStyle(
-                                color: ConstantData.mainTextColor,
-                                fontFamily: ConstantData.fontFamily),
-                            dialogTextStyle: TextStyle(
-                                color: ConstantData.mainTextColor,
-                                fontFamily: ConstantData.fontFamily),
-
-                            showFlagDialog: true,
-                            hideSearch: true,
-                            comparator: (a, b) => b.name.compareTo(a.name),
-
-                            onInit: (code) {
-                              // countryCode = code.dialCode;
-                              print(
-                                  "on init ${code.name} ${code.dialCode} ${code.name}");
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            height: subHeight,
-                            padding: EdgeInsets.only(left: 7),
-                            margin: EdgeInsets.only(left: 7),
-                            alignment: Alignment.centerLeft,
-                            decoration: BoxDecoration(
-                              color: ConstantData.cellColor,
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(radius),
-                              ),
-                            ),
-                            child: TextField(
-                              // controller: myController,
-                              onChanged: (value) async {
-                                try {} catch (e) {
-                                  print("resge$e");
-                                }
-                              },
-                              decoration: InputDecoration(
-                                  contentPadding: EdgeInsets.only(
-                                      left: ConstantWidget.getWidthPercentSize(
-                                          context, 2)),
-                                  border: InputBorder.none,
-                                  focusedBorder: InputBorder.none,
-                                  enabledBorder: InputBorder.none,
-                                  errorBorder: InputBorder.none,
-                                  disabledBorder: InputBorder.none,
-                                  hintText: S.of(context).phoneNumber,
-                                  hintStyle: TextStyle(
-                                      fontFamily: ConstantData.fontFamily,
-                                      color: ConstantData.textColor,
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: fontSize)),
-                              style: TextStyle(
-                                  fontFamily: ConstantData.fontFamily,
-                                  color: ConstantData.textColor,
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: fontSize),
-                              keyboardType: TextInputType.number,
-                              inputFormatters: <TextInputFormatter>[
-                                FilteringTextInputFormatter.digitsOnly
-                              ], // Only numbers can be entered
-                            ),
-                          ),
-                          flex: 1,
-                        )
-                      ],
-                    ),
-                  ),
+                  ConstantWidget.getTextFiledWidget(context,
+                      S.of(context).yourFirstName, textFirstNameController),
+                  ConstantWidget.getTextFiledWidget(context,
+                      S.of(context).yourLastName, textLastNameController),
                   ConstantWidget.getPasswordTextFiled(
                       context, S.of(context).password, textPasswordController),
+                  ConstantWidget.getPasswordTextFiled(
+                      context,
+                      S.of(context).confirmPassword,
+                      textPasswordConfirmController),
                   InkWell(
                     child: Row(
                       children: [
@@ -293,4 +233,13 @@ class _SignUpPage extends State<SignUpPage> {
         ),
         onWillPop: _requestPop);
   }
+}
+
+class PushNotification {
+  PushNotification({
+    this.title,
+    this.body,
+  });
+  String title;
+  String body;
 }

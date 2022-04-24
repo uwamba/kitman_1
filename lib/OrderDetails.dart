@@ -1,18 +1,15 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:knitman/model/OrderTimeline.dart';
 import 'package:knitman/model/orderList.dart';
-import 'package:knitman/place_picker_custom/place_picker.dart';
 import 'package:location/location.dart';
 import 'package:timelines/timelines.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'ChatScreen.dart';
 import 'generated/l10n.dart';
-import 'model/Message.dart';
-import 'model/TimeLineModel.dart';
 import 'util/ConstantData.dart';
 import 'util/ConstantWidget.dart';
 import 'util/SizeConfig.dart';
@@ -33,14 +30,49 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
     return new Future.value(true);
   }
 
-  Completer _controller = Completer();
-  CameraPosition _currentPosition;
+  String firstName = "", lastName = "", driverPhone = "";
   final Set<Marker> markers = Set();
+  PolylineId polylineId = PolylineId("area");
+  final Set<Polyline> polys = Set();
+  initState() {
+    super.initState();
+    senderCoordinates = LatLng(
+        widget.activeOrderModel.senderCoordinates.latitude,
+        widget.activeOrderModel.senderCoordinates.longitude);
+    receiverCoordinates = LatLng(
+        widget.activeOrderModel.receiverCoordinates.latitude,
+        widget.activeOrderModel.receiverCoordinates.longitude);
+    _kGooglePlex = CameraPosition(
+      target: senderCoordinates,
+      zoom: 12.0,
+    );
+
+    markers.add(Marker(
+        draggable: true,
+        icon: BitmapDescriptor.defaultMarker,
+        infoWindow: const InfoWindow(
+          title: 'Delivery Point',
+        ),
+        markerId: MarkerId("Delivery Point"),
+        position: senderCoordinates));
+    markers.add(Marker(
+        draggable: true,
+        icon: BitmapDescriptor.defaultMarker,
+        infoWindow: const InfoWindow(
+          title: 'Delivery Point',
+        ),
+        markerId: MarkerId("Delivery Point"),
+        position: receiverCoordinates));
+    polys.add(Polyline(
+        polylineId: polylineId,
+        points: getPoints(senderCoordinates, receiverCoordinates),
+        width: 5,
+        color: Colors.green,
+        visible: true));
+  }
+
   final Completer<GoogleMapController> mapController = Completer();
-  static CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(40.65790014590701, -73.77194564694435),
-    zoom: 12.0,
-  );
+  CameraPosition _kGooglePlex;
   List listMarkerIds = [];
   BitmapDescriptor customIcon1;
 
@@ -58,11 +90,11 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
     }
   }
 
-  List<TimeLineModel> timeLineModel = [];
+  String delivery = "Urgent";
+  LatLng senderCoordinates, receiverCoordinates;
+  List<OrderTimeLine> timeLine = [];
   @override
   Widget build(BuildContext context) {
-    PolylineId polylineId = PolylineId("area");
-    final Set<Polyline> polys = Set();
     moveToSenderLocation();
     SizeConfig().init(context);
     double margin = ConstantWidget.getScreenPercentSize(context, 2);
@@ -72,21 +104,59 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
     double bottomImageHeight = ConstantWidget.getPercentSize(bottomHeight, 50);
     SizeConfig().init(context);
 
-    timeLineModel.clear();
-    TimeLineModel model = new TimeLineModel();
-    model.text = widget.activeOrderModel.pickingLocation;
-    model.contact = widget.activeOrderModel.pointLocation;
+    timeLine.clear();
+    OrderTimeLine model = new OrderTimeLine();
+    model.location = widget.activeOrderModel.senderLocation;
+    model.phone = widget.activeOrderModel.senderPhone;
     model.isComplete = true;
-    timeLineModel.add(model);
+    timeLine.add(model);
 
-    model.text = widget.activeOrderModel.pickingLocation;
-    model.contact = widget.activeOrderModel.pointLocation;
-    model.isComplete = true;
-    timeLineModel.add(model);
+    OrderTimeLine model2 = new OrderTimeLine();
+    model2.location = widget.activeOrderModel.receiverLocation;
+    model2.phone = widget.activeOrderModel.receiverPhone;
+    model2.status = widget.activeOrderModel.status;
+    model2.isComplete = true;
+    timeLine.add(model2);
 
-    print(widget.activeOrderModel.receiverAddress +
+    print(widget.activeOrderModel.receiverLocation +
         "sssssssssssssssssssss" +
-        widget.activeOrderModel.senderAddress);
+        widget.activeOrderModel.senderLocation);
+
+    if (widget.activeOrderModel.deliveryType == "0") {
+      delivery = "Urgent";
+    }
+    print(widget.activeOrderModel.driverNumber);
+    if (widget.activeOrderModel.driverNumber.length > 0) {
+      final DatabaseReference ref = FirebaseDatabase.instance
+          .ref()
+          .child("presence/" + widget.activeOrderModel.driverNumber);
+      ref.once().then((event) {
+        final dataSnapshot = event.snapshot;
+
+        // DataSnapshot snap = event.snapshot.value;
+        //final parsed = snap.children.map((doc) => doc.value).toList();
+        //String fname = snap.value;
+        final parsed = dataSnapshot.children.map((doc) => doc.value).toList();
+
+        List lis = parsed.toList();
+        lis.forEach((element) {
+          firstName = element['firstName'];
+          lastName = element['lastName'];
+          driverPhone = element['UID'];
+        });
+        //lis.map((e) => e.toString());
+      });
+    } else {
+      firstName = "Not assigned";
+      lastName = "";
+      driverPhone = "Waiting";
+    }
+    void _callNumber() async {
+      String s = driverPhone;
+
+      String url = "tel:" + s;
+      await launch(url);
+    }
 
     return WillPopScope(
         child: Scaffold(
@@ -120,43 +190,17 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
                         width: double.infinity,
                         child: GoogleMap(
                           initialCameraPosition: _kGooglePlex,
-                          onTap: (latLng) {
-                            moveToLocation(latLng);
-                          },
-                          mapType: MapType.normal,
-                          markers: markers,
                           myLocationButtonEnabled: true,
                           myLocationEnabled: true,
+                          mapType: MapType.normal, //map type
+                          onMapCreated: onMapCreated,
                           polylines: polys,
-                          onMapCreated: (GoogleMapController controler) {
-                            print("complete-----true");
-                            _controller.complete(controler);
-                            moveToSenderLocation();
-                            setState(() {
-                              polys.add(Polyline(
-                                  polylineId: polylineId,
-                                  points: getPoints(
-                                      widget.activeOrderModel.senderAddress
-                                          as LatLng,
-                                      widget.activeOrderModel.receiverAddress
-                                          as LatLng),
-                                  width: 5,
-                                  color: Colors.green,
-                                  visible: true));
-                              markers.add(Marker(
-                                icon: BitmapDescriptor.defaultMarker,
-                                position: widget
-                                    .activeOrderModel.receiverAddress as LatLng,
-                                markerId: MarkerId("Delivery Location"),
-                              ));
-                              markers.add(Marker(
-                                icon: BitmapDescriptor.defaultMarker,
-                                position: widget.activeOrderModel.senderAddress
-                                    as LatLng,
-                                markerId: MarkerId("Picking Location"),
-                              ));
-                            });
+                          onTap: (latLng) {
+                            //clearOverlay();
+                            moveToLocation(latLng);
+                            // getDirections();
                           },
+                          markers: markers,
                         ),
                       ),
                       Container(
@@ -200,7 +244,8 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
                               height: (margin / 2),
                             ),
                             ConstantWidget.getTextWidget(
-                                widget.activeOrderModel.receiverAddress,
+                                "To be delivered at: " +
+                                    widget.activeOrderModel.receiverLocation,
                                 Colors.grey,
                                 TextAlign.start,
                                 FontWeight.w400,
@@ -251,7 +296,7 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   ConstantWidget.getCustomText(
-                                      "James King",
+                                      firstName + " " + lastName,
                                       ConstantData.mainTextColor,
                                       1,
                                       TextAlign.start,
@@ -269,7 +314,7 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
                                       ConstantWidget.getHorizonSpace(
                                           SizeConfig.safeBlockHorizontal * 1.2),
                                       ConstantWidget.getCustomText(
-                                          widget.activeOrderModel.senderId,
+                                          driverPhone,
                                           Colors.grey,
                                           1,
                                           TextAlign.start,
@@ -290,19 +335,6 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
                                 ),
                                 onPressed: () {
                                   _callNumber();
-                                }),
-                            IconButton(
-                                icon: Icon(
-                                  CupertinoIcons.chat_bubble_text_fill,
-                                  color: ConstantData.accentColor,
-                                  size: ConstantWidget.getPercentSize(
-                                      bottomHeight, 20),
-                                ),
-                                onPressed: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        ChatScreen(user: chats[0].sender),
-                                  ));
                                 }),
                           ],
                         ),
@@ -393,27 +425,11 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
                             ),
                             getColumnCell(
                               "Payment Type",
-                              "Cash",
+                              widget.activeOrderModel.paymentMethod,
                             ),
                             SizedBox(
                               height: ((margin * 1.2)),
                             ),
-
-                            // ConstantWidget.getTextWidget(
-                            //     "Weight",
-                            //     Colors.grey,
-                            //     TextAlign.start,
-                            //     FontWeight.w400,
-                            //     ConstantData.font22Px),
-                            // SizedBox(
-                            //   height: (margin / 3),
-                            // ),
-                            // ConstantWidget.getTextWidget(
-                            //     "Up to 1 kg",
-                            //     ConstantData.mainTextColor,
-                            //     TextAlign.start,
-                            //     FontWeight.w400,
-                            //     ConstantData.font22Px),
                           ],
                         ),
                       ),
@@ -424,7 +440,7 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
                         padding: EdgeInsets.symmetric(
                             horizontal: margin, vertical: margin),
                         color: ConstantData.cellColor,
-                        child: _DeliveryProcesses(processes: timeLineModel),
+                        child: _DeliveryProcesses(processes: timeLine),
                       )
                     ],
                   ),
@@ -464,7 +480,7 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
     Location().getLocation().then((locationData) {
       LatLng target = LatLng(locationData.latitude, locationData.longitude);
       _kGooglePlex = CameraPosition(
-        target: widget.activeOrderModel.senderAddress as LatLng,
+        target: senderCoordinates,
         zoom: 12,
       );
       moveToLocation(target);
@@ -491,19 +507,12 @@ getPoints(LatLng a, LatLng b) {
   ];
 }
 
-void _callNumber() async {
-  String s = "89898989";
-
-  String url = "tel:" + s;
-  await launch(url);
-}
-
 class _DeliveryProcesses extends StatelessWidget {
   const _DeliveryProcesses({Key key, @required this.processes})
       : assert(processes != null),
         super(key: key);
 
-  final List<TimeLineModel> processes;
+  final List<OrderTimeLine> processes;
 
   @override
   Widget build(BuildContext context) {
@@ -550,7 +559,7 @@ class _DeliveryProcesses extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      processes[index].text,
+                      processes[index].location,
                       textAlign: TextAlign.start,
                       style: DefaultTextStyle.of(context).style.copyWith(
                           fontSize:
@@ -569,7 +578,7 @@ class _DeliveryProcesses extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             ConstantWidget.getTextWidget(
-                                "Contact person",
+                                "Contact",
                                 Colors.grey,
                                 TextAlign.start,
                                 FontWeight.w400,
@@ -578,7 +587,7 @@ class _DeliveryProcesses extends StatelessWidget {
                               height: (margin / 4),
                             ),
                             ConstantWidget.getTextWidget(
-                                processes[index].contact,
+                                processes[index].phone,
                                 ConstantData.mainTextColor,
                                 TextAlign.start,
                                 FontWeight.w400,
@@ -594,29 +603,6 @@ class _DeliveryProcesses extends StatelessWidget {
                                 ConstantWidget.getScreenPercentSize(context, 3),
                           ),
                         )
-                      ],
-                    ),
-                    SizedBox(
-                      height: ConstantWidget.getScreenPercentSize(context, 3),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ConstantWidget.getTextWidget(
-                            "Comments",
-                            Colors.grey,
-                            TextAlign.start,
-                            FontWeight.w400,
-                            ConstantData.font18Px),
-                        SizedBox(
-                          height: (margin / 4),
-                        ),
-                        ConstantWidget.getTextWidget(
-                            processes[index].text,
-                            ConstantData.mainTextColor,
-                            TextAlign.start,
-                            FontWeight.w400,
-                            ConstantData.font18Px),
                       ],
                     ),
                   ],

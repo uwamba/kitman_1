@@ -67,6 +67,56 @@ class S {
     );
   }
 
+  /// `Your First Name First`
+  String get yourFirstName {
+    return Intl.message(
+      'Your First Name First',
+      name: 'yourFirstName',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Your last Name First`
+  String get yourLastName {
+    return Intl.message(
+      'Your Last Name First',
+      name: 'yourLastName',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Your phone number`
+  String get yourPhoneNumber {
+    return Intl.message(
+      'Your Phone Number',
+      name: 'yourPhoneNumber',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `password`
+  String get password {
+    return Intl.message(
+      'Password',
+      name: 'Password',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `confirm password`
+  String get confirmPassword {
+    return Intl.message(
+      'Confirm Password',
+      name: 'confirmPassword',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Your Email`
   String get yourEmail {
     return Intl.message(
@@ -92,16 +142,6 @@ class S {
     return Intl.message(
       'Phone number',
       name: 'phoneNumber',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Password`
-  String get password {
-    return Intl.message(
-      'Password',
-      name: 'password',
       desc: '',
       args: [],
     );
@@ -332,6 +372,26 @@ class S {
     return Intl.message(
       'Active',
       name: 'active',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `unassigned`
+  String get unassigned {
+    return Intl.message(
+      'Unassigned',
+      name: 'Unassigned',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Assigned`
+  String get assigned {
+    return Intl.message(
+      'Assigned',
+      name: 'Assigned',
       desc: '',
       args: [],
     );
@@ -922,6 +982,16 @@ class S {
     return Intl.message(
       'Notification',
       name: 'notification',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Notification`
+  String get nearDriver {
+    return Intl.message(
+      'Near Drivers',
+      name: 'nearDriver',
       desc: '',
       args: [],
     );

@@ -469,6 +469,52 @@ class ConstantWidget {
       ),
       child: TextField(
         maxLines: 1,
+        keyboardType: TextInputType.number,
+        controller: textEditingController,
+        style: TextStyle(
+            fontFamily: ConstantData.fontFamily,
+            color: ConstantData.textColor,
+            fontWeight: FontWeight.w400,
+            fontSize: fontSize),
+        decoration: InputDecoration(
+            contentPadding: EdgeInsets.only(
+                left: ConstantWidget.getWidthPercentSize(context, 2)),
+            border: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            disabledBorder: InputBorder.none,
+            hintText: s,
+            hintStyle: TextStyle(
+                fontFamily: ConstantData.fontFamily,
+                color: ConstantData.textColor,
+                fontWeight: FontWeight.w400,
+                fontSize: fontSize)),
+      ),
+    );
+  }
+
+  static Widget getTextFiledWidget(BuildContext context, String s,
+      TextEditingController textEditingController) {
+    double height = ConstantWidget.getScreenPercentSize(context, 8.5);
+
+    double radius = ConstantWidget.getPercentSize(height, 20);
+    double fontSize = ConstantWidget.getPercentSize(height, 25);
+
+    return Container(
+      height: height,
+      margin: EdgeInsets.symmetric(
+          vertical: ConstantWidget.getScreenPercentSize(context, 1.2)),
+      alignment: Alignment.centerLeft,
+      decoration: BoxDecoration(
+        color: ConstantData.cellColor,
+        borderRadius: BorderRadius.all(
+          Radius.circular(radius),
+        ),
+      ),
+      child: TextField(
+        maxLines: 1,
+        keyboardType: TextInputType.text,
         controller: textEditingController,
         style: TextStyle(
             fontFamily: ConstantData.fontFamily,

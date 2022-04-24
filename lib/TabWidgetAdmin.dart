@@ -1,11 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:knitman/Database/Db.dart';
 import 'package:knitman/Database/UserPresence.dart';
+import 'package:knitman/NearDrivers.dart';
 import 'package:knitman/OrderDetails.dart';
 import 'package:knitman/model/onlineUser.dart';
 import 'package:knitman/model/orderList.dart';
@@ -17,7 +18,6 @@ import 'CompleteOrderDetail.dart';
 import 'EditProfilePage.dart';
 import 'MyVouchers.dart';
 import 'NotificationPage.dart';
-import 'RatingPage.dart';
 import 'ResetPasswordPage.dart';
 import 'SchedulePage.dart';
 import 'TermsConditionPage.dart';
@@ -84,18 +84,34 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
     String email = await PrefData.getEmail();
     String lastName = await PrefData.getLastName();
     String firstName = await PrefData.getFirstName();
-    UserPresence(phone, email, lastName, firstName).updateUserPresence();
+    UserPresence(phone, email, firstName, lastName).updateUserPresence();
   }
 
   @override
   void initState() {
     // TODO: implement initState
-    setPresence();
-    super.initState();
 
+    setPresence();
+
+    CollectionReference collectionRef =
+        FirebaseFirestore.instance.collection('orders');
+    Db db = new Db();
+    collectionRef.snapshots().listen((querySnapshot) {
+      setState(() {
+        querySnapshot?.docChanges?.forEach(
+          (docChange) => {
+            // If you need to do something for each document change, do it here.
+          },
+        );
+        // Anything you might do every time you get a fresh snapshot can be done here.
+        db.activeOrderList();
+        print("changeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+      });
+    });
     getThemeMode();
     _tabController = new MotionTabController(
         initialIndex: _selectedIndex, length: s.length, vsync: this);
+    super.initState();
   }
 
   List<TimeLineModel> processes;
@@ -529,7 +545,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => NotificationPage(),
+                              builder: (context) => NearDrivers(),
                             ));
                       },
                     ),
@@ -721,81 +737,14 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                                   height: (margin / 2),
                                 ),
                                 ConstantWidget.getCustomText(
-                                    orderSnap.data[index].senderAddress
-                                        .toString(),
+                                    "Courier: " +
+                                        orderSnap.data[index].driverNumber
+                                            .toString(),
                                     Colors.grey,
                                     2,
                                     TextAlign.start,
                                     FontWeight.w500,
                                     ConstantData.font18Px),
-                                SizedBox(
-                                  height: (margin / 2),
-                                ),
-                                Row(
-                                  children: [
-                                    ConstantWidget.getCustomText(
-                                        "5",
-                                        ConstantData.mainTextColor,
-                                        1,
-                                        TextAlign.start,
-                                        FontWeight.w500,
-                                        ConstantData.font18Px),
-                                    RatingBar.builder(
-                                      itemSize: 15,
-                                      initialRating: 5,
-                                      minRating: 1,
-                                      direction: Axis.horizontal,
-                                      allowHalfRating: true,
-                                      itemCount: 5,
-                                      tapOnlyMode: true,
-                                      updateOnDrag: true,
-                                      unratedColor: Colors.grey,
-                                      itemPadding:
-                                          EdgeInsets.symmetric(horizontal: 0.0),
-                                      itemBuilder: (context, _) => Icon(
-                                        Icons.star,
-                                        color: Colors.amber,
-                                        size: 10,
-                                      ),
-                                      onRatingUpdate: (rating) {
-                                        print(rating);
-                                      },
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: (margin / 2),
-                                ),
-                                InkWell(
-                                  child: Container(
-                                    height: height,
-                                    width: ConstantWidget.getWidthPercentSize(
-                                        context, 20),
-                                    decoration: BoxDecoration(
-                                        color: ConstantData.accentColor,
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(
-                                                ConstantWidget.getPercentSize(
-                                                    height, 30)))),
-                                    child: Center(
-                                      child: ConstantWidget.getCustomText(
-                                          S.of(context).rate,
-                                          Colors.white,
-                                          1,
-                                          TextAlign.center,
-                                          FontWeight.w500,
-                                          ConstantWidget.getPercentSize(
-                                              height, 40)),
-                                    ),
-                                  ),
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => RatingPage(),
-                                        ));
-                                  },
-                                ),
                                 SizedBox(
                                   height: (margin / 2),
                                 ),
@@ -816,7 +765,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                   );
                 }
               },
-              future: db.completedOrderList(),
+              future: db.assignedList(),
             ),
           )
         ],
@@ -826,6 +775,10 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
 
   tabActiveWidget() {
     double margin = ConstantWidget.getScreenPercentSize(context, 2);
+    double allMargin = ConstantWidget.getScreenPercentSize(context, 1);
+    double height = ConstantWidget.getScreenPercentSize(context, 13);
+
+    double imageSize = ConstantWidget.getPercentSize(height, 60);
     Db db = new Db();
     PrefData.setIsFirstTime(false);
 
@@ -913,15 +866,16 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                   //OrderList listModel = orderSnap.data[index];
                   timeLineModel.clear();
                   TimeLineModel model = new TimeLineModel();
-                  model.text = orderSnap.data[index].senderAddress;
-                  model.contact = orderSnap.data[index].receiverAddress;
+                  model.text = "From: " + orderSnap.data[index].senderLocation;
+                  model.contact = orderSnap.data[index].senderPhone;
                   model.isComplete = true;
                   timeLineModel.add(model);
 
-                  model.text = orderSnap.data[index].pickingLocation;
-                  model.contact = orderSnap.data[index].pointLocation;
-                  model.isComplete = true;
-                  timeLineModel.add(model);
+                  TimeLineModel model2 = new TimeLineModel();
+                  model2.text = "To: " + orderSnap.data[index].receiverLocation;
+                  model2.contact = orderSnap.data[index].receiverPhone;
+                  model2.isComplete = true;
+                  timeLineModel.add(model2);
 
                   return InkWell(
                     child: Container(
@@ -935,7 +889,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                           Row(
                             children: [
                               ConstantWidget.getTextWidget(
-                                  orderSnap.data[index].price,
+                                  orderSnap.data[index].orderNumber,
                                   ConstantData.mainTextColor,
                                   TextAlign.start,
                                   FontWeight.w400,
@@ -952,6 +906,17 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                           SizedBox(
                             height: (margin / 1.5),
                           ),
+                          Row(children: [
+                            ConstantWidget.getTextWidget(
+                                "Price: " + orderSnap.data[index].price,
+                                ConstantData.mainTextColor,
+                                TextAlign.start,
+                                FontWeight.w400,
+                                ConstantData.font18Px),
+                          ]),
+                          SizedBox(
+                            height: (margin / 1.5),
+                          ),
                           Row(
                             children: [
                               Expanded(
@@ -963,18 +928,34 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                                     ConstantData.font18Px),
                               ),
                               InkWell(
-                                child: Icon(
-                                  Icons.notifications,
-                                  size: (margin * 1.5),
-                                  color: ConstantData.primaryColor,
+                                child: Container(
+                                  margin:
+                                      EdgeInsets.only(left: (allMargin * 3)),
+                                  height: imageSize * 0.60,
+                                  width: imageSize * 0.60,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.transparent,
+                                    image: DecorationImage(
+                                      image: ExactAssetImage(
+                                          ConstantData.assetsPath +
+                                              "assign.png"),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
                                 ),
-                                onTap: () {
-                                  Navigator.push(
+                                onTap: () async {
+                                  String driverId = await Navigator.push(
                                       context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            NotificationPage(),
-                                      ));
+                                      new MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              new NearDrivers()));
+                                  print(
+                                      "driverrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr" +
+                                          driverId);
+                                  db.updateOrder(
+                                      orderSnap.data[index].orderNumber,
+                                      driverId);
                                 },
                               )
                             ],
@@ -1002,7 +983,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
               );
             }
           },
-          future: db.completedOrderList(),
+          future: db.unassignedList(),
         ),
       );
     }

@@ -6,7 +6,7 @@ class UserPresence {
   String lastName;
   String email;
 
-  UserPresence(this.userId,this.firstName,this.lastName,this.email);
+  UserPresence(this.userId, this.email, this.firstName, this.lastName);
   void updateUserPresence() async {
     // userId = PrefData.getPhoneNumber();
     DatabaseReference ref =
