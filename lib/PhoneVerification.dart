@@ -1,17 +1,8 @@
-import 'dart:async';
-
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_phone_auth_handler/firebase_phone_auth_handler.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:knitman/util/CustomDialogBox.dart';
-import 'package:pin_input_text_field/pin_input_text_field.dart';
-
-import 'WidgetNotificationConfirmation.dart';
-import 'generated/l10n.dart';
-import 'util/ConstantData.dart';
-import 'util/ConstantWidget.dart';
-import 'util/PrefData.dart';
-import 'util/SizeConfig.dart';
 
 class PhoneVerification extends StatefulWidget {
   @override
@@ -21,181 +12,166 @@ class PhoneVerification extends StatefulWidget {
 }
 
 class _PhoneVerification extends State<PhoneVerification> {
-  bool isRemember = false;
-  int themeMode = 0;
-  TextEditingController textEmailController = new TextEditingController();
-  TextEditingController textPasswordController = new TextEditingController();
-
-  Future<bool> _requestPop() {
-    Navigator.of(context).pop();
-    return new Future.value(true);
-  }
-
-  final GlobalKey<FormFieldState<String>> _formKey =
-      GlobalKey<FormFieldState<String>>(debugLabel: '_formkey');
-  TextEditingController _pinEditingController =
-      TextEditingController(text: '123');
-  bool _enable = true;
-
   @override
-  void initState() {
-    super.initState();
-
-    setTheme();
+  Widget build(BuildContext context) {
+    WidgetsFlutterBinding.ensureInitialized();
+    Firebase.initializeApp();
+    return FirebasePhoneAuthProvider(
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: VerifyPhoneNumberScreen(phoneNumber: "+250786138376"),
+      ),
+    );
   }
+}
 
-  setTheme() async {
-    themeMode = await PrefData.getThemeMode();
-    setState(() {});
+// ignore: must_be_immutable
+class VerifyPhoneNumberScreen extends StatelessWidget {
+  final String phoneNumber;
+
+  String _enteredOTP;
+
+  VerifyPhoneNumberScreen({
+    Key key,
+    this.phoneNumber,
+  }) : super(key: key);
+
+  void _showSnackBar(BuildContext context, String text) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(text)),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
-    ConstantData.setThemePosition();
-    double height = ConstantWidget.getScreenPercentSize(context, 18);
+    return SafeArea(
+      child: FirebasePhoneAuthHandler(
+        phoneNumber: phoneNumber,
+        timeOutDuration: const Duration(seconds: 60),
+        onLoginSuccess: (userCredential, autoVerified) async {
+          _showSnackBar(
+            context,
+            'Phone number verified successfully!',
+          );
 
-    return WillPopScope(
-        child: Scaffold(
-          backgroundColor: ConstantData.bgColor,
-          body: SafeArea(
-            child: Container(
-              padding: EdgeInsets.all(
-                  ConstantWidget.getScreenPercentSize(context, 2.5)),
-              child: ListView(
-                children: [
-                  SizedBox(
-                    height: ConstantWidget.getScreenPercentSize(context, 2),
-                  ),
-                  Center(
-                    child: Image.asset(
-                      ConstantData.assetsPath + "logo.png",
-                      height: height,
-                    ),
-                  ),
-                  SizedBox(
-                    height: ConstantWidget.getScreenPercentSize(context, 2),
-                  ),
-                  ConstantWidget.getTextWidget(
-                      S.of(context).verification,
-                      ConstantData.mainTextColor,
-                      TextAlign.center,
-                      FontWeight.bold,
-                      ConstantWidget.getScreenPercentSize(context, 4.2)),
-                  SizedBox(
-                    height: ConstantWidget.getScreenPercentSize(context, 5),
-                  ),
-                  Center(
-                    child: Container(
-                      width: SizeConfig.safeBlockHorizontal * 70,
-                      child: PinInputTextFormField(
-                        key: _formKey,
-                        pinLength: 4,
-                        decoration: new BoxLooseDecoration(
-                          textStyle: TextStyle(
-                              color: ConstantData.mainTextColor,
-                              fontFamily: ConstantData.fontFamily,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18),
+          debugPrint(
+            autoVerified
+                ? "OTP was fetched automatically"
+                : "OTP was verified manually",
+          );
 
-                          strokeColorBuilder: PinListenColorBuilder(
-                              ConstantData.textColor,
-                              ConstantData.primaryColor),
+          debugPrint("Login Success UID: ${userCredential.user?.uid}");
+        },
+        onLoginFailed: (authException) {
+          _showSnackBar(
+            context,
+            'Something went wrong (${authException.message})',
+          );
 
-                          obscureStyle: ObscureStyle(
-                            isTextObscure: false,
-                            obscureText: '🤪',
-                          ),
-                          // hintText: _kDefaultHint,
-                        ),
-                        controller: _pinEditingController,
-                        textInputAction: TextInputAction.go,
-                        enabled: _enable,
-                        keyboardType: TextInputType.text,
-                        textCapitalization: TextCapitalization.characters,
-                        onSubmit: (pin) {
-                          print("gtepin===$pin");
-                          if (_formKey.currentState.validate()) {
-                            _formKey.currentState.save();
-                          }
-                        },
-                        onChanged: (pin) {
-                          setState(() {
-                            debugPrint('onChanged execute. pin:$pin');
-                          });
-                        },
-                        onSaved: (pin) {
-                          debugPrint('onSaved pin:$pin');
-                        },
-                        validator: (pin) {
-                          if (pin.isEmpty) {
-                            setState(() {
-                              // _hasError = true;
-                            });
-                            return 'Pin cannot empty.';
-                          }
-                          setState(() {
-                            // _hasError = false;
-                          });
-                          return null;
-                        },
-                        cursor: Cursor(
-                          width: 2,
-                          color: Colors.white,
-                          radius: Radius.circular(1),
-                          enabled: true,
-                        ),
+          debugPrint(authException.message);
+          // handle error further if needed
+        },
+        builder: (context, controller) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text("Verify Phone Number"),
+              actions: [
+                if (controller.codeSent)
+                  TextButton(
+                    child: Text(
+                      controller.timerIsActive
+                          ? "${controller.timerCount.inSeconds}s"
+                          : "RESEND",
+                      style: const TextStyle(
+                        color: Colors.blue,
+                        fontSize: 18,
                       ),
                     ),
+                    onPressed: controller.timerIsActive
+                        ? null
+                        : () async => await controller.sendOTP(),
                   ),
-                  SizedBox(
-                    height: SizeConfig.safeBlockVertical * 5,
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(
-                        horizontal: SizeConfig.safeBlockVertical * 9),
-                    child: Column(
-                      children: [
-                        ConstantWidget.getButtonWidget(
-                            context,
-                            S.of(context).resend,
-                            ConstantData.primaryColor,
-                            () {}),
-                        SizedBox(
-                          height: SizeConfig.safeBlockVertical * 3,
-                        ),
-                        ConstantWidget.getButtonWidget(
-                            context, S.of(context).next, ConstantData.cellColor,
-                            () {
-                          showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return CustomDialogBox(
-                                  title: "Account Created!",
-                                  descriptions:
-                                      "Your account has\nbeen successfully created!",
-                                  text: "Continue",
-                                  func: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              WidgetNotificationConfirmation(),
-                                        ));
-                                  },
-                                );
-                              });
-
-                          // Navigator.push(context, MaterialPageRoute(builder: (context) => SignUpPage(),));
-                        }),
-                      ],
-                    ),
-                  )
-                ],
-              ),
+                const SizedBox(width: 5),
+              ],
             ),
-          ),
-        ),
-        onWillPop: _requestPop);
+            body: controller.codeSent
+                ? ListView(
+                    padding: const EdgeInsets.all(20),
+                    children: [
+                      Text(
+                        "We've sent an SMS with a verification code to $phoneNumber",
+                        style: const TextStyle(
+                          fontSize: 25,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Divider(),
+                      AnimatedContainer(
+                        duration: const Duration(seconds: 1),
+                        height: controller.timerIsActive ? null : 0,
+                        child: Column(
+                          children: const [
+                            CircularProgressIndicator.adaptive(),
+                            SizedBox(height: 50),
+                            Text(
+                              "Listening for OTP",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 25,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Divider(),
+                            Text("OR", textAlign: TextAlign.center),
+                            Divider(),
+                          ],
+                        ),
+                      ),
+                      const Text(
+                        "Enter OTP",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      TextField(
+                        maxLength: 6,
+                        keyboardType: TextInputType.number,
+                        onChanged: (String v) async {
+                          _enteredOTP = v;
+                          if (_enteredOTP?.length == 6) {
+                            final isValidOTP = await controller.verifyOTP(
+                              otp: _enteredOTP,
+                            );
+                            // Incorrect OTP
+                            if (!isValidOTP) {
+                              _showSnackBar(
+                                context,
+                                "Please enter the correct OTP sent to $phoneNumber",
+                              );
+                            }
+                          }
+                        },
+                      ),
+                    ],
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: const [
+                      CircularProgressIndicator.adaptive(),
+                      SizedBox(height: 50),
+                      Center(
+                        child: Text(
+                          "Sending OTP",
+                          style: TextStyle(fontSize: 25),
+                        ),
+                      ),
+                    ],
+                  ),
+          );
+        },
+      ),
+    );
   }
 }

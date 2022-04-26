@@ -50,6 +50,7 @@ dependencies:
   firebase_database: ^9.0.10
   firebase_messaging: ^11.2.11
   overlay_support: ^1.2.1
+  firebase_phone_auth_handler:
 
 
 

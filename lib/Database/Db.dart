@@ -47,16 +47,6 @@ class Db {
               doc.reference.update({'status': 'assigned'});
               doc.reference.update({'driverNumber': driver});
             }));
-
-    // CollectionReference collectionRef3;
-    //collectionRef3
-    // .doc(id)
-    // .collection('orders')
-    // .where('orderId', isEqualTo: id)
-    // .get()
-    //  .then((value) => value.docs.forEach((doc) {
-    //   doc.reference.update({'answer': ''});
-    // }));
   }
 
   Future<List<OrderList>> completedOrderList() async {

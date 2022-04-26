@@ -1,18 +1,27 @@
 {
   "project_info": {
     "project_number": "853162747548",
+    "firebase_url": "https://kitman-3a2d0-default-rtdb.firebaseio.com",
     "project_id": "kitman-3a2d0",
     "storage_bucket": "kitman-3a2d0.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:853162747548:android:11dcdafa782664bd1fef59",
+        "mobilesdk_app_id": "1:853162747548:android:a2ec2b94e68e66bb1fef59",
         "android_client_info": {
-          "package_name": "com.delivery.Knitman"
+          "package_name": "com.delivery.knitman"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "853162747548-74ke0uqev1lvnbi6g2gscirp9gimuoqe.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.delivery.knitman",
+            "certificate_hash": "4dad2604e8293bb4b0794126a75c5b7bf624a4f0"
+          }
+        },
         {
           "client_id": "853162747548-6rv2m6uububspe08ttmu5obmr8ki8lqb.apps.googleusercontent.com",
           "client_type": 3

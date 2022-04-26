@@ -5,8 +5,9 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:knitman/Database/Db.dart';
+import 'package:knitman/PhoneVerification.dart';
 
-import 'PhoneVerification.dart';
 import 'SignInPage.dart';
 import 'TermsConditionPage.dart';
 import 'generated/l10n.dart';
@@ -94,6 +95,8 @@ class _SignUpPage extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
+    Db db = new Db();
+    String date = DateTime.now().toString();
     SizeConfig().init(context);
     ConstantData.setThemePosition();
 
@@ -190,11 +193,48 @@ class _SignUpPage extends State<SignUpPage> {
                   ConstantWidget.getButtonWidget(
                       context, S.of(context).signUp, ConstantData.primaryColor,
                       () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PhoneVerification(),
-                        ));
+                    String pas1 = textPasswordController.text;
+                    String pas2 = textPasswordConfirmController.text;
+                    if (pas1 == pas2) {
+                      print("+++++++++++++++++++++++++++++++++");
+                      db.signUp(
+                          textPhoneController.text,
+                          textEmailController.text,
+                          textFirstNameController.text,
+                          textLastNameController.text,
+                          "Customer",
+                          date,
+                          textPasswordController.text);
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PhoneVerification(),
+                          ));
+                    } else {
+                      print("--------------------");
+                      setState(() {
+                        AlertDialog(
+                          title: const Text('AlertDialog Title'),
+                          content: SingleChildScrollView(
+                            child: ListBody(
+                              children: const <Widget>[
+                                Text('This is a demo alert dialog.'),
+                                Text(
+                                    'Would you like to approve of this message?'),
+                              ],
+                            ),
+                          ),
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text('Approve'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      });
+                    }
                   }),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
