@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:853162747548:android:a2ec2b94e68e66bb1fef59",
         "android_client_info": {
-          "package_name": "com.delivery.knitman"
+          "package_name": "com.delivery.Knitman"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "853162747548-74ke0uqev1lvnbi6g2gscirp9gimuoqe.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.delivery.knitman",
+            "package_name": "com.delivery.Knitman",
             "certificate_hash": "4dad2604e8293bb4b0794126a75c5b7bf624a4f0"
           }
         },

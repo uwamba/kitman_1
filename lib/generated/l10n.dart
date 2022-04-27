@@ -117,6 +117,16 @@ class S {
     );
   }
 
+  /// `confirm password`
+  String get Role {
+    return Intl.message(
+      'Your Role',
+      name: 'Role',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Your Email`
   String get yourEmail {
     return Intl.message(
