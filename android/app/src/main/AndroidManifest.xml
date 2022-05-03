@@ -19,7 +19,7 @@
         android:icon="@mipmap/ic_launcher">
 
        <meta-data android:name="com.google.android.geo.API_KEY"
-           android:value="AIzaSyDqsiCTWY09YdZPNmtDpw56MxjukjI3w6g"/>
+           android:value="AIzaSyC-dIJ5UWH1sd05F8fx4sHhtZZ7hHNwmbo"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
@@ -44,6 +44,8 @@
               android:name="io.flutter.embedding.android.SplashScreenDrawable"
               android:resource="@drawable/launch_background"
               />
+
+
             <meta-data
                 android:name="firebase_messaging_auto_init_enabled"
                 android:value="false" />
@@ -51,6 +53,7 @@
                 android:name="firebase_analytics_collection_enabled"
                 android:value="false" />
             <intent-filter>
+                <action android:name="FLUTTER_NOTIFICATION_CLICK" />
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>

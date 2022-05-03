@@ -51,6 +51,7 @@ dependencies:
   firebase_messaging: ^11.2.11
   overlay_support: ^1.2.1
   firebase_phone_auth_handler:
+  flutter_local_notifications: ^9.2.0
 
 
 

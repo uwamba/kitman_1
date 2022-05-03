@@ -6,7 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:knitman/Database/Db.dart';
-import 'package:knitman/PhoneVerification.dart';
+import 'package:knitman/UsersList.dart';
 
 import 'SignInPage.dart';
 import 'TermsConditionPage.dart';
@@ -37,7 +37,7 @@ class _Registration extends State<Registration> {
   TextEditingController textPhoneController = new TextEditingController();
   TextEditingController textLastNameController = new TextEditingController();
   TextEditingController textRoleController = new TextEditingController();
-
+  String dropdownValue = 'Customer';
   bool isCheck = false;
 
   void registerNotification() async {
@@ -145,8 +145,28 @@ class _Registration extends State<Registration> {
                       S.of(context).yourFirstName, textFirstNameController),
                   ConstantWidget.getTextFiledWidget(context,
                       S.of(context).yourLastName, textLastNameController),
-                  ConstantWidget.getPasswordTextFiled(
-                      context, S.of(context).Role, textRoleController),
+                  DropdownButton<String>(
+                    value: dropdownValue,
+                    icon: const Icon(Icons.arrow_downward),
+                    elevation: 16,
+                    style: const TextStyle(color: Colors.deepPurple),
+                    underline: Container(
+                      height: 2,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    onChanged: (String newValue) {
+                      setState(() {
+                        dropdownValue = newValue;
+                      });
+                    },
+                    items: <String>['Customer', 'Corporate', 'Admin', 'Driver']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
                   ConstantWidget.getTextFiledWidget(
                       context, S.of(context).password, textPasswordController),
                   ConstantWidget.getPasswordTextFiled(
@@ -205,38 +225,16 @@ class _Registration extends State<Registration> {
                           textEmailController.text,
                           textFirstNameController.text,
                           textLastNameController.text,
-                          "Customer",
+                          dropdownValue,
                           date,
                           textPasswordController.text);
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => PhoneVerification(),
+                            builder: (context) => UsersList(),
                           ));
                     } else {
                       print("--------------------");
-                      setState(() {
-                        AlertDialog(
-                          title: const Text('AlertDialog Title'),
-                          content: SingleChildScrollView(
-                            child: ListBody(
-                              children: const <Widget>[
-                                Text('This is a demo alert dialog.'),
-                                Text(
-                                    'Would you like to approve of this message?'),
-                              ],
-                            ),
-                          ),
-                          actions: <Widget>[
-                            TextButton(
-                              child: const Text('Approve'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        );
-                      });
                     }
                   }),
                   Row(

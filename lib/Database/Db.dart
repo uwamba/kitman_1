@@ -47,11 +47,23 @@ class Db {
               doc.reference.update({'status': 'assigned'});
               doc.reference.update({'driverNumber': driver});
             }));
+    print("updated");
+  }
+
+  Future updateStatus(id, status) async {
+    QuerySnapshot querySnapshot;
+    await collectionRef
+        .where('orderNumber', isEqualTo: id)
+        .get()
+        .then((value) => value.docs.forEach((doc) {
+              doc.reference.update({'status': status});
+            }));
+    print(status + id);
   }
 
   Future<List<OrderList>> completedOrderList() async {
     QuerySnapshot querySnapshot =
-        await collectionRef.where('status', isEqualTo: "Completed").get();
+        await collectionRef.where('status', isEqualTo: "completed").get();
     final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
 
     completeOrderList =
@@ -75,6 +87,64 @@ class Db {
       querySnapshot.docChanges.forEach((change) async {
         QuerySnapshot querySnapshot =
             await collectionRef.where('status', isEqualTo: "new").get();
+
+        final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+        completeOrderList =
+            parsed.map<OrderList>((json) => OrderList.fromJson(json)).toList();
+
+        print(completeOrderList);
+      });
+    });
+
+    return completeOrderList;
+  }
+
+  Future<List<OrderList>> adminActiveOrderList() async {
+    QuerySnapshot querySnapshot = await collectionRef
+        .where("status", whereIn: ["accepted", "picked", "delivered"]).get();
+
+    final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+    completeOrderList =
+        parsed.map<OrderList>((json) => OrderList.fromJson(json)).toList();
+
+    print(completeOrderList);
+    collectionRef.snapshots().listen((querySnapshot) {
+      querySnapshot.docChanges.forEach((change) async {
+        QuerySnapshot querySnapshot =
+            await collectionRef.where('status', isEqualTo: "new").get();
+
+        final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+        completeOrderList =
+            parsed.map<OrderList>((json) => OrderList.fromJson(json)).toList();
+
+        print(completeOrderList);
+      });
+    });
+
+    return completeOrderList;
+  }
+
+  Future<List<OrderList>> customerActiveOrderList(sender) async {
+    QuerySnapshot querySnapshot = await collectionRef
+        .where("status",
+            whereIn: ["accepted", "picked", "delivered", "assigned", "new"])
+        .where("senderId", isEqualTo: sender)
+        .get();
+
+    final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+    completeOrderList =
+        parsed.map<OrderList>((json) => OrderList.fromJson(json)).toList();
+
+    print(completeOrderList);
+    collectionRef.snapshots().listen((querySnapshot) {
+      querySnapshot.docChanges.forEach((change) async {
+        QuerySnapshot querySnapshot = await collectionRef
+            .where("status", isNotEqualTo: "completed")
+            .get();
 
         final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
 
@@ -215,6 +285,7 @@ class Db {
       'email': email,
       'role': role,
       'created': date,
+      'phone': userId,
       'password': password
     };
     users.add(userData);

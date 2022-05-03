@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:knitman/model/orderList.dart';
 
+import 'Database/Db.dart';
 import 'TrackOrderDetail.dart';
 import 'generated/l10n.dart';
 import 'util/ConstantData.dart';
@@ -59,13 +61,22 @@ class _TrackOrderPage extends State<TrackOrderPage> {
                 spaceWidget,
                 getCell(textController),
                 spaceWidget,
-                ConstantWidget.getBottomText(context, S.of(context).track, () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        // builder: (context) => PackageDeliveryTrackingPage(),
-                        builder: (context) => TrackOrderDetail(),
-                      ));
+                ConstantWidget.getBottomText(context, S.of(context).track,
+                    () async {
+                  Db db = new Db();
+                  List<OrderList> list = await db.orderListWhere(
+                      "orderNumber", textController.text);
+                  if (list.length <= 0) {
+                    print("not found");
+                  } else {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          // builder: (context) => PackageDeliveryTrackingPage(),
+                          builder: (context) => TrackOrderDetail(
+                              textController.text, list.elementAt(0)),
+                        ));
+                  }
                 }),
                 spaceWidget,
               ],

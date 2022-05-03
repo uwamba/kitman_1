@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:knitman/Database/Db.dart';
 import 'package:knitman/Database/UserPresence.dart';
 import 'package:knitman/model/orderList.dart';
+import 'package:location/location.dart';
 import 'package:timelines/timelines.dart';
 
 import 'AboutUsPage.dart';
@@ -15,6 +18,7 @@ import 'MyVouchers.dart';
 import 'NotificationPage.dart';
 import 'OrderDetail.dart';
 import 'OrderDetails.dart';
+import 'OrderDetailsDriver.dart';
 import 'RatingPage.dart';
 import 'ResetPasswordPage.dart';
 import 'SchedulePage.dart';
@@ -67,6 +71,14 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
   int themMode;
   bool isFirstTime = false;
   String phone;
+
+  UserLocation _currentLocation;
+  Location location = new Location();
+  StreamController<UserLocation> _locationController =
+      StreamController<UserLocation>();
+
+  Stream<UserLocation> get locationStream => _locationController.stream;
+
   getThemeMode() async {
     isFirstTime = await PrefData.getIsFirstTime();
 
@@ -78,19 +90,61 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
     setState(() {});
   }
 
+  Future<GeoPoint> getLocation() async {
+    GeoPoint _currentLocation;
+    try {
+      var userLocation = await location.getLocation();
+      _currentLocation = GeoPoint(
+        userLocation.latitude,
+        userLocation.longitude,
+      );
+    } on Exception catch (e) {
+      print('Could not get location: ${e.toString()}');
+    }
+
+    return _currentLocation;
+  }
+
+  void setUserData() async {
+    phone = await PrefData.getPhoneNumber();
+    String email = await PrefData.getEmail();
+    String lastName = await PrefData.getLastName();
+    String firstName = await PrefData.getFirstName();
+    GeoPoint location = await getLocation();
+    UserPresence(phone, email, lastName, firstName, location)
+        .updateUserPresence();
+  }
+
   void setPresence() async {
     phone = await PrefData.getPhoneNumber();
     String email = await PrefData.getEmail();
     String lastName = await PrefData.getLastName();
     String firstName = await PrefData.getFirstName();
-    UserPresence(phone, email, lastName, firstName).updateUserPresence();
+    GeoPoint location = await getLocation();
+    UserPresence(phone, email, lastName, firstName, location)
+        .updateUserLocation();
+  }
+
+  locationService() {
+    // Request permission to use location
+    location.requestPermission().then((permissionStatus) {
+      if (permissionStatus == PermissionStatus.granted) {
+        // If granted listen to the onLocationChanged stream and emit over our controller
+        location.onLocationChanged.listen((locationData) {
+          if (locationData != null) {
+            print("location changed");
+            setPresence();
+          }
+        });
+      }
+    });
   }
 
   @override
   void initState() {
     // TODO: implement initState
-
-    setPresence();
+    setUserData();
+    locationService();
     getThemeMode();
 
     CollectionReference collectionRef =
@@ -1121,11 +1175,12 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
                       ),
                     ),
                     onTap: () async {
-                      activeOrderListModel = await db.activeOrderList();
+                      activeOrderListModel =
+                          await db.orderListWhere("driverNumber", phone);
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ActiveOrderDetail(
+                            builder: (context) => OrderDetailsDriver(
                                 activeOrderListModel.elementAt(index)),
                           ));
                     },
@@ -1727,4 +1782,11 @@ class _DeliveryProcesses extends StatelessWidget {
       ),
     );
   }
+}
+
+class UserLocation {
+  final double latitude;
+  final double longitude;
+
+  UserLocation({this.latitude, this.longitude});
 }

@@ -3,17 +3,20 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:knitman/model/orderList.dart';
 import 'package:timelines/timelines.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'ChatScreen.dart';
 import 'generated/l10n.dart';
-import 'model/Message.dart';
 import 'util/ConstantData.dart';
 import 'util/ConstantWidget.dart';
 import 'util/SizeConfig.dart';
 
 class TrackOrderDetail extends StatefulWidget {
+  final String keyword;
+  final OrderList list;
+  TrackOrderDetail(this.keyword, this.list);
+
   @override
   _TrackOrderDetail createState() {
     return _TrackOrderDetail();
@@ -26,16 +29,15 @@ class _TrackOrderDetail extends State<TrackOrderDetail> {
     return new Future.value(true);
   }
 
+  CameraPosition _kGooglePlex;
+
   Completer _controller = Completer();
   Map<MarkerId, Marker> markers = {};
-  static final CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(40.65790014590701, -73.77194564694435),
-    zoom: 12.0,
-  );
+
   List listMarkerIds = [];
 
   BitmapDescriptor customIcon1;
-
+  LatLng senderCoordinates, receiverCoordinates;
   createMarker(context) {
     if (customIcon1 == null) {
       ImageConfiguration configuration = createLocalImageConfiguration(context);
@@ -51,9 +53,38 @@ class _TrackOrderDetail extends State<TrackOrderDetail> {
   }
 
   double margin;
+  // List<OrderList> activeOrderListModel;
+  getList() async {
+    print(widget.keyword);
+    senderCoordinates = LatLng(widget.list.senderCoordinates.latitude,
+        widget.list.senderCoordinates.longitude);
+    receiverCoordinates = LatLng(widget.list.receiverCoordinates.latitude,
+        widget.list.receiverCoordinates.longitude);
+    print(receiverCoordinates);
+    _kGooglePlex = CameraPosition(
+      target: senderCoordinates,
+      zoom: 12.0,
+    );
+    getPoints();
+  }
 
   @override
   Widget build(BuildContext context) {
+    getList();
+    // print(list.elementAt(0).orderNumber);
+    //senderCoordinates = LatLng(list.elementAt(0).senderCoordinates.latitude,
+    //list.elementAt(0).senderCoordinates.longitude);
+    //receiverCoordinates = LatLng(list.elementAt(0).receiverCoordinates.latitude,
+    // list.elementAt(0).receiverCoordinates.longitude);
+    //_kGooglePlex = CameraPosition(
+    //  target: senderCoordinates,
+    //  zoom: 12.0,
+    // );
+    _kGooglePlex = CameraPosition(
+      target: LatLng(widget.list.senderCoordinates.latitude,
+          widget.list.senderCoordinates.longitude),
+      zoom: 12.0,
+    );
     createMarker(context);
     PolylineId polylineId = PolylineId("area");
     SizeConfig().init(context);
@@ -85,11 +116,11 @@ class _TrackOrderDetail extends State<TrackOrderDetail> {
               child: ListView(
                 children: [
                   Container(
-                    height: height,
+                    height: height * 2,
                     child: Stack(
                       children: [
                         Container(
-                          height: height,
+                          height: height * 2,
                           width: double.infinity,
                           child: GoogleMap(
                             initialCameraPosition: _kGooglePlex,
@@ -124,7 +155,8 @@ class _TrackOrderDetail extends State<TrackOrderDetail> {
                               Marker marker1 = Marker(
                                   markerId: markerId1,
                                   position: LatLng(
-                                      40.65790014590701, -73.77194564694435),
+                                      widget.list.senderCoordinates.latitude,
+                                      widget.list.senderCoordinates.longitude),
                                   icon: customIcon1
                                   // LatLng(21.214571209464843, 72.88491829958917),
                                   );
@@ -132,7 +164,8 @@ class _TrackOrderDetail extends State<TrackOrderDetail> {
                               Marker marker2 = Marker(
                                 markerId: markerId2,
                                 position: LatLng(
-                                    40.65214565261112, -73.8060743777546),
+                                    widget.list.receiverCoordinates.latitude,
+                                    widget.list.receiverCoordinates.longitude),
 
                                 // LatLng(21.21103054325307, 72.89371594512971),
                               );
@@ -156,17 +189,6 @@ class _TrackOrderDetail extends State<TrackOrderDetail> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        ClipOval(
-                          // borderRadius: BorderRadius.all(Radius.circular(
-                          //     ConstantWidget.getPercentSize(
-                          //         bottomImageHeight, 12))),
-                          child: Image.asset(
-                            ConstantData.assetsPath + "hugh.png",
-                            fit: BoxFit.cover,
-                            width: bottomImageHeight,
-                            height: bottomImageHeight,
-                          ),
-                        ),
                         ConstantWidget.getHorizonSpace(
                             SizeConfig.safeBlockHorizontal * 1.5),
                         Expanded(
@@ -177,7 +199,7 @@ class _TrackOrderDetail extends State<TrackOrderDetail> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               ConstantWidget.getCustomText(
-                                  "James King",
+                                  "Status:" + widget.list.status,
                                   ConstantData.mainTextColor,
                                   1,
                                   TextAlign.start,
@@ -195,7 +217,8 @@ class _TrackOrderDetail extends State<TrackOrderDetail> {
                                   ConstantWidget.getHorizonSpace(
                                       SizeConfig.safeBlockHorizontal * 1.2),
                                   ConstantWidget.getCustomText(
-                                      "ID 2445556",
+                                      "Driver: " +
+                                          widget.list.driverNumber.toString(),
                                       Colors.grey,
                                       1,
                                       TextAlign.start,
@@ -215,20 +238,7 @@ class _TrackOrderDetail extends State<TrackOrderDetail> {
                                   bottomHeight, 20),
                             ),
                             onPressed: () {
-                              _callNumber();
-                            }),
-                        IconButton(
-                            icon: Icon(
-                              CupertinoIcons.chat_bubble_text_fill,
-                              color: ConstantData.accentColor,
-                              size: ConstantWidget.getPercentSize(
-                                  bottomHeight, 20),
-                            ),
-                            onPressed: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) =>
-                                    ChatScreen(user: chats[0].sender),
-                              ));
+                              _callNumber(widget.list.driverNumber);
                             }),
                       ],
                     ),
@@ -236,27 +246,20 @@ class _TrackOrderDetail extends State<TrackOrderDetail> {
                   SizedBox(
                     height: (margin),
                   ),
-                  _DeliveryProcesses(processes: _data(0).deliveryProcesses),
+                  //_DeliveryProcesses(processes: _data(0).deliveryProcesses),
                 ],
               )),
         ),
         onWillPop: _requestPop);
   }
 
-  void _callNumber() async {
-    String s = "89898989";
-
-    String url = "tel:" + s;
+  void _callNumber(number) async {
+    String url = "tel:" + number;
     await launch(url);
   }
 
   getPoints() {
-    return [
-      LatLng(40.65790014590701, -73.77194564694435),
-      // LatLng(21.214571209464843, 72.88491829958917),
-      LatLng(40.65214565261112, -73.8060743777546),
-      // LatLng(21.21103054325307, 72.89371594512971),
-    ];
+    return [senderCoordinates, receiverCoordinates];
   }
 
   _OrderInfo _data(int id) => _OrderInfo(

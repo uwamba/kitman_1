@@ -27,6 +27,8 @@ class _SignUpPage extends State<SignUpPage> {
   FirebaseMessaging _messaging = FirebaseMessaging.instance;
   bool isRemember = false;
   int themeMode = 0;
+  double margin;
+  double radius;
   int _totalNotifications;
   PushNotification _notificationInfo;
   TextEditingController textEmailController = new TextEditingController();
@@ -98,6 +100,8 @@ class _SignUpPage extends State<SignUpPage> {
     Db db = new Db();
     String date = DateTime.now().toString();
     SizeConfig().init(context);
+    margin = ConstantWidget.getScreenPercentSize(context, 2);
+    // radius = ConstantWidget.getScreenPercentSize(context, 1.5);
     ConstantData.setThemePosition();
 
     double subHeight = ConstantWidget.getScreenPercentSize(context, 8.5);
@@ -208,31 +212,13 @@ class _SignUpPage extends State<SignUpPage> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => PhoneVerification(),
+                            builder: (context) =>
+                                PhoneVerification(textPhoneController.text),
                           ));
                     } else {
                       print("--------------------");
                       setState(() {
-                        AlertDialog(
-                          title: const Text('AlertDialog Title'),
-                          content: SingleChildScrollView(
-                            child: ListBody(
-                              children: const <Widget>[
-                                Text('This is a demo alert dialog.'),
-                                Text(
-                                    'Would you like to approve of this message?'),
-                              ],
-                            ),
-                          ),
-                          actions: <Widget>[
-                            TextButton(
-                              child: const Text('Approve'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        );
+                        bottomDeliverDialog();
                       });
                     }
                   }),
@@ -272,6 +258,141 @@ class _SignUpPage extends State<SignUpPage> {
           ),
         ),
         onWillPop: _requestPop);
+  }
+
+  void bottomDeliverDialog() {
+    var widget = SizedBox(
+      height: (margin * 1.2),
+    );
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Wrap(
+        children: [
+          Container(
+            padding:
+                EdgeInsets.all(ConstantWidget.getScreenPercentSize(context, 2)),
+            // height: MediaQuery.of(context).size.height * 0.85,
+            decoration: new BoxDecoration(
+              color: ConstantData.cellColor,
+              borderRadius: new BorderRadius.only(
+                topLeft: Radius.circular(
+                    ConstantWidget.getScreenPercentSize(context, 5)),
+                topRight: Radius.circular(
+                    ConstantWidget.getScreenPercentSize(context, 5)),
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    new Spacer(),
+                    InkWell(
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.grey,
+                        size: ConstantWidget.getScreenPercentSize(context, 3),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                    )
+                  ],
+                ),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Icon(
+                    CupertinoIcons.timer_fill,
+                    size: ConstantWidget.getScreenPercentSize(context, 6),
+                    color: ConstantData.primaryColor,
+                  ),
+                ),
+                widget,
+                ConstantWidget.getTextWidget(
+                    S.of(context).error,
+                    ConstantData.mainTextColor,
+                    TextAlign.start,
+                    FontWeight.w700,
+                    ConstantWidget.getScreenPercentSize(context, 3)),
+                widget,
+                ConstantWidget.getCustomText(
+                    "Password you entered not match try  again!.",
+                    Colors.grey,
+                    2,
+                    TextAlign.start,
+                    FontWeight.w500,
+                    ConstantData.font18Px),
+                widget,
+                Divider(
+                  height: ConstantWidget.getScreenPercentSize(context, 0.02),
+                ),
+                widget,
+                widget,
+                widget,
+                widget,
+                ConstantWidget.getBottomText(context, "Ok", () {
+                  Navigator.pop(context);
+                })
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  getWeightCell() {
+    double size = ConstantWidget.getScreenPercentSize(context, 4);
+    return Container(
+      height: size,
+      decoration: BoxDecoration(
+          color: Colors.grey.withOpacity(0.2),
+          borderRadius: BorderRadius.all(
+              Radius.circular(ConstantWidget.getPercentSize(size, 50)))),
+      child: Row(
+        children: [
+          // Icon(
+          //   Icons.,
+          //   size: ConstantWidget.getPercentSize(size, 60),
+          //   color: Colors.grey,
+          // ),
+          Image.asset(
+            ConstantData.assetsPath + "weight_icon.png",
+            height: ConstantWidget.getPercentSize(size, 60),
+            color: Colors.grey,
+          ),
+          SizedBox(
+            width: (margin / 3),
+          ),
+          Image.asset(
+            ConstantData.assetsPath + "weight_icon.png",
+            height: ConstantWidget.getPercentSize(size, 60),
+            color: Colors.grey,
+          )
+        ],
+      ),
+    );
+  }
+
+  getCircleCell(var color, var icon) {
+    double size = ConstantWidget.getScreenPercentSize(context, 4);
+    return Container(
+      height: size,
+      width: size,
+      decoration:
+          BoxDecoration(shape: BoxShape.circle, color: color.withOpacity(0.2)),
+      child: Center(
+        child: Icon(
+          icon,
+          size: ConstantWidget.getPercentSize(size, 60),
+          color: color,
+        ),
+      ),
+    );
   }
 }
 

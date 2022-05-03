@@ -8,16 +8,20 @@ import 'package:knitman/Database/Db.dart';
 import 'package:knitman/Database/UserPresence.dart';
 import 'package:knitman/NearDrivers.dart';
 import 'package:knitman/OrderDetails.dart';
+import 'package:knitman/Registration.dart';
+import 'package:knitman/UsersList.dart';
 import 'package:knitman/model/onlineUser.dart';
 import 'package:knitman/model/orderList.dart';
+import 'package:location/location.dart';
 import 'package:timelines/timelines.dart';
 
 import 'AboutUsPage.dart';
 import 'ChatScreen.dart';
 import 'CompleteOrderDetail.dart';
+import 'DriverMap.dart';
 import 'EditProfilePage.dart';
-import 'MyVouchers.dart';
 import 'NotificationPage.dart';
+import 'OrderMap.dart';
 import 'ResetPasswordPage.dart';
 import 'SchedulePage.dart';
 import 'TermsConditionPage.dart';
@@ -58,16 +62,17 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
   List<ChatModel> chatUserList = DataFile.getChatUserList();
   List<TimeLineModel> timeLineModel = [];
   int tabPosition = 0;
-  List<String> s = ["Orders", "New Order", "Chat", "Profile"];
+
+  List<String> s = ["New Orders", "Active Orders", "Driver", "Profile"];
   List<NewOrderTypeModel> orderTypeList = DataFile.getOrderTypeList();
   List<CompletedOrderModel> completeOrderList = DataFile.getCompleteOrder();
   List<ActiveOrderModel> activeOrderList = DataFile.getActiveOrderList();
-
+  String phone;
   bool isAppbarVisible = true;
   String presence;
   int themMode;
   bool isFirstTime = false;
-
+  Location location = new Location();
   getThemeMode() async {
     isFirstTime = await PrefData.getIsFirstTime();
 
@@ -79,20 +84,62 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
     setState(() {});
   }
 
-  void setPresence() async {
-    String phone = await PrefData.getPhoneNumber();
+  void setLocation() async {
+    phone = await PrefData.getPhoneNumber();
     String email = await PrefData.getEmail();
     String lastName = await PrefData.getLastName();
     String firstName = await PrefData.getFirstName();
-    UserPresence(phone, email, firstName, lastName).updateUserPresence();
+    GeoPoint location = await getLocation();
+    UserPresence(phone, email, lastName, firstName, location)
+        .updateUserLocation();
+  }
+
+  void setUserData() async {
+    phone = await PrefData.getPhoneNumber();
+    String email = await PrefData.getEmail();
+    String lastName = await PrefData.getLastName();
+    String firstName = await PrefData.getFirstName();
+    GeoPoint location = await getLocation();
+    UserPresence(phone, email, lastName, firstName, location)
+        .updateUserPresence();
+  }
+
+  locationService() {
+    // Request permission to use location
+    location.requestPermission().then((permissionStatus) {
+      if (permissionStatus == PermissionStatus.granted) {
+        // If granted listen to the onLocationChanged stream and emit over our controller
+        location.onLocationChanged.listen((locationData) {
+          if (locationData != null) {
+            print("location changed");
+            setLocation();
+          }
+        });
+      }
+    });
+  }
+
+  Future<GeoPoint> getLocation() async {
+    GeoPoint _currentLocation;
+    try {
+      var userLocation = await location.getLocation();
+      _currentLocation = GeoPoint(
+        userLocation.latitude,
+        userLocation.longitude,
+      );
+    } on Exception catch (e) {
+      print('Could not get location: ${e.toString()}');
+    }
+
+    return _currentLocation;
   }
 
   @override
   void initState() {
     // TODO: implement initState
 
-    setPresence();
-
+    setUserData();
+    locationService();
     CollectionReference collectionRef =
         FirebaseFirestore.instance.collection('orders');
     Db db = new Db();
@@ -119,9 +166,10 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     ConstantData.setThemePosition();
-
+    setUserData();
+    locationService();
     motionTabBar = new MotionTabBar(
-      labels: ["Orders", "New Order", "Chat", "Profile"],
+      labels: ["New Orders", "Active Orders", "Driver", "Profile"],
       initialSelectedTab: s[_selectedIndex],
       tabIconColor: ConstantData.mainTextColor,
       tabSelectedColor: ConstantData.primaryColor,
@@ -164,7 +212,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                   child: orderPage(),
                 ),
                 Container(
-                  child: newOrderPage(),
+                  child: orderPage2(),
                 ),
                 Container(
                   child: getChatPage(),
@@ -419,7 +467,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                       ),
                     ),
                   )),
-                  visible: (users[5]),
+                  visible: (users[7]),
                 )
               ],
             ),
@@ -497,19 +545,126 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
         ),
       ),
       onTap: () {
-        // Navigator.push(
-        //   context,
-        //  MaterialPageRoute(
-        //    builder: (context) => ChatScreen(
-        //   user: chats[0].sender,
-        //  chatModel: chatModel,
-        // ),
-        //));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DriverMap(),
+            ));
       },
     );
   }
 
   orderPage() {
+    double appbarHeight = ConstantWidget.getScreenPercentSize(context, 8);
+    return Container(
+      color: ConstantData.primaryColor,
+      child: SafeArea(
+        child: Column(
+          children: [
+            Container(
+              height: appbarHeight,
+              color: ConstantData.primaryColor,
+              padding: EdgeInsets.only(right: ConstantData.font15Px),
+              child: Stack(
+                children: [
+                  Center(
+                    child: ConstantWidget.getTextWidget(
+                        S.of(context).orders,
+                        Colors.white,
+                        TextAlign.center,
+                        FontWeight.w600,
+                        ConstantData.font22Px),
+                  ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: InkWell(
+                      child: Padding(
+                        padding: EdgeInsets.only(left: (ConstantData.font15Px)),
+                        child: Icon(
+                          Icons.notifications,
+                          size: ConstantWidget.getPercentSize(appbarHeight, 50),
+                          color: Colors.white,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => NearDrivers(),
+                            ));
+                      },
+                    ),
+                  ),
+                  Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          ConstantData.assetsPath + "delivery.png",
+                          height:
+                              ConstantWidget.getPercentSize(appbarHeight, 50),
+                          color: Colors.white,
+                        ),
+                        SizedBox(
+                          width: ConstantData.font15Px,
+                        ),
+                        InkWell(
+                          child: ConstantWidget.getTextWidget(
+                              S.of(context).tracknorder,
+                              Colors.white,
+                              TextAlign.center,
+                              FontWeight.w400,
+                              ConstantData.font18Px),
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => TrackOrderPage(),
+                                ));
+                          },
+                        ),
+                        SizedBox(
+                          width: ConstantData.font15Px,
+                        ),
+                        // Icon(
+                        //   Icons.info_outlined,
+                        //   size: ConstantWidget.getPercentSize(appbarHeight, 50),
+                        //   color: Colors.white,
+                        // ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Container(
+                height: appbarHeight,
+                color: ConstantData.cellColor,
+                child: Stack(
+                  children: [
+                    Row(
+                      children: [
+                        getTabWidget(S.of(context).unassigned, 0),
+                        getTabWidget(S.of(context).assigned, 1),
+                      ],
+                    )
+                  ],
+                )),
+            Expanded(
+                child: Container(
+              color: ConstantData.bgColor,
+              child: (tabPosition == 0)
+                  ? tabUnassignedWidget()
+                  : tabAssignedWidget(),
+            ))
+          ],
+        ),
+      ),
+    );
+  }
+
+  orderPage2() {
     double appbarHeight = ConstantWidget.getScreenPercentSize(context, 8);
     return Container(
       color: ConstantData.primaryColor,
@@ -765,7 +920,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                   );
                 }
               },
-              future: db.assignedList(),
+              future: db.completedOrderList(),
             ),
           )
         ],
@@ -774,6 +929,226 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
   }
 
   tabActiveWidget() {
+    double margin = ConstantWidget.getScreenPercentSize(context, 2);
+    double allMargin = ConstantWidget.getScreenPercentSize(context, 1);
+    double height = ConstantWidget.getScreenPercentSize(context, 13);
+
+    double imageSize = ConstantWidget.getPercentSize(height, 60);
+    Db db = new Db();
+    PrefData.setIsFirstTime(false);
+
+    if (!widget.isDataShow) {
+      return Container(
+        width: double.infinity,
+        margin:
+            EdgeInsets.symmetric(horizontal: margin, vertical: (margin / 2)),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ConstantWidget.getTextWidget(
+                S.of(context).noActiveOrdersAtTheMoment,
+                Colors.grey,
+                TextAlign.start,
+                FontWeight.w400,
+                ConstantData.font18Px),
+            Expanded(
+                child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                InkWell(
+                  child: getActivityButton(
+                      S.of(context).sendPackage,
+                      S
+                          .of(context)
+                          .deliverOrReceiveItemsSuchAsGiftsdocumentskeys,
+                      "package.png",
+                      ConstantData.accentColor),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SchedulePage(false),
+                        ));
+                  },
+                ),
+                /*InkWell(
+                  child: getActivityButton(
+                      S.of(context).buyFromStorage,
+                      S.of(context).haveYourOrderBoughtAndDeliveredFromAnyStore,
+                      "shopping-cart.png",
+                      ConstantData.mainTextColor),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SchedulePage(false),
+                        ));
+                  },
+                ), */
+                InkWell(
+                  child: getActivityButton(
+                      S.of(context).iAmRecipient,
+                      S.of(context).trackAnIncomingDeliverITheApp,
+                      "location_1.png",
+                      ConstantData.mainTextColor),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TrackOrderPage(),
+                        ));
+                  },
+                )
+              ],
+            ))
+          ],
+        ),
+      );
+    } else {
+      return Container(
+        color: ConstantData.bgColor,
+        width: double.infinity,
+        child: FutureBuilder<List<OrderList>>(
+          builder: (context, orderSnap) {
+            if (!orderSnap.hasData) {
+              return Center(child: CircularProgressIndicator());
+            } else {
+              return ListView.builder(
+                itemCount: orderSnap.data.length,
+                itemBuilder: (context, index) {
+                  //OrderList listModel = orderSnap.data[index];
+                  timeLineModel.clear();
+                  TimeLineModel model = new TimeLineModel();
+                  model.text = "From: " + orderSnap.data[index].senderLocation;
+                  model.contact = orderSnap.data[index].senderPhone;
+                  model.isComplete = true;
+                  timeLineModel.add(model);
+
+                  TimeLineModel model2 = new TimeLineModel();
+                  model2.text = "To: " + orderSnap.data[index].receiverLocation;
+                  model2.contact = orderSnap.data[index].receiverPhone;
+                  model2.isComplete = true;
+                  timeLineModel.add(model2);
+
+                  return InkWell(
+                    child: Container(
+                      padding: EdgeInsets.all(margin),
+                      color: ConstantData.cellColor,
+                      margin: EdgeInsets.only(
+                          bottom:
+                              ConstantWidget.getScreenPercentSize(context, 1)),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              ConstantWidget.getTextWidget(
+                                  orderSnap.data[index].orderNumber,
+                                  ConstantData.mainTextColor,
+                                  TextAlign.start,
+                                  FontWeight.w400,
+                                  ConstantData.font22Px),
+                              new Spacer(),
+                              ConstantWidget.getTextWidget(
+                                  orderSnap.data[index].deliveryDate,
+                                  Colors.grey,
+                                  TextAlign.start,
+                                  FontWeight.w400,
+                                  ConstantData.font15Px),
+                            ],
+                          ),
+                          SizedBox(
+                            height: (margin / 1.5),
+                          ),
+                          Row(children: [
+                            ConstantWidget.getTextWidget(
+                                "Price: " + orderSnap.data[index].price,
+                                ConstantData.mainTextColor,
+                                TextAlign.start,
+                                FontWeight.w400,
+                                ConstantData.font18Px),
+                          ]),
+                          SizedBox(
+                            height: (margin / 1.5),
+                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ConstantWidget.getTextWidget(
+                                    orderSnap.data[index].packageWeight,
+                                    Colors.green,
+                                    TextAlign.start,
+                                    FontWeight.w400,
+                                    ConstantData.font18Px),
+                              ),
+                              InkWell(
+                                child: Container(
+                                  margin:
+                                      EdgeInsets.only(left: (allMargin * 3)),
+                                  height: imageSize * 0.80,
+                                  width: imageSize * 0.80,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.transparent,
+                                    image: DecorationImage(
+                                      image: ExactAssetImage(
+                                          ConstantData.assetsPath +
+                                              "track_order.png"),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                onTap: () async {
+                                  String driverId = await Navigator.push(
+                                      context,
+                                      new MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              new OrderMap(
+                                                  orderSnap
+                                                      .data[index].orderNumber,
+                                                  orderSnap.data[index]
+                                                      .driverNumber)));
+                                  print(
+                                      "driverrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr" +
+                                          driverId);
+                                  db.updateOrder(
+                                      orderSnap.data[index].orderNumber,
+                                      driverId);
+                                },
+                              )
+                            ],
+                          ),
+                          SizedBox(
+                            height: (margin / 1.5),
+                          ),
+                          _DeliveryProcesses(
+                            processes: timeLineModel,
+                          )
+                        ],
+                      ),
+                    ),
+                    onTap: () async {
+                      activeOrderListModel = await db.activeOrderList();
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ActiveOrderDetail(
+                                activeOrderListModel.elementAt(index)),
+                          ));
+                    },
+                  );
+                },
+              );
+            }
+          },
+          future: db.adminActiveOrderList(),
+        ),
+      );
+    }
+  }
+
+  tabUnassignedWidget() {
     double margin = ConstantWidget.getScreenPercentSize(context, 2);
     double allMargin = ConstantWidget.getScreenPercentSize(context, 1);
     double height = ConstantWidget.getScreenPercentSize(context, 13);
@@ -984,6 +1359,222 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
             }
           },
           future: db.unassignedList(),
+        ),
+      );
+    }
+  }
+
+  tabAssignedWidget() {
+    double margin = ConstantWidget.getScreenPercentSize(context, 2);
+    double allMargin = ConstantWidget.getScreenPercentSize(context, 1);
+    double height = ConstantWidget.getScreenPercentSize(context, 13);
+
+    double imageSize = ConstantWidget.getPercentSize(height, 60);
+    Db db = new Db();
+    PrefData.setIsFirstTime(false);
+
+    if (!widget.isDataShow) {
+      return Container(
+        width: double.infinity,
+        margin:
+            EdgeInsets.symmetric(horizontal: margin, vertical: (margin / 2)),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ConstantWidget.getTextWidget(
+                S.of(context).noActiveOrdersAtTheMoment,
+                Colors.grey,
+                TextAlign.start,
+                FontWeight.w400,
+                ConstantData.font18Px),
+            Expanded(
+                child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                InkWell(
+                  child: getActivityButton(
+                      S.of(context).sendPackage,
+                      S
+                          .of(context)
+                          .deliverOrReceiveItemsSuchAsGiftsdocumentskeys,
+                      "package.png",
+                      ConstantData.accentColor),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SchedulePage(false),
+                        ));
+                  },
+                ),
+                /*InkWell(
+                  child: getActivityButton(
+                      S.of(context).buyFromStorage,
+                      S.of(context).haveYourOrderBoughtAndDeliveredFromAnyStore,
+                      "shopping-cart.png",
+                      ConstantData.mainTextColor),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SchedulePage(false),
+                        ));
+                  },
+                ), */
+                InkWell(
+                  child: getActivityButton(
+                      S.of(context).iAmRecipient,
+                      S.of(context).trackAnIncomingDeliverITheApp,
+                      "location_1.png",
+                      ConstantData.mainTextColor),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TrackOrderPage(),
+                        ));
+                  },
+                )
+              ],
+            ))
+          ],
+        ),
+      );
+    } else {
+      return Container(
+        color: ConstantData.bgColor,
+        width: double.infinity,
+        child: FutureBuilder<List<OrderList>>(
+          builder: (context, orderSnap) {
+            if (!orderSnap.hasData) {
+              return Center(child: CircularProgressIndicator());
+            } else {
+              return ListView.builder(
+                itemCount: orderSnap.data.length,
+                itemBuilder: (context, index) {
+                  //OrderList listModel = orderSnap.data[index];
+                  timeLineModel.clear();
+                  TimeLineModel model = new TimeLineModel();
+                  model.text = "From: " + orderSnap.data[index].senderLocation;
+                  model.contact = orderSnap.data[index].senderPhone;
+                  model.isComplete = true;
+                  timeLineModel.add(model);
+
+                  TimeLineModel model2 = new TimeLineModel();
+                  model2.text = "To: " + orderSnap.data[index].receiverLocation;
+                  model2.contact = orderSnap.data[index].receiverPhone;
+                  model2.isComplete = true;
+                  timeLineModel.add(model2);
+
+                  return InkWell(
+                    child: Container(
+                      padding: EdgeInsets.all(margin),
+                      color: ConstantData.cellColor,
+                      margin: EdgeInsets.only(
+                          bottom:
+                              ConstantWidget.getScreenPercentSize(context, 1)),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              ConstantWidget.getTextWidget(
+                                  orderSnap.data[index].orderNumber,
+                                  ConstantData.mainTextColor,
+                                  TextAlign.start,
+                                  FontWeight.w400,
+                                  ConstantData.font22Px),
+                              new Spacer(),
+                              ConstantWidget.getTextWidget(
+                                  orderSnap.data[index].deliveryDate,
+                                  Colors.grey,
+                                  TextAlign.start,
+                                  FontWeight.w400,
+                                  ConstantData.font15Px),
+                            ],
+                          ),
+                          SizedBox(
+                            height: (margin / 1.5),
+                          ),
+                          Row(children: [
+                            ConstantWidget.getTextWidget(
+                                "Price: " + orderSnap.data[index].price,
+                                ConstantData.mainTextColor,
+                                TextAlign.start,
+                                FontWeight.w400,
+                                ConstantData.font18Px),
+                          ]),
+                          SizedBox(
+                            height: (margin / 1.5),
+                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ConstantWidget.getTextWidget(
+                                    orderSnap.data[index].packageWeight,
+                                    Colors.green,
+                                    TextAlign.start,
+                                    FontWeight.w400,
+                                    ConstantData.font18Px),
+                              ),
+                              InkWell(
+                                child: Container(
+                                  margin:
+                                      EdgeInsets.only(left: (allMargin * 3)),
+                                  height: imageSize * 0.60,
+                                  width: imageSize * 0.60,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.transparent,
+                                    image: DecorationImage(
+                                      image: ExactAssetImage(
+                                          ConstantData.assetsPath +
+                                              "assign.png"),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                onTap: () async {
+                                  String driverId = await Navigator.push(
+                                      context,
+                                      new MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              new NearDrivers()));
+                                  print(
+                                      "driverrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr" +
+                                          driverId);
+                                  db.updateOrder(
+                                      orderSnap.data[index].orderNumber,
+                                      driverId);
+                                },
+                              )
+                            ],
+                          ),
+                          SizedBox(
+                            height: (margin / 1.5),
+                          ),
+                          _DeliveryProcesses(
+                            processes: timeLineModel,
+                          )
+                        ],
+                      ),
+                    ),
+                    onTap: () async {
+                      activeOrderListModel = await db.activeOrderList();
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ActiveOrderDetail(
+                                activeOrderListModel.elementAt(index)),
+                          ));
+                    },
+                  );
+                },
+              );
+            }
+          },
+          future: db.assignedList(),
         ),
       );
     }
@@ -1278,9 +1869,15 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
           ),
 
           InkWell(
-            child: _getCell(S.of(context).giftCard, Icons.card_giftcard),
+            child: _getCell(S.of(context).userRegistration, Icons.person_add),
             onTap: () {
-              sendAction(MyVouchers(false));
+              sendAction(Registration());
+            },
+          ),
+          InkWell(
+            child: _getCell(S.of(context).users, Icons.person),
+            onTap: () {
+              sendAction(UsersList());
             },
           ),
           InkWell(

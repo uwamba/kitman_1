@@ -347,6 +347,26 @@ class S {
     );
   }
 
+  /// `User Registration`
+  String get userRegistration {
+    return Intl.message(
+      'User Registration',
+      name: 'userRegistration',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Users`
+  String get users {
+    return Intl.message(
+      'Users',
+      name: 'users',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Logout`
   String get logout {
     return Intl.message(
@@ -387,11 +407,11 @@ class S {
     );
   }
 
-  /// `unassigned`
+  /// `Unassigned`
   String get unassigned {
     return Intl.message(
       'Unassigned',
-      name: 'Unassigned',
+      name: 'unassigned',
       desc: '',
       args: [],
     );
@@ -722,6 +742,16 @@ class S {
     return Intl.message(
       'Deliver Now',
       name: 'deliverNow',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `error`
+  String get error {
+    return Intl.message(
+      'Error',
+      name: 'error',
       desc: '',
       args: [],
     );

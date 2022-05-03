@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:knitman/Database/Db.dart';
-import 'package:knitman/Database/UserPresence.dart';
 import 'package:knitman/OrderDetails.dart';
+import 'package:knitman/OrderMap.dart';
 import 'package:knitman/model/orderList.dart';
 import 'package:timelines/timelines.dart';
 
@@ -65,6 +65,10 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
 
   int themMode;
   bool isFirstTime = false;
+  String phone;
+  void getUserData() async {
+    phone = await PrefData.getPhoneNumber();
+  }
 
   getThemeMode() async {
     isFirstTime = await PrefData.getIsFirstTime();
@@ -77,18 +81,18 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
     setState(() {});
   }
 
-  void setPresence() async {
-    String phone = await PrefData.getPhoneNumber();
-    String email = await PrefData.getEmail();
-    String lastName = await PrefData.getLastName();
-    String firstName = await PrefData.getFirstName();
-    UserPresence(phone, email, lastName, firstName).updateUserPresence();
-  }
+  //void setPresence() async {
+  // String phone = await PrefData.getPhoneNumber();
+  // String email = await PrefData.getEmail();
+  // String lastName = await PrefData.getLastName();
+  // String firstName = await PrefData.getFirstName();
+  // UserPresence(phone, email, lastName, firstName).updateUserPresence();
+  //}
 
   @override
   void initState() {
     // TODO: implement initState
-    setPresence();
+    //  setPresence();
     CollectionReference collectionRef =
         FirebaseFirestore.instance.collection('orders');
     Db db = new Db();
@@ -117,7 +121,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     ConstantData.setThemePosition();
-
+    getUserData();
     motionTabBar = new MotionTabBar(
       labels: ["Orders", "New Order", "Chat", "Profile"],
       initialSelectedTab: s[_selectedIndex],
@@ -954,13 +958,27 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                                         color: ConstantData.primaryColor,
                                         padding: EdgeInsets.symmetric(
                                             horizontal: (margin / 2)),
-                                        child: ConstantWidget.getCustomText(
-                                            orderSnap.data[index].status,
-                                            Colors.white,
-                                            1,
-                                            TextAlign.start,
-                                            FontWeight.w500,
-                                            ConstantData.font18Px),
+                                        child: InkWell(
+                                          child: ConstantWidget.getCustomText(
+                                              "Track",
+                                              Colors.white,
+                                              1,
+                                              TextAlign.start,
+                                              FontWeight.w500,
+                                              ConstantData.font18Px),
+                                          onTap: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      OrderMap(
+                                                          orderSnap.data[index]
+                                                              .orderNumber,
+                                                          orderSnap.data[index]
+                                                              .driverNumber),
+                                                ));
+                                          },
+                                        ),
                                       )
                                     ],
                                   ),
@@ -1018,41 +1036,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                                                           height, 30)))),
                                           child: Center(
                                             child: ConstantWidget.getCustomText(
-                                                S.of(context).Cancel,
-                                                Colors.white,
-                                                1,
-                                                TextAlign.center,
-                                                FontWeight.w500,
-                                                ConstantWidget.getPercentSize(
-                                                    height, 40)),
-                                          ),
-                                        ),
-                                        onTap: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    RatingPage(),
-                                              ));
-                                        },
-                                      ),
-                                      SizedBox(
-                                        width: (margin),
-                                      ),
-                                      InkWell(
-                                        child: Container(
-                                          height: height,
-                                          width: ConstantWidget
-                                              .getWidthPercentSize(context, 20),
-                                          decoration: BoxDecoration(
-                                              color: ConstantData.accentColor,
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(ConstantWidget
-                                                      .getPercentSize(
-                                                          height, 30)))),
-                                          child: Center(
-                                            child: ConstantWidget.getCustomText(
-                                                S.of(context).Pay,
+                                                orderSnap.data[index].status,
                                                 Colors.white,
                                                 1,
                                                 TextAlign.center,
@@ -1094,7 +1078,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                   }
                 }
               },
-              future: db.activeOrderList(),
+              future: db.customerActiveOrderList(phone),
             ),
           )
         ],

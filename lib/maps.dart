@@ -34,6 +34,7 @@ class _HomePageState extends State<maps> {
 
   PolylinePoints polylinePoints = PolylinePoints();
 
+  //String googleAPiKey = "AIzaSyDqsiCTWY09YdZPNmtDpw56MxjukjI3w6g";
   String googleAPiKey = "AIzaSyC-dIJ5UWH1sd05F8fx4sHhtZZ7hHNwmbo";
 
   Set<Marker> markers2 = Set(); //markers for google map
@@ -260,18 +261,17 @@ class _HomePageState extends State<maps> {
             color: Colors.green,
             visible: true));
         print(calculateDistance(
-                    widget.pickingPoint.latitude,
-                    widget.pickingPoint.longitude,
-                    widget.pickingPoint.latitude,
-                    widget.pickingPoint.longitude)
-                .toStringAsFixed(2) +
-            " KM");
+                widget.pickingPoint.latitude,
+                widget.pickingPoint.longitude,
+                startLocation.latitude,
+                startLocation.longitude)
+            .toString);
         distanceText = "Total Distance: " +
             calculateDistance(
                     widget.pickingPoint.latitude,
                     widget.pickingPoint.longitude,
-                    widget.pickingPoint.latitude,
-                    widget.pickingPoint.longitude)
+                    startLocation.latitude,
+                    startLocation.longitude)
                 .toString();
       });
     }
@@ -297,7 +297,7 @@ class _HomePageState extends State<maps> {
               onTap: (latLng) {
                 //clearOverlay();
                 moveToLocation(latLng);
-                // getDirections();
+                getDirections();
               },
               markers: markers,
             ),

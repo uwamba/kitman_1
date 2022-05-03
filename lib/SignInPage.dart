@@ -54,19 +54,19 @@ class _SignInPage extends State<SignInPage> {
           PrefData.setLastName(doc["lastName"]);
           PrefData.setUserId(doc["phone"]);
 
-          if (signIn == "customer") {
+          if (signIn == "Customer") {
             Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
                   builder: (context) => MyHomePage(),
                 ));
-          } else if (signIn == "rider") {
+          } else if (signIn == "Driver") {
             Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
                   builder: (context) => TabWidgetRider(true),
                 ));
-          } else if (signIn == "admin") {
+          } else if (signIn == "Admin") {
             Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
@@ -132,7 +132,7 @@ class _SignInPage extends State<SignInPage> {
                     height: ConstantWidget.getScreenPercentSize(context, 1.5),
                   ),
                   ConstantWidget.getTextWidget(
-                      S.of(context).signIn,
+                      S.of(this.context).signIn,
                       ConstantData.mainTextColor,
                       TextAlign.center,
                       FontWeight.bold,
