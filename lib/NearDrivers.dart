@@ -171,7 +171,7 @@ class _NearDrivers extends State<NearDrivers> {
                         ),
                       ),
                     )),
-                    visible: (users[5]),
+                    visible: (users[7]),
                   )
                 ],
               ),
@@ -198,7 +198,7 @@ class _NearDrivers extends State<NearDrivers> {
                             Container(
                               alignment: Alignment.centerRight,
                               child: ConstantWidget.getCustomText(
-                                  "At 34Km",
+                                  "ok",
                                   ConstantData.color1,
                                   1,
                                   TextAlign.left,

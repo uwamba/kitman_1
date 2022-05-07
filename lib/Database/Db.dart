@@ -75,7 +75,7 @@ class Db {
 
   Future<List<OrderList>> activeOrderList() async {
     QuerySnapshot querySnapshot =
-        await collectionRef.where('status', isEqualTo: "new").get();
+        await collectionRef.where('status', isEqualTo: "assigned").get();
 
     final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
 
@@ -86,7 +86,7 @@ class Db {
     collectionRef.snapshots().listen((querySnapshot) {
       querySnapshot.docChanges.forEach((change) async {
         QuerySnapshot querySnapshot =
-            await collectionRef.where('status', isEqualTo: "new").get();
+            await collectionRef.where('status', isEqualTo: "assigned").get();
 
         final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
 
@@ -289,6 +289,21 @@ class Db {
       'password': password
     };
     users.add(userData);
+  }
+
+  Future<void> addNotification(String from, to, text, action) async {
+    CollectionReference notification =
+        FirebaseFirestore.instance.collection('notifications');
+    //var newFormat = DateFormat("yy-MM-dd");
+    //String updatedDt = newFormat.format(dt);
+
+    Map<String, dynamic> userData = {
+      'from': from,
+      'to': to,
+      'text': text,
+      'action': action,
+    };
+    notification.add(userData);
   }
 
   Future<void> addOrder(

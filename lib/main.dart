@@ -1,15 +1,18 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:knitman/util/PrefData.dart';
 
+import 'Database/Db.dart';
 import 'IntroPage.dart';
 import 'SignUpPage.dart';
 import 'TabWidget.dart';
@@ -17,70 +20,132 @@ import 'generated/l10n.dart';
 import 'util/ConstantData.dart';
 import 'util/ConstantWidget.dart';
 
-Future<void> main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Firebase.initializeApp();
   WidgetsFlutterBinding.ensureInitialized();
 
+  //Firebase.onBackgroundFirestore(_firebaseMessagingBackgroundHandler);
+  initializeService();
+  runApp(MyApp());
+}
+
+Future<void> _firebaseBackgroundHandler() async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+  await Firebase.initializeApp();
+
+  Db db = new Db();
+  CollectionReference collectionRef =
+      FirebaseFirestore.instance.collection('orders');
+
+  collectionRef.snapshots().listen((querySnapshot) {
+    querySnapshot?.docChanges?.forEach(
+      (docChange) => {
+        if (docChange.type.toString() == "DocumentChangeType.added")
+          {print("document added")},
+        print("document changed"),
+        print(docChange.type),
+        print(docChange.doc.get("status"))
+        //db.addNotification("from", "to", "text", "action")
+        // If you need to do something for each document change, do it here.
+      },
+    );
+    // Anything you might do every time you get a fresh snapshot can be done here.
+
+    print(
+        "background changeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+  });
+
+  print("Handling a background message:");
+}
+
+Future<void> initializeService() async {
+  //WidgetsFlutterBinding.ensureInitialized();
+  //Firebase.initializeApp();
+  // WidgetsFlutterBinding.ensureInitialized();
+  final service = FlutterBackgroundService();
+  await service.configure(
+    androidConfiguration: AndroidConfiguration(
+      // this will executed when app is in foreground or background in separated isolate
+      onStart: onStart,
+
+      // auto start service
+      autoStart: true,
+      isForegroundMode: true,
+    ),
+    iosConfiguration: IosConfiguration(
+      // auto start service
+      autoStart: true,
+
+      // this will executed when app is in foreground in separated isolate
+      onForeground: onStart,
+
+      // you have to enable background fetch capability on xcode project
+      onBackground: onIosBackground,
+    ),
+  );
+  service.startService();
+  _firebaseBackgroundHandler();
+}
+
+// to ensure this executed
+// run app from xcode, then from xcode menu, select Simulate Background Fetch
+bool onIosBackground(ServiceInstance service) {
   WidgetsFlutterBinding.ensureInitialized();
+  print('FLUTTER BACKGROUND FETCH');
 
-  Future<void> _firebaseMessagingBackgroundHandler(
-      RemoteMessage message) async {
-    // If you're going to use other Firebase services in the background, such as Firestore,
-    // make sure you call `initializeApp` before using other Firebase services.
+  return true;
+}
 
-    await Firebase.initializeApp(
-        options: FirebaseOptions(
-      appId: '1:853162747548:android:ffab45000555890b1fef59',
-      apiKey: 'AIzaSyDqsiCTWY09YdZPNmtDpw56MxjukjI3w6g',
-      projectId: '853162747548',
-      messagingSenderId: '',
-    ));
-    AndroidNotificationChannel channel;
+Future<void> onStart(ServiceInstance service) async {
+  if (service is AndroidServiceInstance) {
+    service.on('setAsForeground').listen((event) {
+      service.setAsForegroundService();
+    });
 
-    /// Initialize the [FlutterLocalNotificationsPlugin] package.
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-    //click listiner on local notification
+    service.on('setAsBackground').listen((event) {
+      service.setAsBackgroundService();
+    });
+  }
 
-    if (!kIsWeb) {
-      channel = const AndroidNotificationChannel(
-        'notification_channel_id', // id
-        'Notification Title', // title
+  service.on('stopService').listen((event) {
+    service.stopSelf();
+  });
 
-        importance: Importance.high,
-      );
-
-      flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
-      /// Create an Android Notification Channel.
-      ///
-      /// We use this channel in the `AndroidManifest.xml` file to override the
-      /// default FCM channel to enable heads up notifications.
-      await flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
-          ?.createNotificationChannel(channel);
-
-      /// Update the iOS foreground notification presentation options to allow
-      /// heads up notifications.
-      await FirebaseMessaging.instance
-          .setForegroundNotificationPresentationOptions(
-        alert: true,
-        badge: true,
-        sound: true,
+  // bring to foreground
+  Timer.periodic(const Duration(seconds: 30), (timer) async {
+    if (service is AndroidServiceInstance) {
+      service.setForegroundNotificationInfo(
+        title: "Notification",
+        content: "Updated at ${DateTime.now()}",
       );
     }
 
-    //background message listiner
-    //await Firebase.initializeApp();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitDown,
-      DeviceOrientation.portraitUp,
-    ]);
-  }
+    /// you can see this log in logcat
+    print('FLUTTER BACKGROUND SERVICE: ${DateTime.now()}');
 
-  runApp(MyApp());
+    // test using external plugin
+    final deviceInfo = DeviceInfoPlugin();
+    String device;
+    if (Platform.isAndroid) {
+      final androidInfo = await deviceInfo.androidInfo;
+      device = androidInfo.model;
+    }
+
+    if (Platform.isIOS) {
+      final iosInfo = await deviceInfo.iosInfo;
+      device = iosInfo.model;
+    }
+
+    service.invoke(
+      'update',
+      {
+        "current_date": DateTime.now().toIso8601String(),
+        "device": device,
+      },
+    );
+  });
 }
 
 class MyApp extends StatelessWidget {
