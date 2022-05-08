@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>853162747548-6j7sdb0m3kc3j67p4a89m5k0scscrmg5.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.853162747548-6j7sdb0m3kc3j67p4a89m5k0scscrmg5</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>853162747548-a1p74i2qj5n5lag8ab4b9co8hsck4aqk.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCPaC1dlB5g5PzZS2ulMCMOsi-Uh8kc9sQ</string>
+	<key>GCM_SENDER_ID</key>
+	<string>853162747548</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.delivery.Knitman</string>
+	<key>PROJECT_ID</key>
+	<string>kitman-3a2d0</string>
+	<key>STORAGE_BUCKET</key>
+	<string>kitman-3a2d0.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:853162747548:ios:442bd481dabbef5b1fef59</string>
+	<key>DATABASE_URL</key>
+	<string>https://kitman-3a2d0-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>
