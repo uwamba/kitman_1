@@ -1518,37 +1518,6 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                                     FontWeight.w400,
                                     ConstantData.font18Px),
                               ),
-                              InkWell(
-                                child: Container(
-                                  margin:
-                                      EdgeInsets.only(left: (allMargin * 3)),
-                                  height: imageSize * 0.60,
-                                  width: imageSize * 0.60,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.transparent,
-                                    image: DecorationImage(
-                                      image: ExactAssetImage(
-                                          ConstantData.assetsPath +
-                                              "assign.png"),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                                onTap: () async {
-                                  String driverId = await Navigator.push(
-                                      context,
-                                      new MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              new NearDrivers()));
-                                  print(
-                                      "driverrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr" +
-                                          driverId);
-                                  db.updateOrder(
-                                      orderSnap.data[index].orderNumber,
-                                      driverId);
-                                },
-                              )
                             ],
                           ),
                           SizedBox(
