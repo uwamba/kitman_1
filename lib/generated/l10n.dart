@@ -88,6 +88,7 @@ class S {
   }
 
   /// `Your phone number`
+
   String get yourPhoneNumber {
     return Intl.message(
       'Your Phone Number',

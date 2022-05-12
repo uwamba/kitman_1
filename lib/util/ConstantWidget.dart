@@ -450,7 +450,8 @@ class ConstantWidget {
   }
 
   static Widget getDefaultTextFiledWidget(BuildContext context, String s,
-      TextEditingController textEditingController) {
+      TextEditingController textEditingController,
+      {TextInputType keyboardType}) {
     double height = ConstantWidget.getScreenPercentSize(context, 8.5);
 
     double radius = ConstantWidget.getPercentSize(height, 20);

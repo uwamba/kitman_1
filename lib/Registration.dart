@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:knitman/Database/Db.dart';
+import 'package:knitman/FormValidation.dart';
 import 'package:knitman/UsersList.dart';
 
 import 'SignInPage.dart';
@@ -38,6 +39,7 @@ class _Registration extends State<Registration> {
   TextEditingController textLastNameController = new TextEditingController();
   TextEditingController textRoleController = new TextEditingController();
   String dropdownValue = 'Customer';
+
   bool isCheck = false;
 
   void registerNotification() async {
@@ -220,6 +222,10 @@ class _Registration extends State<Registration> {
                     String pas2 = textPasswordConfirmController.text;
                     if (pas1 == pas2) {
                       print("+++++++++++++++++++++++++++++++++");
+                      FormValidation val = new FormValidation();
+                      if (val.isEmail(textEmailController.text) == false) {
+                        print("Enter valid email");
+                      }
                       db.signUp(
                           textPhoneController.text,
                           textEmailController.text,
