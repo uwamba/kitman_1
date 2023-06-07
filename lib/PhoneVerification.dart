@@ -44,7 +44,6 @@ class VerifyPhoneNumberScreen extends State<PhoneVerification> {
         home: SafeArea(
           child: FirebasePhoneAuthHandler(
             phoneNumber: newNumber,
-            timeOutDuration: const Duration(seconds: 60),
             onLoginSuccess: (userCredential, autoVerified) async {
               Navigator.push(
                   context,
@@ -64,13 +63,13 @@ class VerifyPhoneNumberScreen extends State<PhoneVerification> {
 
               debugPrint("Login Success UID: ${userCredential.user?.uid}");
             },
-            onLoginFailed: (authException) {
+            onLoginFailed: (FirebaseAuthException, StackTrace) {
               _showSnackBar(
                 context,
-                'Something went wrong (${authException.message})',
+                'Something went wrong (${FirebaseAuthException.message})',
               );
 
-              debugPrint(authException.message);
+              debugPrint(FirebaseAuthException.message);
               // handle error further if needed
             },
             builder: (context, controller) {
@@ -81,15 +80,15 @@ class VerifyPhoneNumberScreen extends State<PhoneVerification> {
                     if (controller.codeSent)
                       TextButton(
                         child: Text(
-                          controller.timerIsActive
-                              ? "${controller.timerCount.inSeconds}s"
+                          !controller.isOtpExpired
+                              ? "${controller.otpExpirationTimeLeft.toString()}s"
                               : "RESEND",
                           style: const TextStyle(
                             color: Colors.blue,
                             fontSize: 18,
                           ),
                         ),
-                        onPressed: controller.timerIsActive
+                        onPressed: !controller.isOtpExpired
                             ? null
                             : () async => await controller.sendOTP(),
                       ),
@@ -110,7 +109,7 @@ class VerifyPhoneNumberScreen extends State<PhoneVerification> {
                           const Divider(),
                           AnimatedContainer(
                             duration: const Duration(seconds: 1),
-                            height: controller.timerIsActive ? null : 0,
+                            height: !controller.isOtpExpired ? null : 0,
                             child: Column(
                               children: const [
                                 CircularProgressIndicator.adaptive(),
@@ -142,8 +141,8 @@ class VerifyPhoneNumberScreen extends State<PhoneVerification> {
                             onChanged: (String v) async {
                               _enteredOTP = v;
                               if (_enteredOTP?.length == 6) {
-                                final isValidOTP = await controller.verifyOTP(
-                                  otp: _enteredOTP,
+                                final isValidOTP = await controller.verifyOtp(
+                                  _enteredOTP,
                                 );
                                 // Incorrect OTP
                                 if (!isValidOTP) {
