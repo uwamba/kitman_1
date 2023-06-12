@@ -37,6 +37,7 @@ class VerifyPhoneNumberScreen extends State<PhoneVerification> {
   Widget build(BuildContext context) {
     WidgetsFlutterBinding.ensureInitialized();
     String newNumber = "+25" + widget.phone;
+    print(newNumber);
     Firebase.initializeApp();
     return FirebasePhoneAuthProvider(
       child: MaterialApp(

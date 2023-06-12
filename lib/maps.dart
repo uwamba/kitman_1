@@ -9,10 +9,12 @@ import 'package:location/location.dart';
 class maps extends StatefulWidget {
   LatLng pickingPoint;
   bool isPickingLocation;
-  maps(this.pickingPoint, this.isPickingLocation);
+  int btnClick;
+
+  maps(this.pickingPoint, this.isPickingLocation, this.btnClick);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _HomePageState createState() => _HomePageState(btnClick, pickingPoint);
 }
 
 class _HomePageState extends State<maps> {
@@ -34,22 +36,28 @@ class _HomePageState extends State<maps> {
 
   PolylinePoints polylinePoints = PolylinePoints();
 
-  //String googleAPiKey = "AIzaSyDqsiCTWY09YdZPNmtDpw56MxjukjI3w6g";
-  String googleAPiKey = "AIzaSyC-dIJ5UWH1sd05F8fx4sHhtZZ7hHNwmbo";
+  String googleAPiKey = "AIzaSyDb43xswSOqr64gN2mLA53aqmvTmlseIR8";
+
+  ///String googleAPiKey = "AIzaSyC-dIJ5UWH1sd05F8fx4sHhtZZ7hHNwmbo";
 
   Set<Marker> markers2 = Set(); //markers for google map
   Map<PolylineId, Polyline> polylines = {}; //polylines to show direction
 
-  LatLng startLocation = LatLng(-2.5825288719982, 29.01545043904463);
-  LatLng endLocation = LatLng(-2.6115797815698643, 29.01829060711035);
+  LatLng startLocation = LatLng(-1.9534712184928378, 30.097560882568363);
+  LatLng endLocation = LatLng(-1.9934712184928378, 30.007560882568363);
   Widget position;
   double distance = 0.0;
+  int btnClick;
+  LatLng pickingPoint;
+  _HomePageState(this.btnClick, this.pickingPoint);
   @override
   initState() {
     super.initState();
-
+    if (btnClick == 2) {
+      startLocation = pickingPoint;
+    }
     _currentPosition = CameraPosition(
-      target: LatLng(-2.5825288719982, 29.01545043904463),
+      target: LatLng(-1.9534712184928378, 30.097560882568363),
       zoom: 12,
     );
     if (widget.isPickingLocation == true) {
@@ -91,6 +99,7 @@ class _HomePageState extends State<maps> {
     }
 
     getDirections();
+    _locateMe();
   }
 
   _locateMe() async {
@@ -137,8 +146,7 @@ class _HomePageState extends State<maps> {
       result.points.forEach((PointLatLng point) {
         polylineCoordinates.add(LatLng(point.latitude, point.longitude));
         print(polylineCoordinates);
-        print(
-            "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+        print("ooooooooooooooooooooooooooooooooooooooooooooooo");
       });
     } else {
       print(result.errorMessage);
@@ -153,8 +161,7 @@ class _HomePageState extends State<maps> {
           polylineCoordinates[i + 1].latitude,
           polylineCoordinates[i + 1].longitude);
     }
-    print(
-        "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd");
+    print("dddddddddddddddddddddddddddddddddddddddddddddd");
     print(totalDistance);
 
     setState(() {
@@ -169,7 +176,7 @@ class _HomePageState extends State<maps> {
     PolylineId id = PolylineId("poly");
     Polyline polyline = Polyline(
       polylineId: id,
-      color: Colors.deepPurpleAccent,
+      color: Colors.redAccent,
       points: polylineCoordinates,
       width: 8,
     );
@@ -182,9 +189,7 @@ class _HomePageState extends State<maps> {
     var a = 0.5 -
         cos((lat2 - lat1) * p) / 2 +
         cos(lat1 * p) * cos(lat2 * p) * (1 - cos((lon2 - lon1) * p)) / 2;
-    setState(() {
-      return 12742 * asin(sqrt(a));
-    });
+    return 12742 * asin(sqrt(a));
   }
 
   setUpMarker() async {
@@ -219,18 +224,9 @@ class _HomePageState extends State<maps> {
 
   void onMapCreated(GoogleMapController controller) {
     this.mapController.complete(controller);
-    moveToCurrentUserLocation();
-    //getDirections();
-  }
 
-  void moveToCurrentUserLocation() {
-    Location().getLocation().then((locationData) {
-      LatLng target = LatLng(locationData.latitude, locationData.longitude);
-      moveToLocation(target);
-    }).catchError((error) {
-      // TODO: Handle the exception here
-      print(error);
-    });
+    //moveToCurrentUserLocation();
+    //getDirections();
   }
 
   getPoints(LatLng a, LatLng b) {
@@ -293,8 +289,15 @@ class _HomePageState extends State<maps> {
               myLocationEnabled: true,
               mapType: MapType.normal, //map type
               onMapCreated: onMapCreated,
-              polylines: polys,
+              polylines: Set<Polyline>.of(polylines.values),
               onTap: (latLng) {
+                if (btnClick == 1) {
+                  startLocation = latLng;
+                  print("BUTTON 1111111111111111111111111111111");
+                } else if (btnClick == 2) {
+                  endLocation = latLng;
+                  print("BUTTON 22222222222222222222222222");
+                }
                 //clearOverlay();
                 moveToLocation(latLng);
                 getDirections();

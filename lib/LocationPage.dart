@@ -274,7 +274,7 @@ class _LocationPage extends State<LocationPage> {
             context,
             new MaterialPageRoute(
                 builder: (BuildContext context) =>
-                    new maps(initialLocation, true)));
+                    new maps(initialLocation, true, 1)));
         print(startLocation);
         setState(() {
           senderCoordinatesController.text = startLocation.toString();
@@ -317,15 +317,17 @@ class _LocationPage extends State<LocationPage> {
         ),
       ),
       onTap: () async {
-        endLocation = await Navigator.push(
-            context,
-            new MaterialPageRoute(
-                builder: (BuildContext context) =>
-                    new maps(startLocation, false)));
-        print(endLocation.toString());
-        setState(() {
-          receiverCoordinatesController.text = endLocation.toString();
-        });
+        if (startLocation != null) {
+          endLocation = await Navigator.push(
+              context,
+              new MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      new maps(startLocation, false, 2)));
+          print(endLocation.toString());
+          setState(() {
+            receiverCoordinatesController.text = endLocation.toString();
+          });
+        }
       },
     );
   }
@@ -563,7 +565,58 @@ class _LocationPage extends State<LocationPage> {
       },
     );
   }
+  void datePickerDialog(bool isPoint) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: ConstantData.bgColor,
+      builder: (builder) {
+        return new Container(
+          padding: EdgeInsets.only(
+            left: 5.0,
+            right: 5.0,
+            top: 5.0,
+            bottom: 5.0,
+          ),
+          decoration: new BoxDecoration(
+            color: ConstantData.bgColor,
+          ),
+          child: new Wrap(
+            children: <Widget>[
+              ListView.separated(
+                shrinkWrap: true,
+                itemCount: timeList.length,
+                separatorBuilder: (BuildContext context, int index) =>
+                    Divider(height: 5, color: ConstantData.mainTextColor),
+                itemBuilder: (context, index) {
+                  return new ListTile(
+                    title: Text(
+                      timeList[index],
+                      style: TextStyle(
+                          fontSize: ConstantData.font22Px,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: ConstantData.fontFamily,
+                          color: ConstantData.mainTextColor),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
 
+                      setState(() {
+                        if (isPoint) {
+                          receivedTime = dateList[index];
+                        } else {
+                          deliveryTime = dateList[index];
+                        }
+                      });
+                    },
+                  );
+                },
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
   getCell(bool isPoint, bool isDate) {
     double height = ConstantWidget.getScreenPercentSize(context, 6);
     double icon = ConstantWidget.getPercentSize(height, 40);

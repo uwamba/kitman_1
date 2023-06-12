@@ -54,7 +54,7 @@ class _AboutUsPage extends State<AboutUsPage> {
               child: Container(
             margin: EdgeInsets.all(margin),
             child: ConstantWidget.getCustomTextWithoutAlign(
-                S.of(context).loremText,
+                S.of(context).orders,
                 ConstantData.textColor,
                 FontWeight.w500,
                 ConstantData.font15Px),

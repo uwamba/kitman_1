@@ -29,6 +29,7 @@ class _SignUpPage extends State<SignUpPage> {
   int themeMode = 0;
   double margin;
   double radius;
+  bool term = false;
   int _totalNotifications;
   PushNotification _notificationInfo;
   TextEditingController textEmailController = new TextEditingController();
@@ -175,20 +176,20 @@ class _SignUpPage extends State<SignUpPage> {
                             ConstantData.font15Px)
                       ],
                     ),
-                    onTap: () {
-                      // setState(() {
-                      //   if (isCheck) {
-                      //     isCheck = false;
-                      //   } else {
-                      //     isCheck = true;
-                      //   }
-                      //
-                      // });
-                      Navigator.push(
+                    onTap: () async {
+                      isCheck = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => TermsConditionPage(),
+                            builder: (context) => TermsConditionPage(isCheck),
                           ));
+                      print(isCheck);
+                      setState(() {
+                        if (isCheck) {
+                          isCheck = true;
+                        } else {
+                          isCheck = false;
+                        }
+                      });
                     },
                   ),
                   SizedBox(
@@ -200,7 +201,7 @@ class _SignUpPage extends State<SignUpPage> {
                     String pas1 = textPasswordController.text;
                     String pas2 = textPasswordConfirmController.text;
                     if (pas1 == pas2) {
-                      print("+++++++++++++++++++++++++++++++++");
+                      print("+++++++++++++++++++++++++++++++++"+textPhoneController.text);
                       db.signUp(
                           textPhoneController.text,
                           textEmailController.text,

@@ -1407,7 +1407,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
             child: _getCell(
                 S.of(context).termsConditions, Icons.privacy_tip_outlined),
             onTap: () {
-              sendAction(TermsConditionPage());
+              sendAction(TermsConditionPage(true));
             },
           ),
           InkWell(

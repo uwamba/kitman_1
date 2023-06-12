@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:knitman/model/OrderTimeline.dart';
 import 'package:knitman/model/orderList.dart';
-import 'package:location/location.dart';
 import 'package:timelines/timelines.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -95,7 +94,7 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
   List<OrderTimeLine> timeLine = [];
   @override
   Widget build(BuildContext context) {
-    moveToSenderLocation();
+    //moveToSenderLocation();
     SizeConfig().init(context);
     double margin = ConstantWidget.getScreenPercentSize(context, 2);
     double height = ConstantWidget.getScreenPercentSize(context, 40);
@@ -472,22 +471,8 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
 
   void onMapCreated(GoogleMapController controller) {
     this.mapController.complete(controller);
-    moveToSenderLocation();
+    // moveToSenderLocation();
     //getDirections();
-  }
-
-  void moveToSenderLocation() {
-    Location().getLocation().then((locationData) {
-      LatLng target = LatLng(locationData.latitude, locationData.longitude);
-      _kGooglePlex = CameraPosition(
-        target: senderCoordinates,
-        zoom: 12,
-      );
-      moveToLocation(target);
-    }).catchError((error) {
-      // TODO: Handle the exception here
-      print(error);
-    });
   }
 
   void moveToLocation(LatLng latLng) {

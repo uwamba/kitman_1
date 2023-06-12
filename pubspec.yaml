@@ -56,6 +56,7 @@ dependencies:
   flutter_background_service: ^2.0.0
   device_info_plus: ^3.2.3
   flutter_background_service_android: ^2.0.0
+  flutter_html: ^3.0.0-alpha.6
 
 
 

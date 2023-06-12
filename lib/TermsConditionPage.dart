@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 import 'generated/l10n.dart';
 import 'util/ConstantData.dart';
@@ -7,13 +8,18 @@ import 'util/ConstantWidget.dart';
 import 'util/SizeConfig.dart';
 
 class TermsConditionPage extends StatefulWidget {
+  bool isCheck;
+  TermsConditionPage(this.isCheck);
+
   @override
   _TermsConditionPage createState() {
-    return _TermsConditionPage();
+    return _TermsConditionPage(isCheck);
   }
 }
 
 class _TermsConditionPage extends State<TermsConditionPage> {
+  _TermsConditionPage(this.isCheck);
+  bool isCheck;
   @override
   void initState() {
     super.initState();
@@ -49,14 +55,18 @@ class _TermsConditionPage extends State<TermsConditionPage> {
             ),
           ),
           body: SingleChildScrollView(
-              child: Container(
-            margin: EdgeInsets.all(margin),
-            child: ConstantWidget.getCustomTextWithoutAlign(
-                S.of(context).loremText,
-                ConstantData.textColor,
-                FontWeight.w500,
-                ConstantData.font15Px),
-          )),
+              child: Column(children: [
+            Container(
+                margin: EdgeInsets.all(margin),
+                child: Html(data: S.of(context).html_terms)),
+            (isCheck)
+                ? ConstantWidget.getBottomText(context, "Disagree", () {
+                    Navigator.of(context).pop(false);
+                  })
+                : ConstantWidget.getBottomText(context, "Agree", () {
+                    Navigator.of(context).pop(true);
+                  })
+          ])),
         ),
         onWillPop: _requestPop);
   }

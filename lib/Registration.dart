@@ -208,7 +208,7 @@ class _Registration extends State<Registration> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => TermsConditionPage(),
+                            builder: (context) => TermsConditionPage(true),
                           ));
                     },
                   ),

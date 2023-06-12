@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "645841968535",
+    "firebase_url": "https://knitman-89d79-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "knitman-89d79",
+    "storage_bucket": "knitman-89d79.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:645841968535:android:58948afa560fdce9d8b8d2",
+        "android_client_info": {
+          "package_name": "com.delivery.Knitman"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "645841968535-66o635gnb3qtvujhjnfvge3krjpkcsq0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDb43xswSOqr64gN2mLA53aqmvTmlseIR8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "645841968535-66o635gnb3qtvujhjnfvge3krjpkcsq0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "645841968535-7ef3k1fmgtgbr8kuaoqpc37elvnelpqj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.delivery.Knitman"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
