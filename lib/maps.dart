@@ -43,8 +43,10 @@ class _HomePageState extends State<maps> {
   Set<Marker> markers2 = Set(); //markers for google map
   Map<PolylineId, Polyline> polylines = {}; //polylines to show direction
 
-  LatLng startLocation = LatLng(-1.9534712184928378, 30.097560882568363);
-  LatLng endLocation = LatLng(-1.9934712184928378, 30.007560882568363);
+  // LatLng startLocation = LatLng(-1.9534712184928378, 30.097560882568363);
+  //LatLng endLocation = LatLng(-1.9934712184928378, 30.007560882568363);
+  LatLng startLocation;
+  LatLng endLocation;
   Widget position;
   double distance = 0.0;
   int btnClick;
