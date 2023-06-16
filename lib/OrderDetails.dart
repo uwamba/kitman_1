@@ -33,6 +33,7 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
   final Set<Marker> markers = Set();
   PolylineId polylineId = PolylineId("area");
   final Set<Polyline> polys = Set();
+  GoogleMapController gMapController;
   initState() {
     super.initState();
     senderCoordinates = LatLng(
@@ -92,12 +93,14 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
   String delivery = "Urgent";
   LatLng senderCoordinates, receiverCoordinates;
   List<OrderTimeLine> timeLine = [];
+
   @override
   Widget build(BuildContext context) {
     //moveToSenderLocation();
+
     SizeConfig().init(context);
     double margin = ConstantWidget.getScreenPercentSize(context, 2);
-    double height = ConstantWidget.getScreenPercentSize(context, 40);
+    double height = ConstantWidget.getScreenPercentSize(context, 60);
     double bottomHeight = SizeConfig.safeBlockVertical * 20;
 
     double bottomImageHeight = ConstantWidget.getPercentSize(bottomHeight, 50);
@@ -125,31 +128,19 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
       delivery = "Urgent";
     }
     print(widget.activeOrderModel.driverNumber);
-    if (widget.activeOrderModel.driverNumber.length > 0) {
-      final DatabaseReference ref = FirebaseDatabase.instance
+    List lis;
+    Future<List> driver() async {
+      final DatabaseReference ref = await FirebaseDatabase.instance
           .ref()
           .child("presence/" + widget.activeOrderModel.driverNumber);
-      ref.once().then((event) {
-        final dataSnapshot = event.snapshot;
-
-        // DataSnapshot snap = event.snapshot.value;
-        //final parsed = snap.children.map((doc) => doc.value).toList();
-        //String fname = snap.value;
-        final parsed = dataSnapshot.children.map((doc) => doc.value).toList();
-
-        List lis = parsed.toList();
-        lis.forEach((element) {
-          firstName = element['firstName'];
-          lastName = element['lastName'];
-          driverPhone = element['UID'];
-        });
-        //lis.map((e) => e.toString());
-      });
-    } else {
-      firstName = "Not assigned";
-      lastName = "";
-      driverPhone = "Waiting";
+      final event = await ref.once(DatabaseEventType.value);
+      final data = event.snapshot;
+      final parsed = data.children.map((doc) => doc.value).toList();
+      lis = parsed.toList();
+      print(lis);
+      return lis;
     }
+
     void _callNumber() async {
       String s = driverPhone;
 
@@ -178,273 +169,301 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
           ),
           body: Container(
             height: double.infinity,
-            child: ListView(
-              children: [
-                Container(
-                  height: height,
-                  child: Stack(
-                    children: [
-                      Container(
-                        height: height,
-                        width: double.infinity,
-                        child: GoogleMap(
-                          initialCameraPosition: _kGooglePlex,
-                          myLocationButtonEnabled: true,
-                          myLocationEnabled: true,
-                          mapType: MapType.normal, //map type
-                          onMapCreated: onMapCreated,
-                          polylines: polys,
-                          onTap: (latLng) {
-                            //clearOverlay();
-                            moveToLocation(latLng);
-                            // getDirections();
-                          },
-                          markers: markers,
-                        ),
+            child: FutureBuilder(
+              builder: (ctx, snapshot) {
+                // Checking if future is resolved or not
+                if (snapshot.connectionState == ConnectionState.done) {
+                  // If we got an error
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text(
+                        '${snapshot.error} occurred',
+                        style: TextStyle(fontSize: 18),
                       ),
-                      Container(
-                        width: double.infinity,
-                        color: Colors.green,
-                        padding: EdgeInsets.all(margin),
-                        child: ConstantWidget.getTextWidget(
-                            widget.activeOrderModel.deliveryDate,
-                            Colors.white,
-                            TextAlign.start,
-                            FontWeight.w500,
-                            ConstantData.font18Px),
-                      )
-                    ],
-                  ),
-                ),
-                Container(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: margin),
-                        width: double.infinity,
-                        color: ConstantData.cellColor,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              height: (margin / 2),
-                            ),
-                            ConstantWidget.getTextWidget(
-                                widget.activeOrderModel.price,
-                                ConstantData.mainTextColor,
-                                TextAlign.start,
-                                FontWeight.w400,
-                                ConstantWidget.getScreenPercentSize(
-                                    context, 3)),
-                            SizedBox(
-                              height: (margin / 2),
-                            ),
-                            ConstantWidget.getTextWidget(
-                                "To be delivered at: " +
-                                    widget.activeOrderModel.receiverLocation,
-                                Colors.grey,
-                                TextAlign.start,
-                                FontWeight.w400,
-                                ConstantData.font18Px),
-                            SizedBox(
-                              height: (margin / 2),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                            vertical: margin, horizontal: margin),
-                        child: ConstantWidget.getTextWidget(
-                            "Courier",
-                            ConstantData.mainTextColor,
-                            TextAlign.start,
-                            FontWeight.bold,
-                            ConstantWidget.getScreenPercentSize(context, 2)),
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: margin),
-                        color: ConstantData.cellColor,
-                        width: double.infinity,
-                        height: SizeConfig.safeBlockVertical * 16,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            ClipOval(
-                              // borderRadius: BorderRadius.all(Radius.circular(
-                              //     ConstantWidget.getPercentSize(
-                              //         bottomImageHeight, 12))),
-                              child: Image.asset(
-                                ConstantData.assetsPath + "hugh.png",
-                                fit: BoxFit.cover,
-                                width: bottomImageHeight,
-                                height: bottomImageHeight,
-                              ),
-                            ),
-                            ConstantWidget.getHorizonSpace(
-                                SizeConfig.safeBlockHorizontal * 1.5),
-                            Expanded(
-                                child: InkWell(
-                              onTap: () {},
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ConstantWidget.getCustomText(
-                                      firstName + " " + lastName,
-                                      ConstantData.mainTextColor,
-                                      1,
-                                      TextAlign.start,
-                                      FontWeight.w500,
-                                      ConstantWidget.getPercentSize(
-                                          bottomHeight, 15)),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.check_circle,
-                                        color: ConstantData.accentColor,
-                                        size: ConstantWidget.getPercentSize(
-                                            bottomHeight, 15),
-                                      ),
-                                      ConstantWidget.getHorizonSpace(
-                                          SizeConfig.safeBlockHorizontal * 1.2),
-                                      ConstantWidget.getCustomText(
-                                          driverPhone,
-                                          Colors.grey,
-                                          1,
-                                          TextAlign.start,
-                                          FontWeight.normal,
-                                          ConstantWidget.getPercentSize(
-                                              bottomHeight, 12))
-                                    ],
-                                  )
-                                ],
-                              ),
-                            )),
-                            IconButton(
-                                icon: Icon(
-                                  Icons.call,
-                                  color: ConstantData.accentColor,
-                                  size: ConstantWidget.getPercentSize(
-                                      bottomHeight, 20),
+                    );
+
+                    // if we got our data
+                  } else if (snapshot.hasData) {
+                    final List data = snapshot.data;
+                    return ListView(
+                      children: [
+                        Container(
+                          height: height,
+                          child: Stack(
+                            children: [
+                              Container(
+                                height: height,
+                                width: double.infinity,
+                                child: GoogleMap(
+                                  initialCameraPosition: _kGooglePlex,
+                                  myLocationButtonEnabled: true,
+                                  compassEnabled: true,
+                                  myLocationEnabled: true,
+                                  tiltGesturesEnabled: true,
+                                  mapToolbarEnabled: true,
+                                  mapType: MapType.hybrid, //map type
+                                  onMapCreated: onMapCreated,
+                                  polylines: polys,
+                                  onTap: (latLng) {
+                                    //clearOverlay();
+                                    moveToLocation(latLng);
+                                    // getDirections();
+                                  },
+                                  markers: markers,
                                 ),
-                                onPressed: () {
-                                  _callNumber();
-                                }),
-                          ],
+                              ),
+                              Container(
+                                width: double.infinity,
+                                color: Colors.green,
+                                padding: EdgeInsets.all(margin),
+                                child: ConstantWidget.getTextWidget(
+                                    widget.activeOrderModel.deliveryDate,
+                                    Colors.white,
+                                    TextAlign.start,
+                                    FontWeight.w500,
+                                    ConstantData.font18Px),
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        height: (margin),
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: margin),
-                        width: double.infinity,
-                        color: ConstantData.cellColor,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              height: (margin / 2),
-                            ),
-                            ConstantWidget.getTextWidget(
-                                "Information",
-                                Colors.grey,
-                                TextAlign.start,
-                                FontWeight.w400,
-                                ConstantWidget.getScreenPercentSize(
-                                    context, 2)),
-                            SizedBox(
-                              height: (margin),
-                            ),
+                        Container(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding:
+                                    EdgeInsets.symmetric(horizontal: margin),
+                                width: double.infinity,
+                                color: ConstantData.cellColor,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      height: (margin / 2),
+                                    ),
+                                    ConstantWidget.getTextWidget(
+                                        widget.activeOrderModel.price,
+                                        ConstantData.mainTextColor,
+                                        TextAlign.start,
+                                        FontWeight.w400,
+                                        ConstantWidget.getScreenPercentSize(
+                                            context, 3)),
+                                    SizedBox(
+                                      height: (margin / 2),
+                                    ),
+                                    ConstantWidget.getTextWidget(
+                                        "To be delivered at: " +
+                                            widget.activeOrderModel
+                                                .receiverLocation,
+                                        Colors.grey,
+                                        TextAlign.start,
+                                        FontWeight.w400,
+                                        ConstantData.font18Px),
+                                    SizedBox(
+                                      height: (margin / 2),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: margin, horizontal: margin),
+                                child: ConstantWidget.getTextWidget(
+                                    "Courier",
+                                    ConstantData.mainTextColor,
+                                    TextAlign.start,
+                                    FontWeight.bold,
+                                    ConstantWidget.getScreenPercentSize(
+                                        context, 2)),
+                              ),
+                              Container(
+                                padding:
+                                    EdgeInsets.symmetric(horizontal: margin),
+                                color: ConstantData.cellColor,
+                                width: double.infinity,
+                                height: SizeConfig.safeBlockVertical * 16,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    ClipOval(
+                                      // borderRadius: BorderRadius.all(Radius.circular(
+                                      //     ConstantWidget.getPercentSize(
+                                      //         bottomImageHeight, 12))),
+                                      child: Image.asset(
+                                        ConstantData.assetsPath + "hugh.png",
+                                        fit: BoxFit.cover,
+                                        width: bottomImageHeight,
+                                        height: bottomImageHeight,
+                                      ),
+                                    ),
+                                    ConstantWidget.getHorizonSpace(
+                                        SizeConfig.safeBlockHorizontal * 1.5),
+                                    Expanded(
+                                        child: InkWell(
+                                      onTap: () {},
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          ConstantWidget.getCustomText(
+                                              data.elementAt(2) +
+                                                  " " +
+                                                  data.elementAt(3),
+                                              ConstantData.mainTextColor,
+                                              1,
+                                              TextAlign.start,
+                                              FontWeight.w500,
+                                              ConstantWidget.getPercentSize(
+                                                  bottomHeight, 15)),
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                Icons.check_circle,
+                                                color: ConstantData.accentColor,
+                                                size: ConstantWidget
+                                                    .getPercentSize(
+                                                        bottomHeight, 15),
+                                              ),
+                                              ConstantWidget.getHorizonSpace(
+                                                  SizeConfig
+                                                          .safeBlockHorizontal *
+                                                      1.2),
+                                              ConstantWidget.getCustomText(
+                                                  driverPhone,
+                                                  Colors.grey,
+                                                  1,
+                                                  TextAlign.start,
+                                                  FontWeight.normal,
+                                                  ConstantWidget.getPercentSize(
+                                                      bottomHeight, 12))
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    )),
+                                    IconButton(
+                                        icon: Icon(
+                                          Icons.call,
+                                          color: ConstantData.accentColor,
+                                          size: ConstantWidget.getPercentSize(
+                                              bottomHeight, 20),
+                                        ),
+                                        onPressed: () {
+                                          _callNumber();
+                                        }),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: (margin),
+                              ),
+                              Container(
+                                padding:
+                                    EdgeInsets.symmetric(horizontal: margin),
+                                width: double.infinity,
+                                color: ConstantData.cellColor,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      height: (margin / 2),
+                                    ),
+                                    ConstantWidget.getTextWidget(
+                                        "Information",
+                                        Colors.grey,
+                                        TextAlign.start,
+                                        FontWeight.w400,
+                                        ConstantWidget.getScreenPercentSize(
+                                            context, 2)),
+                                    SizedBox(
+                                      height: (margin),
+                                    ),
 
-                            getColumnCell(
-                              "Created",
-                              widget.activeOrderModel.deliveryDate,
-                            ),
+                                    getColumnCell(
+                                      "Created",
+                                      widget.activeOrderModel.deliveryDate,
+                                    ),
 
-                            // ConstantWidget.getTextWidget(
-                            //     "Created",
-                            //     Colors.grey,
-                            //     TextAlign.start,
-                            //     FontWeight.w400,
-                            //     ConstantData.font22Px),
-                            // SizedBox(
-                            //   height: (margin / 3),
-                            // ),
-                            // ConstantWidget.getTextWidget(
-                            //     "257.05.2021 17:15",
-                            //     ConstantData.mainTextColor,
-                            //     TextAlign.start,
-                            //     FontWeight.w400,
-                            //     ConstantData.font22Px),
-                            //
-                            SizedBox(
-                              height: ((margin * 1.2)),
-                            ),
+                                    SizedBox(
+                                      height: ((margin * 1.2)),
+                                    ),
 
-                            getColumnCell(
-                              "Weight",
-                              widget.activeOrderModel.packageWeight,
-                            ),
+                                    getColumnCell(
+                                      "Weight",
+                                      widget.activeOrderModel.packageWeight,
+                                    ),
 
-                            //
-                            SizedBox(
-                              height: ((margin * 1.2)),
-                            ),
-                            getColumnCell(
-                              "Delivery Method",
-                              widget.activeOrderModel.deliveryType,
-                            ),
-                            //
-                            SizedBox(
-                              height: ((margin * 1.2)),
-                            ),
-                            getColumnCell(
-                              "Contents",
-                              widget.activeOrderModel.packageType,
-                            ),
+                                    //
+                                    SizedBox(
+                                      height: ((margin * 1.2)),
+                                    ),
+                                    getColumnCell(
+                                      "Delivery Method",
+                                      widget.activeOrderModel.deliveryType,
+                                    ),
+                                    //
+                                    SizedBox(
+                                      height: ((margin * 1.2)),
+                                    ),
+                                    getColumnCell(
+                                      "Contents",
+                                      widget.activeOrderModel.packageType,
+                                    ),
 
-                            //
-                            SizedBox(
-                              height: ((margin * 1.2)),
-                            ),
-                            getColumnCell(
-                              "Stated value",
-                              widget.activeOrderModel.packageValue,
-                            ),
-                            //
-                            SizedBox(
-                              height: ((margin * 1.2)),
-                            ),
-                            getColumnCell(
-                              "Payment Type",
-                              widget.activeOrderModel.paymentMethod,
-                            ),
-                            SizedBox(
-                              height: ((margin * 1.2)),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        height: margin,
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: margin, vertical: margin),
-                        color: ConstantData.cellColor,
-                        child: _DeliveryProcesses(processes: timeLine),
-                      )
-                    ],
-                  ),
-                )
-              ],
+                                    //
+                                    SizedBox(
+                                      height: ((margin * 1.2)),
+                                    ),
+                                    getColumnCell(
+                                      "Stated value",
+                                      widget.activeOrderModel.packageValue,
+                                    ),
+                                    //
+                                    SizedBox(
+                                      height: ((margin * 1.2)),
+                                    ),
+                                    getColumnCell(
+                                      "Payment Type",
+                                      widget.activeOrderModel.paymentMethod,
+                                    ),
+                                    SizedBox(
+                                      height: ((margin * 1.2)),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: margin,
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: margin, vertical: margin),
+                                color: ConstantData.cellColor,
+                                child: _DeliveryProcesses(processes: timeLine),
+                              )
+                            ],
+                          ),
+                        )
+                      ],
+                    );
+                  }
+                }
+
+                // Displaying LoadingSpinner to indicate waiting state
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              },
+
+              // Future that needs to be resolved
+              // inorder to display something on the Canvas
+              future: driver(),
             ),
           ),
         ),
@@ -471,6 +490,20 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
 
   void onMapCreated(GoogleMapController controller) {
     this.mapController.complete(controller);
+    gMapController = controller;
+    senderCoordinates = LatLng(
+        widget.activeOrderModel.senderCoordinates.latitude,
+        widget.activeOrderModel.senderCoordinates.longitude);
+    receiverCoordinates = LatLng(
+        widget.activeOrderModel.receiverCoordinates.latitude,
+        widget.activeOrderModel.receiverCoordinates.longitude);
+    LatLngBounds bound = LatLngBounds(
+        southwest: senderCoordinates, northeast: receiverCoordinates);
+    CameraUpdate u2 = CameraUpdate.newLatLngBounds(bound, 50);
+    this.gMapController.animateCamera(u2).then((void v) {
+      check(u2, this.gMapController);
+    });
+
     // moveToSenderLocation();
     //getDirections();
   }
@@ -482,6 +515,17 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
             CameraPosition(target: latLng, zoom: 12.0)),
       );
     });
+  }
+
+  void check(CameraUpdate u, GoogleMapController c) async {
+    c.animateCamera(u);
+    gMapController.animateCamera(u);
+    LatLngBounds l1 = await c.getVisibleRegion();
+    LatLngBounds l2 = await c.getVisibleRegion();
+    print(l1.toString());
+    print(l2.toString());
+    if (l1.southwest.latitude == -90 || l2.southwest.latitude == -90)
+      check(u, c);
   }
 }
 

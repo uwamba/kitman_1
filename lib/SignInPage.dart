@@ -9,7 +9,6 @@ import 'package:knitman/TabWidgetAdmin.dart';
 import 'package:knitman/TabWidgetRider.dart';
 
 import 'ForgotPassword.dart';
-import 'Registration.dart';
 import 'generated/l10n.dart';
 import 'main.dart';
 import 'util/ConstantData.dart';
@@ -33,12 +32,18 @@ class _SignInPage extends State<SignInPage> {
 
   Future<void> login() async {
     signIn = "";
+    FirebaseFirestore.instance.settings =
+        const Settings(persistenceEnabled: false);
     FirebaseFirestore.instance
         .collection('users')
         .where('phone', isEqualTo: textPhoneController.text)
         .where('password', isEqualTo: textPasswordController.text)
         .get()
         .then((QuerySnapshot querySnapshot) {
+      final source = (querySnapshot.metadata.isFromCache)
+          ? "===================local cache"
+          : "==========================server";
+      print(source);
       querySnapshot.docs.forEach((doc) {
         print("email " + doc["phone"] + " Password " + doc["password"]);
         if (doc["phone"] == textPhoneController.text &&
@@ -72,13 +77,17 @@ class _SignInPage extends State<SignInPage> {
                 MaterialPageRoute(
                   builder: (context) => TabWidgetadmin(true),
                 ));
+          } else {
+            print("you are not allowed");
           }
+        } else {
+          print("incorrect username or password");
         }
       });
     });
     print(signIn);
     if (signIn.isEmpty) {
-      print("incorrect email or password");
+      print("incorrect username/password");
       setState(() {});
     }
   }

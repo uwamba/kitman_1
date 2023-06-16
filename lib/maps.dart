@@ -289,7 +289,7 @@ class _HomePageState extends State<maps> {
               initialCameraPosition: _currentPosition,
               myLocationButtonEnabled: true,
               myLocationEnabled: true,
-              mapType: MapType.normal, //map type
+              mapType: MapType.hybrid, //map type
               onMapCreated: onMapCreated,
               polylines: Set<Polyline>.of(polylines.values),
               onTap: (latLng) {

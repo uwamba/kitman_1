@@ -22,8 +22,10 @@ import 'util/ConstantWidget.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Firebase.initializeApp();
-  WidgetsFlutterBinding.ensureInitialized();
+  Firebase.initializeApp().whenComplete(() {
+    FirebaseFirestore.instance.clearPersistence();
+  });
+  // WidgetsFlutterBinding.ensureInitialized();
 
   //Firebase.onBackgroundFirestore(_firebaseMessagingBackgroundHandler);
   initializeService();
@@ -93,6 +95,7 @@ Future<void> initializeService() async {
 // run app from xcode, then from xcode menu, select Simulate Background Fetch
 bool onIosBackground(ServiceInstance service) {
   WidgetsFlutterBinding.ensureInitialized();
+
   print('FLUTTER BACKGROUND FETCH');
 
   return true;
