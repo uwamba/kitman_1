@@ -19,7 +19,6 @@ import 'NotificationPage.dart';
 import 'OrderDetail.dart';
 import 'OrderDetails.dart';
 import 'OrderDetailsDriver.dart';
-import 'RatingPage.dart';
 import 'ResetPasswordPage.dart';
 import 'SchedulePage.dart';
 import 'TermsConditionPage.dart';
@@ -585,11 +584,11 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
                               FontWeight.w400,
                               ConstantData.font18Px),
                           onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => TrackOrderPage(),
-                                ));
+                            // Navigator.push(
+                            // context,
+                            // MaterialPageRoute(
+                            //   builder: (context) => TrackOrderPage(),
+                            // ));
                           },
                         ),
                         SizedBox(
@@ -817,11 +816,11 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
                                     ),
                                   ),
                                   onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => RatingPage(),
-                                        ));
+                                    // Navigator.push(
+                                    //   context,
+                                    //   MaterialPageRoute(
+                                    //     builder: (context) => RatingPage(),
+                                    //   ));
                                   },
                                 ),
                                 SizedBox(
@@ -979,11 +978,11 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
                             color: ConstantData.primaryColor,
                           ),
                           onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => NotificationPage(),
-                                ));
+                            // Navigator.push(
+                            //   context,
+                            //  MaterialPageRoute(
+                            //   builder: (context) => NotificationPage(),
+                            // ));
                           },
                         )
                       ],

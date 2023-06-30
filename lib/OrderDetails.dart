@@ -29,22 +29,43 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
     return new Future.value(true);
   }
 
+  LatLngBounds boundsFromLatLngList(List<LatLng> list) {
+    assert(list.isNotEmpty);
+    double x0, x1, y0, y1;
+    for (LatLng latLng in list) {
+      if (x0 == null) {
+        x0 = x1 = latLng.latitude;
+        y0 = y1 = latLng.longitude;
+      } else {
+        if (latLng.latitude > x1) x1 = latLng.latitude;
+        if (latLng.latitude < x0) x0 = latLng.latitude;
+        if (latLng.longitude > y1) y1 = latLng.longitude;
+        if (latLng.longitude < y0) y0 = latLng.longitude;
+      }
+    }
+    return LatLngBounds(northeast: LatLng(x1, y1), southwest: LatLng(x0, y0));
+  }
+
   String firstName = "", lastName = "", driverPhone = "";
   final Set<Marker> markers = Set();
   PolylineId polylineId = PolylineId("area");
   final Set<Polyline> polys = Set();
   GoogleMapController gMapController;
+  List<LatLng> list;
   initState() {
     super.initState();
+
     senderCoordinates = LatLng(
         widget.activeOrderModel.senderCoordinates.latitude,
         widget.activeOrderModel.senderCoordinates.longitude);
     receiverCoordinates = LatLng(
         widget.activeOrderModel.receiverCoordinates.latitude,
         widget.activeOrderModel.receiverCoordinates.longitude);
+    list = [senderCoordinates, receiverCoordinates];
+
     _kGooglePlex = CameraPosition(
-      target: senderCoordinates,
-      zoom: 12.0,
+      target: receiverCoordinates,
+      zoom: 10.0,
     );
 
     markers.add(Marker(
@@ -198,6 +219,8 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
                                   initialCameraPosition: _kGooglePlex,
                                   myLocationButtonEnabled: true,
                                   compassEnabled: true,
+                                  scrollGesturesEnabled: true,
+                                  rotateGesturesEnabled: true,
                                   myLocationEnabled: true,
                                   tiltGesturesEnabled: true,
                                   mapToolbarEnabled: true,
@@ -206,7 +229,7 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
                                   polylines: polys,
                                   onTap: (latLng) {
                                     //clearOverlay();
-                                    moveToLocation(latLng);
+                                    // moveToLocation(latLng);
                                     // getDirections();
                                   },
                                   markers: markers,
@@ -497,23 +520,18 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
     receiverCoordinates = LatLng(
         widget.activeOrderModel.receiverCoordinates.latitude,
         widget.activeOrderModel.receiverCoordinates.longitude);
-    LatLngBounds bound = LatLngBounds(
-        southwest: senderCoordinates, northeast: receiverCoordinates);
-    CameraUpdate u2 = CameraUpdate.newLatLngBounds(bound, 50);
-    this.gMapController.animateCamera(u2).then((void v) {
-      check(u2, this.gMapController);
-    });
+    list = [senderCoordinates, receiverCoordinates];
 
-    // moveToSenderLocation();
-    //getDirections();
+    moveToLocation(list);
   }
 
-  void moveToLocation(LatLng latLng) {
-    this.mapController.future.then((controller) {
-      controller.animateCamera(
-        CameraUpdate.newCameraPosition(
-            CameraPosition(target: latLng, zoom: 12.0)),
-      );
+  void moveToLocation(List<LatLng> listLatLng) {
+    LatLngBounds bound = boundsFromLatLngList(listLatLng);
+    Future.delayed(Duration(milliseconds: 500)).then((v) async {
+      CameraUpdate u2 = CameraUpdate.newLatLngBounds(bound, 100);
+      this.gMapController.animateCamera(u2).then((void v) {
+        check(u2, this.gMapController);
+      });
     });
   }
 

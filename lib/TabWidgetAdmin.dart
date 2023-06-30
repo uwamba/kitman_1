@@ -617,11 +617,11 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                               FontWeight.w400,
                               ConstantData.font18Px),
                           onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => TrackOrderPage(),
-                                ));
+                            //Navigator.push(
+                            //  context,
+                            //  MaterialPageRoute(
+                            //    builder: (context) => TrackOrderPage(),
+                            //  ));
                           },
                         ),
                         SizedBox(
@@ -697,11 +697,11 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                         ),
                       ),
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => NearDrivers(),
-                            ));
+                        //  Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //    builder: (context) => NearDrivers(),
+                        //  ));
                       },
                     ),
                   ),

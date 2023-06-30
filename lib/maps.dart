@@ -306,12 +306,27 @@ class _HomePageState extends State<maps> {
               },
               markers: markers,
             ),
+            Positioned(
+                bottom: 200,
+                left: 50,
+                child: Container(
+                    child: Card(
+                  child: Container(
+                      padding: EdgeInsets.all(20),
+                      child: Text(
+                          "Total Distance: " +
+                              distance.toStringAsFixed(2) +
+                              " KM",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold))),
+                )))
           ])),
       floatingActionButton: FloatingActionButton.extended(
         label: Text('Select Location'),
         icon: Icon(Icons.location_searching),
         backgroundColor: Colors.pink,
-        onPressed: () => Navigator.of(context).pop(loc),
+        onPressed: () => Navigator.of(context)
+            .pop(loc.toString() + ";" + distance.toString()),
       ),
     );
   }

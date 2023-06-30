@@ -167,7 +167,23 @@ class _SignInPage extends State<SignInPage> {
     });
     print(signIn);
     if (signIn.isEmpty) {
-      print("incorrect username/password");
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: new Text("Alert!!"),
+            content: new Text("incorrect username or password"),
+            actions: <Widget>[
+              TextButton(
+                child: new Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
       setState(() {});
     }
   }

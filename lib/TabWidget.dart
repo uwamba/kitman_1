@@ -16,7 +16,6 @@ import 'ChatScreen.dart';
 import 'EditProfilePage.dart';
 import 'MyVouchers.dart';
 import 'NotificationPage.dart';
-import 'RatingPage.dart';
 import 'ResetPasswordPage.dart';
 import 'SchedulePage.dart';
 import 'TermsConditionPage.dart';
@@ -56,7 +55,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
   List<ChatModel> chatUserList = DataFile.getChatUserList();
   StreamSubscription<QuerySnapshot> _eventsSubscription;
   int tabPosition = 0;
-  List<String> s = ["Orders", "New Order", "Chat", "Profile"];
+  List<String> s = ["Orders", "New Order", "Profile"];
   List<NewOrderTypeModel> orderTypeList = DataFile.getOrderTypeList();
   List<CompletedOrderModel> completeOrderList = DataFile.getCompleteOrder();
   List<ActiveOrderModel> activeOrderList = DataFile.getActiveOrderList();
@@ -123,7 +122,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
     ConstantData.setThemePosition();
     getUserData();
     motionTabBar = new MotionTabBar(
-      labels: ["Orders", "New Order", "Chat", "Profile"],
+      labels: ["Orders", "New Order", "Profile"],
       initialSelectedTab: s[_selectedIndex],
       tabIconColor: ConstantData.mainTextColor,
       tabSelectedColor: ConstantData.primaryColor,
@@ -138,7 +137,6 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
       icons: [
         "bottom_icon_1.png",
         "bottom_icon_2.png",
-        "bottom_icon_3.png",
         "bottom_icon_4.png",
         "Icons.category",
         "Icons.add_box_outlined",
@@ -168,9 +166,9 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                 Container(
                   child: newOrderPage(),
                 ),
-                Container(
-                  child: getChatPage(),
-                ),
+                //Container(
+                // child: getChatPage(),
+                //),
                 Container(
                   child: getProfilePage(),
                 ),
@@ -541,11 +539,11 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                         ),
                       ),
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => NotificationPage(),
-                            ));
+                        // Navigator.push(
+                        //    context,
+                        //    MaterialPageRoute(
+                        //    builder: (context) => NotificationPage(),
+                        //  ));
                       },
                     ),
                   ),
@@ -571,11 +569,11 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                               FontWeight.w400,
                               ConstantData.font18Px),
                           onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => TrackOrderPage(),
-                                ));
+                            // Navigator.push(
+                            // context,
+                            //MaterialPageRoute(
+                            //   builder: (context) => TrackOrderPage(),
+                            // ));
                           },
                         ),
                         SizedBox(
@@ -804,11 +802,11 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                                     ),
                                   ),
                                   onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => RatingPage(),
-                                        ));
+                                    // Navigator.push(
+                                    //  context,
+                                    // MaterialPageRoute(
+                                    //  builder: (context) => RatingPage(),
+                                    //));
                                   },
                                 ),
                                 SizedBox(
@@ -1046,12 +1044,12 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                                           ),
                                         ),
                                         onTap: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    RatingPage(),
-                                              ));
+                                          //Navigator.push(
+                                          // context,
+                                          // MaterialPageRoute(
+                                          //   builder: (context) =>
+                                          //      RatingPage(),
+                                          // ));
                                         },
                                       ),
                                     ],

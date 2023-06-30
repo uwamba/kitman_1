@@ -35,6 +35,7 @@ class _LocationPage extends State<LocationPage> {
   List<String> timeList = DataFile.getTimeList();
   List<String> dateList = DataFile.getDateList();
   GoogleMapController mapController;
+  double distance = 0.0;
   static final kInitialPosition = LatLng(-33.8567844, 151.213108);
   //PickResult selectedPlace;
 
@@ -213,7 +214,8 @@ class _LocationPage extends State<LocationPage> {
                             widget.priority,
                             widget.weight,
                             orderType,
-                            packageValueController.text),
+                            packageValueController.text,
+                            distance),
                       ));
                 })
               ],
@@ -343,12 +345,27 @@ class _LocationPage extends State<LocationPage> {
       ),
       onTap: () async {
         if (startLocation != null) {
-          endLocation = await Navigator.push(
+          String res = await Navigator.push(
               context,
               new MaterialPageRoute(
                   builder: (BuildContext context) =>
                       new maps(startLocation, false, 2)));
-          print(endLocation.toString());
+
+          final sp = res.split(";");
+          //endLocation = sp[0] as LatLng;
+          final sp1 = sp[0].split("(");
+          print(sp1);
+          final sp2 = sp1[1].split(")");
+          print(sp2);
+          final sp3 = sp2[0].split(",");
+          print(sp3);
+          double latitude = double.parse(sp3[0]);
+          double longitude = double.parse(sp3[1]);
+          endLocation = new LatLng(latitude, longitude);
+          print(sp[0]);
+          distance = double.parse(sp[1]);
+          print("Distanceeeeeeessssssssssssssssssssssssssssss" +
+              distance.toString());
           setState(() {
             receiverCoordinatesController.text = endLocation.toString();
           });

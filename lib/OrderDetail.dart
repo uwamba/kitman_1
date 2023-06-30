@@ -41,7 +41,8 @@ class _OrderDetail extends State<OrderDetail> {
   );
   List listMarkerIds = [];
   BitmapDescriptor customIcon1;
-
+  final Completer<GoogleMapController> mapController = Completer();
+  LatLng loc;
   createMarker(context) {
     if (customIcon1 == null) {
       ImageConfiguration configuration = createLocalImageConfiguration(context);
@@ -66,6 +67,16 @@ class _OrderDetail extends State<OrderDetail> {
     double bottomHeight = SizeConfig.safeBlockVertical * 20;
 
     double bottomImageHeight = ConstantWidget.getPercentSize(bottomHeight, 50);
+    void moveToLocation(LatLng latLng) {
+      this.mapController.future.then((controller) {
+        loc = latLng;
+
+        controller.animateCamera(
+          CameraUpdate.newCameraPosition(
+              CameraPosition(target: latLng, zoom: 12.0)),
+        );
+      });
+    }
 
     return WillPopScope(
         child: Scaffold(
@@ -112,7 +123,18 @@ class _OrderDetail extends State<OrderDetail> {
                         width: double.infinity,
                         child: GoogleMap(
                           initialCameraPosition: _kGooglePlex,
-                          onTap: (_) {},
+                          myLocationButtonEnabled: true,
+                          compassEnabled: true,
+                          scrollGesturesEnabled: true,
+                          rotateGesturesEnabled: true,
+                          myLocationEnabled: true,
+                          tiltGesturesEnabled: true,
+                          mapToolbarEnabled: true,
+
+                          mapType: MapType.hybrid, //map type
+                          onTap: (latLng) {
+                            moveToLocation(latLng);
+                          },
                           markers: Set.of(markers.values),
                           polylines: Set<Polyline>.of(<Polyline>[
                             Polyline(

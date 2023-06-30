@@ -35,6 +35,7 @@ class PreferencePage extends StatefulWidget {
       weight,
       orderType,
       packageValue;
+  double distance;
   GeoPoint receiverCoordinates, senderCoordinates;
   PreferencePage(
       this.status,
@@ -54,7 +55,8 @@ class PreferencePage extends StatefulWidget {
       this.priority,
       this.weight,
       this.orderType,
-      this.packageValue);
+      this.packageValue,
+      this.distance);
 
   @override
   _PreferencePage createState() {
@@ -449,8 +451,7 @@ class _PreferencePage extends State<PreferencePage> {
                             child: InkWell(
                               child: ConstantWidget.getTextWidget(
                                   "RWF " +
-                                      priceCalculator(
-                                              "Document", 20, 0, 50000, 20, 25)
+                                      ((super.widget.distance * 120).toInt())
                                           .toString(),
                                   Colors.white,
                                   TextAlign.start,
@@ -538,7 +539,7 @@ class _PreferencePage extends State<PreferencePage> {
         onWillPop: _requestPop);
   }
 
-  double priceCalculator(String packageType, double distance, double orderType,
+  double priceCalculators(String packageType, double distance, double orderType,
       double packageValue, double price, double weight) {
     double newPrice;
 
