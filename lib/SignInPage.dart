@@ -66,22 +66,102 @@ class _SignInPage extends State<SignInPage> {
                   builder: (context) => MyHomePage(),
                 ));
           } else if (signIn == "Driver") {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TabWidgetRider(true),
-                ));
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: new Text("Alert!!"),
+                  content: new Text(
+                      "Location Disclosure: This app collects location data in background to provide GPS information to the readingTechnology Company database. Click yes to accept and continue click No to refuse"),
+                  actions: <Widget>[
+                    TextButton(
+                      child: new Text("Yes"),
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TabWidgetRider(true),
+                            ));
+                      },
+                    ),
+                    TextButton(
+                      child: new Text("No"),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
           } else if (signIn == "Admin") {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TabWidgetadmin(true),
-                ));
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: new Text("Alert!!"),
+                  content: new Text(
+                      "Location Disclosure: This app collects location data in background to provide GPS information to the readingTechnology Company database. Click yes to accept and continue click No to refuse"),
+                  actions: <Widget>[
+                    TextButton(
+                      child: new Text("Yes"),
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TabWidgetadmin(true),
+                            ));
+                      },
+                    ),
+                    TextButton(
+                      child: new Text("No"),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
           } else {
-            print("you are not allowed");
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: new Text("Alert!!"),
+                  content: new Text("incorrect username or password"),
+                  actions: <Widget>[
+                    TextButton(
+                      child: new Text("OK"),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
           }
         } else {
-          print("incorrect username or password");
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: new Text("Alert!!"),
+                content: new Text("incorrect username or password"),
+                actions: <Widget>[
+                  TextButton(
+                    child: new Text("OK"),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
         }
       });
     });

@@ -270,15 +270,40 @@ class _LocationPage extends State<LocationPage> {
         ),
       ),
       onTap: () async {
-        startLocation = await Navigator.push(
-            context,
-            new MaterialPageRoute(
-                builder: (BuildContext context) =>
-                    new maps(initialLocation, true, 1)));
-        print(startLocation);
-        setState(() {
-          senderCoordinatesController.text = startLocation.toString();
-        });
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: new Text("Alert!!"),
+              content: new Text(
+                  "Location Disclosure: This app collects location data to provide GPS information to the readingTechnology Company database. data may be collected in background or while in use. Click yes to continue and No to stop"),
+              actions: <Widget>[
+                TextButton(
+                  child: new Text("Yes"),
+                  onPressed: () async {
+                    Navigator.of(context).pop();
+                    startLocation = await Navigator.push(
+                        context,
+                        new MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                new maps(initialLocation, true, 1)));
+                    print(startLocation);
+                    setState(() {
+                      senderCoordinatesController.text =
+                          startLocation.toString();
+                    });
+                  },
+                ),
+                TextButton(
+                  child: new Text("No"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
       },
     );
   }
@@ -565,6 +590,7 @@ class _LocationPage extends State<LocationPage> {
       },
     );
   }
+
   void datePickerDialog(bool isPoint) {
     showModalBottomSheet(
       context: context,
@@ -617,6 +643,7 @@ class _LocationPage extends State<LocationPage> {
       },
     );
   }
+
   getCell(bool isPoint, bool isDate) {
     double height = ConstantWidget.getScreenPercentSize(context, 6);
     double icon = ConstantWidget.getPercentSize(height, 40);
