@@ -4,6 +4,8 @@ import 'package:knitman/model/UserlListModel.dart';
 import 'package:knitman/model/onlineUser.dart';
 import 'package:knitman/model/orderList.dart';
 
+import '../model/variables.dart';
+
 class Db {
   String status,
       deliveryTime,
@@ -27,6 +29,7 @@ class Db {
   GeoPoint senderCoordinates, receiverCoordinates;
   CollectionReference orders;
   List<OrderList> completeOrderList;
+  List<Variables> variableList;
   List<UserListModel> allUserList;
   CollectionReference collectionRef =
       FirebaseFirestore.instance.collection('orders');
@@ -34,6 +37,8 @@ class Db {
   bool avail;
   CollectionReference _userCollectionRef =
       FirebaseFirestore.instance.collection('users');
+  CollectionReference _variableCollectionRef =
+      FirebaseFirestore.instance.collection('global_variables');
   Db() {
     orders = FirebaseFirestore.instance.collection('orders');
   }
@@ -48,6 +53,17 @@ class Db {
               doc.reference.update({'driverNumber': driver});
             }));
     print("updated");
+  }
+
+  Future<List<Variables>> getVariables() async {
+    QuerySnapshot querySnapshot = await _variableCollectionRef.get();
+    final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+    variableList =
+        parsed.map<Variables>((json) => Variables.fromJson(json)).toList();
+
+    print(variableList);
+    return variableList;
   }
 
   Future updateStatus(id, status) async {

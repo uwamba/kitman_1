@@ -14,7 +14,7 @@ import 'package:knitman/util/PrefData.dart';
 
 import 'Database/Db.dart';
 import 'IntroPage.dart';
-import 'SignUpPage.dart';
+import 'SignInPage.dart';
 import 'TabWidget.dart';
 import 'generated/l10n.dart';
 import 'util/ConstantData.dart';
@@ -231,7 +231,7 @@ class _MyHomePageState extends State<MyHomePage> {
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => SignUpPage(),
+              builder: (context) => SignInPage(),
             ));
       } else {
         Timer(Duration(seconds: 3), () {

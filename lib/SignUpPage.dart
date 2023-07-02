@@ -201,7 +201,8 @@ class _SignUpPage extends State<SignUpPage> {
                     String pas1 = textPasswordController.text;
                     String pas2 = textPasswordConfirmController.text;
                     if (pas1 == pas2) {
-                      print("+++++++++++++++++++++++++++++++++"+textPhoneController.text);
+                      print("+++++++++++++++++++++++++++++++++" +
+                          textPhoneController.text);
                       db.signUp(
                           textPhoneController.text,
                           textEmailController.text,

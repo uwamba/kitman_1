@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +11,7 @@ import 'generated/l10n.dart';
 import 'model/AddressModel.dart';
 import 'model/PaymentCardModel.dart';
 import 'model/PaymentSelectModel.dart';
+import 'model/variables.dart';
 import 'util/ConstantData.dart';
 import 'util/ConstantWidget.dart';
 import 'util/DataFile.dart';
@@ -274,160 +273,160 @@ class _PreferencePage extends State<PreferencePage> {
                           ),
                         ),
 
-                        Visibility(
-                          child: Container(
-                            margin: EdgeInsets.symmetric(horizontal: margin),
-                            child: Column(
-                              children: [
-                                ListView.builder(
-                                    shrinkWrap: true,
-                                    physics: NeverScrollableScrollPhysics(),
-                                    itemCount: 1,
-                                    itemBuilder: (context, index) {
-                                      return InkWell(
-                                        child: Container(
-                                          margin: EdgeInsets.only(
-                                              bottom: ConstantWidget
-                                                  .getWidthPercentSize(
-                                                      context, 3.5)),
-                                          padding: EdgeInsets.all(ConstantWidget
-                                              .getScreenPercentSize(
-                                                  context, 2)),
-                                          decoration: getDecoration(),
-
-                                          // decoration: BoxDecoration(
-                                          //     color: ConstantData.bgColor,
-                                          //     borderRadius: BorderRadius.circular(
-                                          //         ConstantWidget.getScreenPercentSize(
-                                          //             context, 1.5)),
-                                          //     border: Border.all(
-                                          //         color: ConstantData.borderColor,
-                                          //         width: ConstantWidget.getWidthPercentSize(
-                                          //             context, 0.08)),
-                                          //     boxShadow: [
-                                          //       BoxShadow(
-                                          //         color: Colors.grey.shade200,
-                                          //       )
-                                          //     ]),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Image.asset(
-                                                    paymentModelList[index]
-                                                        .image,
-                                                    height: ConstantWidget
-                                                        .getScreenPercentSize(
-                                                            context, 4),
-                                                  ),
-                                                  SizedBox(
-                                                    width: ConstantWidget
-                                                        .getScreenPercentSize(
-                                                            context, 2),
-                                                  ),
-                                                  Expanded(
-                                                    child: Stack(
-                                                      children: [
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .start,
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Column(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .start,
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                ConstantWidget.getCustomTextWithoutAlign(
-                                                                    "Momo Pay",
-                                                                    ConstantData
-                                                                        .mainTextColor,
-                                                                    FontWeight
-                                                                        .w700,
-                                                                    ConstantData
-                                                                        .font22Px),
-                                                                Padding(
-                                                                  padding: EdgeInsets.only(
-                                                                      top: ConstantWidget.getScreenPercentSize(
-                                                                          context,
-                                                                          0.5)),
-                                                                  child: ConstantWidget.getCustomTextWithoutAlign(
-                                                                      "+25078XXXXXXX",
-                                                                      ConstantData
-                                                                          .textColor,
-                                                                      FontWeight
-                                                                          .w500,
-                                                                      ConstantData
-                                                                          .font18Px),
-                                                                )
-                                                              ],
-                                                            ),
-                                                            // new Spacer(),
-                                                            // Align(
-                                                            //   alignment:
-                                                            //   Alignment.centerRight,
-                                                            //   child: Padding(
-                                                            //     padding:
-                                                            //     EdgeInsets.only(
-                                                            //         right: 3),
-                                                            //     child: Icon(
-                                                            //       (index ==
-                                                            //           _selectedAddress)
-                                                            //           ? Icons
-                                                            //           .radio_button_checked
-                                                            //           : Icons
-                                                            //           .radio_button_unchecked,
-                                                            //       color: (index ==
-                                                            //           _selectedAddress)
-                                                            //           ? ConstantData
-                                                            //           .textColor
-                                                            //           : Colors.grey,
-                                                            //       size: ConstantWidget.getPercentSize(cellHeight,
-                                                            //           25),
-                                                            //     ),
-                                                            //   ),
-                                                            // )
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    flex: 1,
-                                                  )
-                                                ],
-                                              ),
-                                              spaceWidget,
-                                              getPhoneCell(phoneController),
-                                            ],
-                                          ),
-                                        ),
-                                        onTap: () {
-                                          _selectedCard = index;
-                                          setState(() {});
-                                        },
-                                      );
-                                    }),
-                                spaceWidget,
-                                Container(
-                                  height: ConstantWidget.getScreenPercentSize(
-                                      context, 0.05),
-                                  color: Colors.grey,
-                                ),
-                                spaceWidget,
-                              ],
-                            ),
-                          ),
-                          visible: (!isCash),
-                        ),
+                        // Visibility(
+                        //   child: Container(
+                        //     margin: EdgeInsets.symmetric(horizontal: margin),
+                        //     child: Column(
+                        //       children: [
+                        //         ListView.builder(
+                        //             shrinkWrap: true,
+                        //             physics: NeverScrollableScrollPhysics(),
+                        //             itemCount: 1,
+                        //             itemBuilder: (context, index) {
+                        //               return InkWell(
+                        //                 child: Container(
+                        //                   margin: EdgeInsets.only(
+                        //                       bottom: ConstantWidget
+                        //                           .getWidthPercentSize(
+                        //                               context, 3.5)),
+                        //                   padding: EdgeInsets.all(ConstantWidget
+                        //                       .getScreenPercentSize(
+                        //                           context, 2)),
+                        //                   decoration: getDecoration(),
+                        //
+                        //                   // decoration: BoxDecoration(
+                        //                   //     color: ConstantData.bgColor,
+                        //                   //     borderRadius: BorderRadius.circular(
+                        //                   //         ConstantWidget.getScreenPercentSize(
+                        //                   //             context, 1.5)),
+                        //                   //     border: Border.all(
+                        //                   //         color: ConstantData.borderColor,
+                        //                   //         width: ConstantWidget.getWidthPercentSize(
+                        //                   //             context, 0.08)),
+                        //                   //     boxShadow: [
+                        //                   //       BoxShadow(
+                        //                   //         color: Colors.grey.shade200,
+                        //                   //       )
+                        //                   //     ]),
+                        //                   child: Column(
+                        //                     mainAxisAlignment:
+                        //                         MainAxisAlignment.center,
+                        //                     crossAxisAlignment:
+                        //                         CrossAxisAlignment.center,
+                        //                     children: [
+                        //                       Row(
+                        //                         children: [
+                        //                           Image.asset(
+                        //                             paymentModelList[index]
+                        //                                 .image,
+                        //                             height: ConstantWidget
+                        //                                 .getScreenPercentSize(
+                        //                                     context, 4),
+                        //                           ),
+                        //                           SizedBox(
+                        //                             width: ConstantWidget
+                        //                                 .getScreenPercentSize(
+                        //                                     context, 2),
+                        //                           ),
+                        //                           Expanded(
+                        //                             child: Stack(
+                        //                               children: [
+                        //                                 Row(
+                        //                                   mainAxisAlignment:
+                        //                                       MainAxisAlignment
+                        //                                           .start,
+                        //                                   crossAxisAlignment:
+                        //                                       CrossAxisAlignment
+                        //                                           .center,
+                        //                                   children: [
+                        //                                     Column(
+                        //                                       mainAxisAlignment:
+                        //                                           MainAxisAlignment
+                        //                                               .start,
+                        //                                       crossAxisAlignment:
+                        //                                           CrossAxisAlignment
+                        //                                               .start,
+                        //                                       children: [
+                        //                                         ConstantWidget.getCustomTextWithoutAlign(
+                        //                                             "Momo Pay",
+                        //                                             ConstantData
+                        //                                                 .mainTextColor,
+                        //                                             FontWeight
+                        //                                                 .w700,
+                        //                                             ConstantData
+                        //                                                 .font22Px),
+                        //                                         Padding(
+                        //                                           padding: EdgeInsets.only(
+                        //                                               top: ConstantWidget.getScreenPercentSize(
+                        //                                                   context,
+                        //                                                   0.5)),
+                        //                                           child: ConstantWidget.getCustomTextWithoutAlign(
+                        //                                               "+25078XXXXXXX",
+                        //                                               ConstantData
+                        //                                                   .textColor,
+                        //                                               FontWeight
+                        //                                                   .w500,
+                        //                                               ConstantData
+                        //                                                   .font18Px),
+                        //                                         )
+                        //                                       ],
+                        //                                     ),
+                        //                                     // new Spacer(),
+                        //                                     // Align(
+                        //                                     //   alignment:
+                        //                                     //   Alignment.centerRight,
+                        //                                     //   child: Padding(
+                        //                                     //     padding:
+                        //                                     //     EdgeInsets.only(
+                        //                                     //         right: 3),
+                        //                                     //     child: Icon(
+                        //                                     //       (index ==
+                        //                                     //           _selectedAddress)
+                        //                                     //           ? Icons
+                        //                                     //           .radio_button_checked
+                        //                                     //           : Icons
+                        //                                     //           .radio_button_unchecked,
+                        //                                     //       color: (index ==
+                        //                                     //           _selectedAddress)
+                        //                                     //           ? ConstantData
+                        //                                     //           .textColor
+                        //                                     //           : Colors.grey,
+                        //                                     //       size: ConstantWidget.getPercentSize(cellHeight,
+                        //                                     //           25),
+                        //                                     //     ),
+                        //                                     //   ),
+                        //                                     // )
+                        //                                   ],
+                        //                                 ),
+                        //                               ],
+                        //                             ),
+                        //                             flex: 1,
+                        //                           )
+                        //                         ],
+                        //                       ),
+                        //                       spaceWidget,
+                        //                       getPhoneCell(phoneController),
+                        //                     ],
+                        //                   ),
+                        //                 ),
+                        //                 onTap: () {
+                        //                   _selectedCard = index;
+                        //                   setState(() {});
+                        //                 },
+                        //               );
+                        //             }),
+                        //         spaceWidget,
+                        //         Container(
+                        //           height: ConstantWidget.getScreenPercentSize(
+                        //               context, 0.05),
+                        //           color: Colors.grey,
+                        //         ),
+                        //         spaceWidget,
+                        //       ],
+                        //     ),
+                        //   ),
+                        //   visible: (!isCash),
+                        // ),
                         spaceWidget,
 
                         // ConstantWidget.getBottomText(context, S.of(context).continueText, (){
@@ -492,6 +491,8 @@ class _PreferencePage extends State<PreferencePage> {
                               // builder: (context) => SubmitOrderPage(),
                               // ));
                               if (isCash == true) {
+                                int dis = super.widget.distance.round();
+                                servicePrice = dis.toDouble() * 120;
                                 db
                                     .addOrder(
                                       widget.status,
@@ -777,13 +778,26 @@ class _PreferencePage extends State<PreferencePage> {
                     FontWeight.w700,
                     ConstantWidget.getScreenPercentSize(context, 3)),
                 widget,
-                ConstantWidget.getCustomText(
-                    "Dial *182*7*1# and flow instructions",
-                    Colors.grey,
-                    2,
-                    TextAlign.start,
-                    FontWeight.w500,
-                    ConstantData.font18Px),
+                FutureBuilder<List<Variables>>(
+                  builder: (context, orderSnap) {
+                    if (!orderSnap.hasData) {
+                      return Center(child: CircularProgressIndicator());
+                    } else {
+                      return ConstantWidget.getCustomText(
+                          orderSnap.data[0].momoCode +
+                              "\n " +
+                              orderSnap.data[0].momoNumber +
+                              "\n " +
+                              orderSnap.data[0].bankAccount,
+                          Colors.blue,
+                          6,
+                          TextAlign.start,
+                          FontWeight.w900,
+                          ConstantData.font22Px);
+                    }
+                  },
+                  future: db.getVariables(),
+                ),
                 widget,
                 SizedBox(
                   height: (margin / 2),
@@ -823,6 +837,8 @@ class _PreferencePage extends State<PreferencePage> {
                 widget,
                 ConstantWidget.getBottomText(context, "Continue", () {
                   if (isCash == false) {
+                    int dis = super.widget.distance.round();
+                    servicePrice = dis.toDouble() * 120;
                     db
                         .addOrder(
                           super.widget.status,
@@ -843,7 +859,7 @@ class _PreferencePage extends State<PreferencePage> {
                           super.widget.packageValue,
                           phoneController.text,
                           servicePrice.toString(),
-                          "MOMO",
+                          "Other",
                           super.widget.senderCoordinates,
                           super.widget.receiverCoordinates,
                         )

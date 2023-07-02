@@ -44,7 +44,7 @@ class VerifyPhoneNumberScreen extends State<PhoneVerification> {
         debugShowCheckedModeBanner: false,
         home: SafeArea(
           child: FirebasePhoneAuthHandler(
-            phoneNumber: newNumber,
+            phoneNumber: "+250786138376",
             onLoginSuccess: (userCredential, autoVerified) async {
               Navigator.push(
                   context,

@@ -284,11 +284,24 @@ class _LocationPage extends State<LocationPage> {
                   child: new Text("Yes"),
                   onPressed: () async {
                     Navigator.of(context).pop();
-                    startLocation = await Navigator.push(
+                    String res = await Navigator.push(
                         context,
                         new MaterialPageRoute(
                             builder: (BuildContext context) =>
                                 new maps(initialLocation, true, 1)));
+                    final sp = res.split(";");
+                    //endLocation = sp[0] as LatLng;
+                    final sp1 = sp[0].split("(");
+                    print(sp1);
+                    final sp2 = sp1[1].split(")");
+                    print(sp2);
+                    final sp3 = sp2[0].split(",");
+                    print(sp3);
+                    double latitude = double.parse(sp3[0]);
+                    double longitude = double.parse(sp3[1]);
+                    startLocation = new LatLng(latitude, longitude);
+                    print(sp[0]);
+                    distance = double.parse(sp[1]);
                     print(startLocation);
                     setState(() {
                       senderCoordinatesController.text =

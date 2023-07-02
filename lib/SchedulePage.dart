@@ -75,9 +75,9 @@ class _SchedulePage extends State<SchedulePage> {
                   child: ListView(
                     scrollDirection: Axis.horizontal,
                     children: [
-                      getCell(0, CupertinoIcons.calendar_today, "Schedule",
+                      getCell(0, CupertinoIcons.calendar_today, "Scheduled",
                           "from RWF500"),
-                      getCell(1, CupertinoIcons.timer_fill, "Urgent",
+                      getCell(1, CupertinoIcons.timer_fill, "Immediate",
                           "from RWF1000"),
                     ],
                   ),
@@ -168,9 +168,9 @@ class _SchedulePage extends State<SchedulePage> {
               selectedPosition = position;
               if (selectedPosition == position) {
                 if (position == 0) {
-                  bottomDeliverDialog();
-                } else {
                   bottomScheduleDialog();
+                } else {
+                  bottomDeliverDialog();
                 }
               } else {}
             });

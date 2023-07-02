@@ -10,7 +10,6 @@ import 'package:knitman/FormValidation.dart';
 import 'package:knitman/UsersList.dart';
 
 import 'SignInPage.dart';
-import 'TermsConditionPage.dart';
 import 'generated/l10n.dart';
 import 'util/ConstantData.dart';
 import 'util/ConstantWidget.dart';
@@ -175,43 +174,43 @@ class _Registration extends State<Registration> {
                       context,
                       S.of(context).confirmPassword,
                       textPasswordConfirmController),
-                  InkWell(
-                    child: Row(
-                      children: [
-                        Icon(
-                          (isCheck)
-                              ? Icons.check_box
-                              : Icons.check_box_outline_blank,
-                          color: Colors.grey,
-                          size: ConstantData.font18Px,
-                        ),
-                        SizedBox(
-                          width: ConstantData.font12Px,
-                        ),
-                        ConstantWidget.getTextWidget(
-                            "terms and conditions",
-                            ConstantData.mainTextColor,
-                            TextAlign.start,
-                            FontWeight.w400,
-                            ConstantData.font15Px)
-                      ],
-                    ),
-                    onTap: () {
-                      // setState(() {
-                      //   if (isCheck) {
-                      //     isCheck = false;
-                      //   } else {
-                      //     isCheck = true;
-                      //   }
-                      //
-                      // });
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TermsConditionPage(true),
-                          ));
-                    },
-                  ),
+                  // InkWell(
+                  //   child: Row(
+                  //     children: [
+                  //       Icon(
+                  //         (isCheck)
+                  //             ? Icons.check_box
+                  //             : Icons.check_box_outline_blank,
+                  //         color: Colors.grey,
+                  //         size: ConstantData.font18Px,
+                  //       ),
+                  //       SizedBox(
+                  //         width: ConstantData.font12Px,
+                  //       ),
+                  //       // ConstantWidget.getTextWidget(
+                  //       //     "terms and conditions",
+                  //       //     ConstantData.mainTextColor,
+                  //       //     TextAlign.start,
+                  //       //     FontWeight.w400,
+                  //       //     ConstantData.font15Px)
+                  //     ],
+                  //   ),
+                  //   onTap: () {
+                  //     // setState(() {
+                  //     //   if (isCheck) {
+                  //     //     isCheck = false;
+                  //     //   } else {
+                  //     //     isCheck = true;
+                  //     //   }
+                  //     //
+                  //     // });
+                  //     Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //           builder: (context) => TermsConditionPage(true),
+                  //         ));
+                  //   },
+                  // ),
                   SizedBox(
                     height: ConstantData.font18Px,
                   ),

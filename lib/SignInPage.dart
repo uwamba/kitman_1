@@ -4,11 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:knitman/Registration.dart';
 import 'package:knitman/TabWidgetAdmin.dart';
 import 'package:knitman/TabWidgetRider.dart';
 
 import 'ForgotPassword.dart';
+import 'SignUpPage.dart';
 import 'generated/l10n.dart';
 import 'main.dart';
 import 'util/ConstantData.dart';
@@ -326,7 +326,7 @@ class _SignInPage extends State<SignInPage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Registration(),
+                          builder: (context) => SignUpPage(),
                         ));
                   }),
                 ],
