@@ -41,6 +41,7 @@ class _SignUpPage extends State<SignUpPage> {
   TextEditingController textLastNameController = new TextEditingController();
 
   bool isCheck = false;
+  final _formKey = GlobalKey<FormState>();
 
   void registerNotification() async {
     await Firebase.initializeApp();
@@ -123,107 +124,183 @@ class _SignUpPage extends State<SignUpPage> {
                   SizedBox(
                     height: ConstantWidget.getScreenPercentSize(context, 2),
                   ),
-                  Center(
-                    child: Image.asset(
-                      ConstantData.assetsPath + "logo.png",
-                      height: height,
-                    ),
-                  ),
-                  SizedBox(
-                    height: ConstantWidget.getScreenPercentSize(context, 1.5),
-                  ),
                   ConstantWidget.getTextWidget(
                       S.of(context).signUp,
                       ConstantData.mainTextColor,
                       TextAlign.center,
                       FontWeight.bold,
-                      ConstantWidget.getScreenPercentSize(context, 4.2)),
+                      ConstantWidget.getScreenPercentSize(context, 2.2)),
                   SizedBox(
                     height: ConstantWidget.getScreenPercentSize(context, 2.5),
                   ),
-                  ConstantWidget.getDefaultTextFiledWidget(context,
-                      S.of(context).yourPhoneNumber, textPhoneController),
-                  ConstantWidget.getTextFiledWidget(
-                      context, S.of(context).yourEmail, textEmailController),
-                  ConstantWidget.getTextFiledWidget(context,
-                      S.of(context).yourFirstName, textFirstNameController),
-                  ConstantWidget.getTextFiledWidget(context,
-                      S.of(context).yourLastName, textLastNameController),
-                  ConstantWidget.getPasswordTextFiled(
-                      context, S.of(context).password, textPasswordController),
-                  ConstantWidget.getPasswordTextFiled(
-                      context,
-                      S.of(context).confirmPassword,
-                      textPasswordConfirmController),
-                  InkWell(
-                    child: Row(
-                      children: [
-                        Icon(
-                          (isCheck)
-                              ? Icons.check_box
-                              : Icons.check_box_outline_blank,
-                          color: Colors.grey,
-                          size: ConstantData.font18Px,
-                        ),
-                        SizedBox(
-                          width: ConstantData.font12Px,
-                        ),
-                        ConstantWidget.getTextWidget(
-                            "terms and conditions",
-                            ConstantData.mainTextColor,
-                            TextAlign.start,
-                            FontWeight.w400,
-                            ConstantData.font15Px)
-                      ],
-                    ),
-                    onTap: () async {
-                      isCheck = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TermsConditionPage(isCheck),
-                          ));
-                      print(isCheck);
-                      setState(() {
-                        if (isCheck) {
-                          isCheck = true;
-                        } else {
-                          isCheck = false;
-                        }
-                      });
-                    },
-                  ),
-                  SizedBox(
-                    height: ConstantData.font18Px,
-                  ),
-                  ConstantWidget.getButtonWidget(
-                      context, S.of(context).signUp, ConstantData.primaryColor,
-                      () {
-                    String pas1 = textPasswordController.text;
-                    String pas2 = textPasswordConfirmController.text;
-                    if (pas1 == pas2) {
-                      print("+++++++++++++++++++++++++++++++++" +
-                          textPhoneController.text);
-                      db.signUp(
-                          textPhoneController.text,
-                          textEmailController.text,
-                          textFirstNameController.text,
-                          textLastNameController.text,
-                          "Customer",
-                          date,
-                          textPasswordController.text);
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                PhoneVerification(textPhoneController.text),
-                          ));
-                    } else {
-                      print("--------------------");
-                      setState(() {
-                        bottomDeliverDialog();
-                      });
-                    }
-                  }),
+                  Form(
+                      key: _formKey,
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ConstantWidget.getFormFieldWidget(
+                                context,
+                                S.of(context).yourPhoneNumber,
+                                textPhoneController,
+                                "Please Enter valid phone number",
+                                TextInputType.phone,
+                                "phone",
+                                false),
+                            ConstantWidget.getFormFieldWidget(
+                                context,
+                                S.of(context).yourEmail,
+                                textEmailController,
+                                "Please Enter valid Email address",
+                                TextInputType.text,
+                                "email",
+                                false),
+                            ConstantWidget.getFormFieldWidget(
+                                context,
+                                S.of(context).yourFirstName,
+                                textFirstNameController,
+                                "Please Enter valid name",
+                                TextInputType.text,
+                                "name",
+                                false),
+                            ConstantWidget.getFormFieldWidget(
+                                context,
+                                S.of(context).yourLastName,
+                                textLastNameController,
+                                "Please Enter valid name",
+                                TextInputType.text,
+                                "name",
+                                false),
+                            ConstantWidget.getFormFieldWidget(
+                                context,
+                                S.of(context).password,
+                                textPasswordController,
+                                "Password can not be empty",
+                                TextInputType.text,
+                                "pass",
+                                true),
+                            ConstantWidget.getFormFieldWidget(
+                                context,
+                                S.of(context).confirmPassword,
+                                textPasswordConfirmController,
+                                "Password can not be empty",
+                                TextInputType.text,
+                                "pass",
+                                true),
+                            InkWell(
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    (isCheck)
+                                        ? Icons.check_box
+                                        : Icons.check_box_outline_blank,
+                                    color: Colors.grey,
+                                    size: ConstantData.font18Px,
+                                  ),
+                                  SizedBox(
+                                    width: ConstantData.font12Px,
+                                  ),
+                                  ConstantWidget.getTextWidget(
+                                      "terms and conditions",
+                                      ConstantData.mainTextColor,
+                                      TextAlign.start,
+                                      FontWeight.w400,
+                                      ConstantData.font15Px)
+                                ],
+                              ),
+                              onTap: () async {
+                                isCheck = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          TermsConditionPage(isCheck),
+                                    ));
+                                print(isCheck);
+                                setState(() {
+                                  if (isCheck) {
+                                    isCheck = true;
+                                  } else {
+                                    isCheck = false;
+                                  }
+                                });
+                              },
+                            ),
+                            SizedBox(
+                              height: ConstantData.font18Px,
+                            ),
+                            ConstantWidget.getButtonWidget(
+                                context,
+                                S.of(context).signUp,
+                                ConstantData.primaryColor, () async {
+                              if (_formKey.currentState.validate()) {
+                                if (isCheck == true) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text('Processing Data')),
+                                  );
+                                  bool res = false;
+                                  bool isUserExist = false;
+                                  String pas1 = textPasswordController.text;
+                                  String pas2 =
+                                      textPasswordConfirmController.text;
+                                  if (pas1 == pas2) {
+                                    print("+++++++++++++++++++++++++++++++++" +
+                                        textPhoneController.text);
+
+                                    await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              PhoneVerification(
+                                                  textPhoneController.text),
+                                        )).then((value) {
+                                      setState(() {
+                                        res = value;
+                                        if (res == true) {
+                                          db
+                                              .signUp(
+                                                  textPhoneController.text,
+                                                  textEmailController.text,
+                                                  textFirstNameController.text,
+                                                  textLastNameController.text,
+                                                  "Customer",
+                                                  date,
+                                                  textPasswordController.text)
+                                              .then((value) {
+                                            isUserExist = value;
+                                            print("value form database:" +
+                                                value.toString());
+                                          }).whenComplete(() {
+                                            if (isUserExist == true) {
+                                              bottomDeliverDialog(
+                                                  "Phone number already in the system try another one");
+                                              // Navigator.of(context).pop(true)
+                                            } else {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        SignInPage(),
+                                                  ));
+                                            }
+                                          });
+                                        } else {}
+                                        print(value);
+                                      });
+                                    });
+                                  } else {
+                                    print("--------------------");
+                                    setState(() {
+                                      bottomDeliverDialog(
+                                          "Password you entered not match try  again!");
+                                    });
+                                  }
+                                } else {
+                                  bottomDeliverDialog(
+                                      "Please read terms and conditions");
+                                }
+                              }
+                            }),
+                          ])),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -262,7 +339,7 @@ class _SignUpPage extends State<SignUpPage> {
         onWillPop: _requestPop);
   }
 
-  void bottomDeliverDialog() {
+  void bottomDeliverDialog(String msg) {
     var widget = SizedBox(
       height: (margin * 1.2),
     );
@@ -308,7 +385,7 @@ class _SignUpPage extends State<SignUpPage> {
                 Align(
                   alignment: Alignment.topLeft,
                   child: Icon(
-                    CupertinoIcons.timer_fill,
+                    CupertinoIcons.ellipses_bubble_fill,
                     size: ConstantWidget.getScreenPercentSize(context, 6),
                     color: ConstantData.primaryColor,
                   ),
@@ -321,21 +398,12 @@ class _SignUpPage extends State<SignUpPage> {
                     FontWeight.w700,
                     ConstantWidget.getScreenPercentSize(context, 3)),
                 widget,
-                ConstantWidget.getCustomText(
-                    "Password you entered not match try  again!.",
-                    Colors.grey,
-                    2,
-                    TextAlign.start,
-                    FontWeight.w500,
-                    ConstantData.font18Px),
+                ConstantWidget.getCustomText(msg, Colors.grey, 2,
+                    TextAlign.start, FontWeight.w500, ConstantData.font18Px),
                 widget,
                 Divider(
                   height: ConstantWidget.getScreenPercentSize(context, 0.02),
                 ),
-                widget,
-                widget,
-                widget,
-                widget,
                 ConstantWidget.getBottomText(context, "Ok", () {
                   Navigator.pop(context);
                 })

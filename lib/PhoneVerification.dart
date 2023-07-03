@@ -3,7 +3,6 @@ import 'package:firebase_phone_auth_handler/firebase_phone_auth_handler.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:knitman/SignInPage.dart';
 
 class PhoneVerification extends StatefulWidget {
   final phone;
@@ -44,13 +43,9 @@ class VerifyPhoneNumberScreen extends State<PhoneVerification> {
         debugShowCheckedModeBanner: false,
         home: SafeArea(
           child: FirebasePhoneAuthHandler(
-            phoneNumber: "+250786138376",
+            phoneNumber: newNumber,
             onLoginSuccess: (userCredential, autoVerified) async {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SignInPage(),
-                  ));
+              Navigator.of(context).pop(true);
               _showSnackBar(
                 context,
                 'Phone number verified successfully!',

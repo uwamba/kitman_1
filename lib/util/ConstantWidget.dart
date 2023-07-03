@@ -495,6 +495,111 @@ class ConstantWidget {
     );
   }
 
+  static Widget getFormFieldWidget(
+      BuildContext context,
+      String s,
+      TextEditingController textEditingController,
+      String error,
+      TextInputType input,
+      String field,
+      bool obs) {
+    double height = ConstantWidget.getScreenPercentSize(context, 8.5);
+
+    double radius = ConstantWidget.getPercentSize(height, 20);
+    double fontSize = ConstantWidget.getPercentSize(height, 25);
+
+    return Container(
+        height: height,
+        margin: EdgeInsets.symmetric(
+            vertical: ConstantWidget.getScreenPercentSize(context, 1.2)),
+        alignment: Alignment.centerLeft,
+        decoration: BoxDecoration(
+          color: ConstantData.cellColor,
+          borderRadius: BorderRadius.all(
+            Radius.circular(radius),
+          ),
+        ),
+        child: TextFormField(
+          // The validator receives the text that the user has entered.
+
+          validator: (value) {
+            switch (field) {
+              case "phone":
+                {
+                  if (value == null ||
+                      value.isEmpty ||
+                      value.length != 10 ||
+                      !RegExp(r'\d').hasMatch(value)) {
+                    return error;
+                  }
+                  return null;
+                }
+                break;
+
+              case "email":
+                {
+                  if (value == null ||
+                      value.isEmpty ||
+                      !RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
+                    return error;
+                  }
+                  return null;
+                }
+                break;
+              case "name":
+                {
+                  if (value == null ||
+                      value.isEmpty ||
+                      !RegExp('[a-zA-Z]').hasMatch(value)) {
+                    return error;
+                  }
+                  return null;
+                }
+                break;
+              case "pass":
+                {
+                  if (value == null || value.isEmpty || value.length == 0) {
+                    return error;
+                  }
+                  return null;
+                }
+                break;
+              default:
+                {
+                  if (value == null || value.isEmpty) {
+                    return error;
+                  }
+                  return null;
+                }
+                break;
+            }
+          },
+          maxLines: 1,
+          keyboardType: input,
+          obscureText: obs,
+          controller: textEditingController,
+          style: TextStyle(
+              fontFamily: ConstantData.fontFamily,
+              color: ConstantData.textColor,
+              fontWeight: FontWeight.w400,
+              fontSize: fontSize),
+          decoration: InputDecoration(
+              contentPadding: EdgeInsets.only(
+                  left: ConstantWidget.getWidthPercentSize(context, 2)),
+              border: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              errorBorder: InputBorder.none,
+              disabledBorder: InputBorder.none,
+              hintText: s,
+              hintStyle: TextStyle(
+                  fontFamily: ConstantData.fontFamily,
+                  color: ConstantData.textColor,
+                  fontWeight: FontWeight.w400,
+                  fontSize: fontSize)),
+        ));
+  }
+
   static Widget getTextFiledWidget(BuildContext context, String s,
       TextEditingController textEditingController) {
     double height = ConstantWidget.getScreenPercentSize(context, 8.5);

@@ -288,23 +288,36 @@ class Db {
     return allUserList;
   }
 
-  Future<void> signUp(String userId, String email, String firstName,
-      String lastName, String role, String date, String password) {
+  Future<bool> signUp(String userId, String email, String firstName,
+      String lastName, String role, String date, String password) async {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
-    //var newFormat = DateFormat("yy-MM-dd");
-    //String updatedDt = newFormat.format(dt);
-
-    Map<String, dynamic> userData = {
-      'UID': userId,
-      'firstName': firstName,
-      'lastName': lastName,
-      'email': email,
-      'role': role,
-      'created': date,
-      'phone': userId,
-      'password': password
-    };
-    users.add(userData);
+    print("UID:" + userId);
+    QuerySnapshot querySnapshot =
+        await users.where("UID", isEqualTo: userId).get();
+    final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
+    List<UserListModel> list = parsed
+        .map<UserListModel>((json) => UserListModel.fromJson(json))
+        .toList();
+    if (list[0].phone.isNotEmpty) {
+      return true;
+    } else {
+      print("test phone:" + list[0].phone);
+      //var newFormat = DateFormat("yy-MM-dd");
+      //String updatedDt = newFormat.format(dt);
+      print("end------");
+      Map<String, dynamic> userData = {
+        'UID': userId,
+        'firstName': firstName,
+        'lastName': lastName,
+        'email': email,
+        'role': role,
+        'created': date,
+        'phone': userId,
+        'password': password
+      };
+      users.add(userData);
+      return false;
+    }
   }
 
   Future<void> addNotification(String from, to, text, action) async {

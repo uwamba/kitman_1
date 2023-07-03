@@ -131,7 +131,7 @@ class _SignInPage extends State<SignInPage> {
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: new Text("Alert!!"),
-                  content: new Text("incorrect username or password"),
+                  content: new Text("Not allowed"),
                   actions: <Widget>[
                     TextButton(
                       child: new Text("OK"),
@@ -166,26 +166,26 @@ class _SignInPage extends State<SignInPage> {
       });
     });
     print(signIn);
-    if (signIn.isEmpty) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: new Text("Alert!!"),
-            content: new Text("incorrect username or password"),
-            actions: <Widget>[
-              TextButton(
-                child: new Text("OK"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-      setState(() {});
-    }
+    // if (signIn.isEmpty) {
+    //   showDialog(
+    //     context: context,
+    //     builder: (BuildContext context) {
+    //       return AlertDialog(
+    //         title: new Text("Alert!!"),
+    //         content: new Text("incorrect username or password"),
+    //         actions: <Widget>[
+    //           TextButton(
+    //             child: new Text("OK"),
+    //             onPressed: () {
+    //               Navigator.of(context).pop();
+    //             },
+    //           ),
+    //         ],
+    //       );
+    //     },
+    //   );
+    //   setState(() {});
+    // }
   }
 
   Future<bool> _requestPop() {

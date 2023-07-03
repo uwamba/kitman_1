@@ -91,7 +91,7 @@ class S {
 
   String get yourPhoneNumber {
     return Intl.message(
-      '07XXXXXXXX',
+      'Your Phone(07XXXXXXXX)',
       name: 'yourPhoneNumber',
       desc: '',
       args: [],

@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "645841968535-lkc5r0snja4050d6kibaqguadgejjcd6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.delivery.Knitman",
+            "certificate_hash": "c91573e41cb69a6824ad0221882edbf7a4ac4f05"
+          }
+        },
+        {
           "client_id": "645841968535-66o635gnb3qtvujhjnfvge3krjpkcsq0.apps.googleusercontent.com",
           "client_type": 3
         }
