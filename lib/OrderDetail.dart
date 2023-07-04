@@ -430,13 +430,6 @@ class _OrderDetail extends State<OrderDetail> {
                             ),
 
                             //
-                            SizedBox(
-                              height: ((margin * 1.2)),
-                            ),
-                            getColumnCell(
-                              "Delivery Method",
-                              "Book a courier",
-                            ),
                             //
                             SizedBox(
                               height: ((margin * 1.2)),

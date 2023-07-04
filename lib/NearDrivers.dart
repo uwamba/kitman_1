@@ -198,7 +198,7 @@ class _NearDrivers extends State<NearDrivers> {
                             Container(
                               alignment: Alignment.centerRight,
                               child: ConstantWidget.getCustomText(
-                                  "ok",
+                                  "",
                                   ConstantData.color1,
                                   1,
                                   TextAlign.left,

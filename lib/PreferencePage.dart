@@ -447,19 +447,32 @@ class _PreferencePage extends State<PreferencePage> {
                       child: Row(
                         children: [
                           Expanded(
-                            child: InkWell(
-                              child: ConstantWidget.getTextWidget(
-                                  "RWF " +
-                                      ((super.widget.distance * 120).toInt())
-                                          .toString(),
-                                  Colors.white,
-                                  TextAlign.start,
-                                  FontWeight.w700,
-                                  ConstantWidget.getPercentSize(
-                                      bottomHeight, 35)),
-                              onTap: () {
-                                bottomDialog();
+                            child: FutureBuilder<List<Variables>>(
+                              builder: (ctx, snapshot) {
+                                if (!snapshot.hasData) {
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                } else {
+                                  return InkWell(
+                                    child: ConstantWidget.getTextWidget(
+                                        "RWF " +
+                                            ((super.widget.distance *
+                                                        snapshot.data[0].price)
+                                                    .toInt())
+                                                .toString(),
+                                        Colors.white,
+                                        TextAlign.start,
+                                        FontWeight.w700,
+                                        ConstantWidget.getPercentSize(
+                                            bottomHeight, 35)),
+                                    onTap: () {
+                                      bottomDialog();
+                                    },
+                                  );
+                                }
                               },
+                              future: db.getVariables(),
                             ),
                           ),
                           InkWell(

@@ -7,18 +7,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:knitman/Database/Db.dart';
 import 'package:knitman/OrderDetails.dart';
-import 'package:knitman/OrderMap.dart';
 import 'package:knitman/model/orderList.dart';
 import 'package:timelines/timelines.dart';
 
-import 'AboutUsPage.dart';
 import 'ChatScreen.dart';
-import 'EditProfilePage.dart';
-import 'MyVouchers.dart';
-import 'NotificationPage.dart';
-import 'ResetPasswordPage.dart';
+import 'OrderMap.dart';
 import 'SchedulePage.dart';
-import 'TermsConditionPage.dart';
 import 'TrackOrderPage.dart';
 import 'customWidget/MotionTabBarView.dart';
 import 'customWidget/MotionTabController.dart';
@@ -821,8 +815,8 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => ActiveOrderDetail(
-                                    activeOrderListModel.elementAt(index)),
+                                builder: (context) =>
+                                    ActiveOrderDetail(orderSnap.data[index]),
                               ));
                         },
                       );
@@ -926,6 +920,8 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                       ),
                     );
                   } else {
+                    double appbarHeight =
+                        ConstantWidget.getScreenPercentSize(context, 8);
                     return ListView.builder(
                       itemCount: orderSnap.data.length,
                       itemBuilder: (context, index) {
@@ -953,31 +949,78 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                                               FontWeight.w500,
                                               ConstantData.font15Px)),
                                       Container(
-                                        color: ConstantData.primaryColor,
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: (margin / 2)),
-                                        child: InkWell(
-                                          child: ConstantWidget.getCustomText(
-                                              "Track",
-                                              Colors.white,
-                                              1,
-                                              TextAlign.start,
-                                              FontWeight.w500,
-                                              ConstantData.font18Px),
-                                          onTap: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      OrderMap(
-                                                          orderSnap.data[index]
-                                                              .orderNumber,
-                                                          orderSnap.data[index]
-                                                              .driverNumber),
-                                                ));
-                                          },
-                                        ),
-                                      )
+                                          color: ConstantData.primaryColor,
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: (margin / 2)),
+                                          child: InkWell(
+                                              child: Center(
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Image.asset(
+                                                  ConstantData.assetsPath +
+                                                      "delivery.png",
+                                                  height: ConstantWidget
+                                                      .getPercentSize(
+                                                          appbarHeight, 50),
+                                                  color: Colors.white,
+                                                ),
+                                                SizedBox(
+                                                  width: ConstantData.font15Px,
+                                                ),
+                                                InkWell(
+                                                    child: ConstantWidget
+                                                        .getTextWidget(
+                                                            S
+                                                                .of(context)
+                                                                .tracknorder,
+                                                            Colors.white,
+                                                            TextAlign.center,
+                                                            FontWeight.w400,
+                                                            ConstantData
+                                                                .font18Px),
+                                                    onTap: () {
+                                                      if (orderSnap.data[index]
+                                                              .status ==
+                                                          "new") {
+                                                      } else {
+                                                        Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) => OrderLocation(
+                                                                  orderSnap
+                                                                      .data[
+                                                                          index]
+                                                                      .orderNumber,
+                                                                  orderSnap
+                                                                      .data[
+                                                                          index]
+                                                                      .driverNumber,
+                                                                  orderSnap
+                                                                      .data[
+                                                                          index]
+                                                                      .senderCoordinates,
+                                                                  orderSnap
+                                                                      .data[
+                                                                          index]
+                                                                      .receiverCoordinates),
+                                                            ));
+                                                      }
+                                                    }),
+                                                SizedBox(
+                                                  width: ConstantData.font15Px,
+                                                ),
+                                                // Icon(
+                                                //   Icons.info_outlined,
+                                                //   size: ConstantWidget.getPercentSize(appbarHeight, 50),
+                                                //   color: Colors.white,
+                                                // ),
+                                              ],
+                                            ),
+                                          )))
                                     ],
                                   ),
                                   SizedBox(
@@ -1043,13 +1086,16 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                                                     height, 40)),
                                           ),
                                         ),
-                                        onTap: () {
-                                          //Navigator.push(
-                                          // context,
-                                          // MaterialPageRoute(
-                                          //   builder: (context) =>
-                                          //      RatingPage(),
-                                          // ));
+                                        onTap: () async {
+                                          activeOrderListModel =
+                                              await db.activeOrderList();
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ActiveOrderDetail(
+                                                        orderSnap.data[index]),
+                                              ));
                                         },
                                       ),
                                     ],
@@ -1066,8 +1112,8 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => ActiveOrderDetail(
-                                      activeOrderListModel.elementAt(index)),
+                                  builder: (context) =>
+                                      ActiveOrderDetail(orderSnap.data[index]),
                                 ));
                           },
                         );
@@ -1274,6 +1320,14 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
     return new Future.value(false);
   }
 
+  String email, names, phoneNumber;
+  Future<String> getData() async {
+    email = await PrefData.getEmail();
+    names = await PrefData.getFirstName() + " " + await PrefData.getLastName();
+    phoneNumber = await PrefData.getPhoneNumber();
+    return names;
+  }
+
   getProfilePage() {
     ProfileModel profileModel = DataFile.getProfileModel();
 
@@ -1313,27 +1367,48 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
                         ),
                       ),
                       Expanded(
-                        child: Container(
-                          margin: EdgeInsets.only(left: deftMargin),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ConstantWidget.getCustomTextWithoutAlign(
-                                  profileModel.name,
-                                  ConstantData.mainTextColor,
-                                  FontWeight.bold,
-                                  ConstantData.font22Px),
-                              Padding(
-                                padding: EdgeInsets.only(top: 2),
-                                child: ConstantWidget.getCustomTextWithoutAlign(
-                                    profileModel.email,
-                                    ConstantData.textColor,
-                                    FontWeight.w500,
-                                    ConstantData.font15Px),
-                              )
-                            ],
-                          ),
+                        child: FutureBuilder<String>(
+                          builder: (ctx, snapshot) {
+                            if (!snapshot.hasData) {
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            } else {
+                              return Container(
+                                margin: EdgeInsets.only(left: deftMargin),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ConstantWidget.getCustomTextWithoutAlign(
+                                        names,
+                                        ConstantData.mainTextColor,
+                                        FontWeight.bold,
+                                        ConstantData.font22Px),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 2),
+                                      child: ConstantWidget
+                                          .getCustomTextWithoutAlign(
+                                              email,
+                                              ConstantData.textColor,
+                                              FontWeight.w500,
+                                              ConstantData.font15Px),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 2),
+                                      child: ConstantWidget
+                                          .getCustomTextWithoutAlign(
+                                              phoneNumber,
+                                              ConstantData.textColor,
+                                              FontWeight.w500,
+                                              ConstantData.font15Px),
+                                    )
+                                  ],
+                                ),
+                              );
+                            }
+                          },
+                          future: getData(),
                         ),
                         flex: 1,
                       )
@@ -1346,7 +1421,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
           InkWell(
             child: _getCell(S.of(context).editProfiles, Icons.edit),
             onTap: () {
-              sendAction(EditProfilePage());
+              //sendAction(EditProfilePage());
             },
           ),
 
@@ -1360,7 +1435,7 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
           InkWell(
             child: _getCell(S.of(context).notification, Icons.notifications),
             onTap: () {
-              sendAction(NotificationPage());
+              // sendAction(NotificationPage());
             },
           ),
 
@@ -1368,14 +1443,14 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
             child: _getCell(
                 S.of(context).resetPassword, Icons.lock_outline_rounded),
             onTap: () {
-              sendAction(ResetPasswordPage());
+              // sendAction(ResetPasswordPage());
             },
           ),
 
           InkWell(
             child: _getCell(S.of(context).giftCard, Icons.card_giftcard),
             onTap: () {
-              sendAction(MyVouchers(false));
+              //sendAction(MyVouchers(false));
             },
           ),
           InkWell(
@@ -1405,13 +1480,13 @@ class _TabWidget extends State<TabWidget> with TickerProviderStateMixin {
             child: _getCell(
                 S.of(context).termsConditions, Icons.privacy_tip_outlined),
             onTap: () {
-              sendAction(TermsConditionPage(true));
+              // sendAction(TermsConditionPage(true));
             },
           ),
           InkWell(
             child: _getCell(S.of(context).aboutUs, Icons.info_outlined),
             onTap: () {
-              sendAction(AboutUsPage());
+              //sendAction(AboutUsPage());
             },
           ),
           InkWell(

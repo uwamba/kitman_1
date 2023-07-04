@@ -115,9 +115,9 @@ class _LocationPage extends State<LocationPage> {
     // initialise database class
 
     setState(() {
-      receivedDate = "Today";
+      receivedDate = "not set";
       receivedTime = "13:00-14:00";
-      deliveryDate = "Today";
+      deliveryDate = "not set";
       deliveryTime = "13:00-14:00";
       status = "New";
       packageType = widget.type;

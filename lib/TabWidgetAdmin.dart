@@ -15,16 +15,11 @@ import 'package:knitman/model/orderList.dart';
 import 'package:location/location.dart';
 import 'package:timelines/timelines.dart';
 
-import 'AboutUsPage.dart';
 import 'ChatScreen.dart';
 import 'CompleteOrderDetail.dart';
 import 'DriverMap.dart';
-import 'EditProfilePage.dart';
-import 'NotificationPage.dart';
 import 'OrderMap.dart';
-import 'ResetPasswordPage.dart';
 import 'SchedulePage.dart';
-import 'TermsConditionPage.dart';
 import 'TrackOrderPage.dart';
 import 'customWidget/MotionTabBarView.dart';
 import 'customWidget/MotionTabController.dart';
@@ -63,7 +58,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
   List<TimeLineModel> timeLineModel = [];
   int tabPosition = 0;
 
-  List<String> s = ["New Orders", "Active Orders", "Driver", "Profile"];
+  List<String> s = ["New", "Active", "Driver", "Profile"];
   List<NewOrderTypeModel> orderTypeList = DataFile.getOrderTypeList();
   List<CompletedOrderModel> completeOrderList = DataFile.getCompleteOrder();
   List<ActiveOrderModel> activeOrderList = DataFile.getActiveOrderList();
@@ -169,7 +164,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
     setUserData();
     locationService();
     motionTabBar = new MotionTabBar(
-      labels: ["New Orders", "Active Orders", "Driver", "Profile"],
+      labels: ["New", "Active", "Driver", "Profile"],
       initialSelectedTab: s[_selectedIndex],
       tabIconColor: ConstantData.mainTextColor,
       tabSelectedColor: ConstantData.primaryColor,
@@ -184,7 +179,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
       icons: [
         "bottom_icon_1.png",
         "bottom_icon_2.png",
-        "bottom_icon_3.png",
+        "motorcycleicon.png",
         "bottom_icon_4.png",
         //"Icons.category",
         // "Icons.add_box_outlined",
@@ -1104,11 +1099,15 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                                       context,
                                       new MaterialPageRoute(
                                           builder: (BuildContext context) =>
-                                              new OrderMap(
+                                              new OrderLocation(
                                                   orderSnap
                                                       .data[index].orderNumber,
+                                                  orderSnap
+                                                      .data[index].driverNumber,
                                                   orderSnap.data[index]
-                                                      .driverNumber)));
+                                                      .senderCoordinates,
+                                                  orderSnap.data[index]
+                                                      .receiverCoordinates)));
                                   print(
                                       "driverrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr" +
                                           driverId);
@@ -1133,8 +1132,8 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ActiveOrderDetail(
-                                activeOrderListModel.elementAt(index)),
+                            builder: (context) =>
+                                ActiveOrderDetail(orderSnap.data[index]),
                           ));
                     },
                   );
@@ -1349,8 +1348,8 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ActiveOrderDetail(
-                                activeOrderListModel.elementAt(index)),
+                            builder: (context) =>
+                                ActiveOrderDetail(orderSnap.data[index]),
                           ));
                     },
                   );
@@ -1534,8 +1533,8 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ActiveOrderDetail(
-                                activeOrderListModel.elementAt(index)),
+                            builder: (context) =>
+                                ActiveOrderDetail(orderSnap.data[index]),
                           ));
                     },
                   );
@@ -1739,6 +1738,14 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
     return new Future.value(false);
   }
 
+  String email, names, phoneNumber;
+  Future<String> getData() async {
+    email = await PrefData.getEmail();
+    names = await PrefData.getFirstName() + " " + await PrefData.getLastName();
+    phoneNumber = await PrefData.getPhoneNumber();
+    return names;
+  }
+
   getProfilePage() {
     ProfileModel profileModel = DataFile.getProfileModel();
 
@@ -1778,27 +1785,48 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
                         ),
                       ),
                       Expanded(
-                        child: Container(
-                          margin: EdgeInsets.only(left: deftMargin),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ConstantWidget.getCustomTextWithoutAlign(
-                                  profileModel.name,
-                                  ConstantData.mainTextColor,
-                                  FontWeight.bold,
-                                  ConstantData.font22Px),
-                              Padding(
-                                padding: EdgeInsets.only(top: 2),
-                                child: ConstantWidget.getCustomTextWithoutAlign(
-                                    profileModel.email,
-                                    ConstantData.textColor,
-                                    FontWeight.w500,
-                                    ConstantData.font15Px),
-                              )
-                            ],
-                          ),
+                        child: FutureBuilder<String>(
+                          builder: (ctx, snapshot) {
+                            if (!snapshot.hasData) {
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            } else {
+                              return Container(
+                                margin: EdgeInsets.only(left: deftMargin),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ConstantWidget.getCustomTextWithoutAlign(
+                                        names,
+                                        ConstantData.mainTextColor,
+                                        FontWeight.bold,
+                                        ConstantData.font22Px),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 2),
+                                      child: ConstantWidget
+                                          .getCustomTextWithoutAlign(
+                                              email,
+                                              ConstantData.textColor,
+                                              FontWeight.w500,
+                                              ConstantData.font15Px),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 2),
+                                      child: ConstantWidget
+                                          .getCustomTextWithoutAlign(
+                                              phoneNumber,
+                                              ConstantData.textColor,
+                                              FontWeight.w500,
+                                              ConstantData.font15Px),
+                                    )
+                                  ],
+                                ),
+                              );
+                            }
+                          },
+                          future: getData(),
                         ),
                         flex: 1,
                       )
@@ -1811,7 +1839,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
           InkWell(
             child: _getCell(S.of(context).editProfiles, Icons.edit),
             onTap: () {
-              sendAction(EditProfilePage());
+              //sendAction(EditProfilePage());
             },
           ),
 
@@ -1825,7 +1853,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
           InkWell(
             child: _getCell(S.of(context).notification, Icons.notifications),
             onTap: () {
-              sendAction(NotificationPage());
+              // sendAction(NotificationPage());
             },
           ),
 
@@ -1833,7 +1861,7 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
             child: _getCell(
                 S.of(context).resetPassword, Icons.lock_outline_rounded),
             onTap: () {
-              sendAction(ResetPasswordPage());
+              // sendAction(ResetPasswordPage());
             },
           ),
 
@@ -1876,13 +1904,13 @@ class _TabWidget extends State<TabWidgetadmin> with TickerProviderStateMixin {
             child: _getCell(
                 S.of(context).termsConditions, Icons.privacy_tip_outlined),
             onTap: () {
-              sendAction(TermsConditionPage(true));
+              // sendAction(TermsConditionPage(true));
             },
           ),
           InkWell(
             child: _getCell(S.of(context).aboutUs, Icons.info_outlined),
             onTap: () {
-              sendAction(AboutUsPage());
+              // sendAction(AboutUsPage());
             },
           ),
           InkWell(

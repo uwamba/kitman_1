@@ -226,6 +226,35 @@ class Db {
     return completeOrderList;
   }
 
+  Future<List<OrderList>> assignedOrderWithDriver(
+      String key, String value) async {
+    QuerySnapshot querySnapshot =
+        await collectionRef.where(key, isEqualTo: value).get();
+
+    final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+    completeOrderList =
+        parsed.map<OrderList>((json) => OrderList.fromJson(json)).toList();
+
+    print(completeOrderList);
+    collectionRef.snapshots().listen((querySnapshot) {
+      querySnapshot.docChanges.forEach((change) async {
+        QuerySnapshot querySnapshot = await collectionRef
+            .where(key, isEqualTo: value)
+            .where("status", isEqualTo: "assigned")
+            .get();
+
+        final parsed = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+        completeOrderList =
+            parsed.map<OrderList>((json) => OrderList.fromJson(json)).toList();
+
+        print(completeOrderList);
+      });
+    });
+    return completeOrderList;
+  }
+
   Future<List<OrderList>> orderListWhere(String key, String value) async {
     QuerySnapshot querySnapshot =
         await collectionRef.where(key, isEqualTo: value).get();
@@ -298,13 +327,11 @@ class Db {
     List<UserListModel> list = parsed
         .map<UserListModel>((json) => UserListModel.fromJson(json))
         .toList();
-    if (list[0].phone.isNotEmpty) {
+
+    if (list.isNotEmpty) {
       return true;
     } else {
-      print("test phone:" + list[0].phone);
-      //var newFormat = DateFormat("yy-MM-dd");
-      //String updatedDt = newFormat.format(dt);
-      print("end------");
+      //save data in database
       Map<String, dynamic> userData = {
         'UID': userId,
         'firstName': firstName,

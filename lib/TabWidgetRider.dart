@@ -11,17 +11,12 @@ import 'package:knitman/model/orderList.dart';
 import 'package:location/location.dart';
 import 'package:timelines/timelines.dart';
 
-import 'AboutUsPage.dart';
-import 'ChatScreen.dart';
-import 'EditProfilePage.dart';
-import 'MyVouchers.dart';
 import 'NotificationPage.dart';
 import 'OrderDetail.dart';
 import 'OrderDetails.dart';
 import 'OrderDetailsDriver.dart';
-import 'ResetPasswordPage.dart';
+import 'OrderMap.dart';
 import 'SchedulePage.dart';
-import 'TermsConditionPage.dart';
 import 'TrackOrderPage.dart';
 import 'customWidget/MotionTabBarView.dart';
 import 'customWidget/MotionTabController.dart';
@@ -31,7 +26,6 @@ import 'main.dart';
 import 'model/ActiveOrderModel.dart';
 import 'model/ChatModel.dart';
 import 'model/CompletedOrderModel.dart';
-import 'model/Message.dart';
 import 'model/NewOrderTypeModel.dart';
 import 'model/ProfileModel.dart';
 import 'model/TimeLineModel.dart';
@@ -59,7 +53,7 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
   List<TimeLineModel> timeLineModel = [];
 
   int tabPosition = 0;
-  List<String> s = ["Orders", "New Order", "Chat", "Profile"];
+  List<String> s = ["Orders", "New Order", "Profile"];
   List<NewOrderTypeModel> orderTypeList = DataFile.getOrderTypeList();
   List<CompletedOrderModel> completeOrderList = DataFile.getCompleteOrder();
   List<ActiveOrderModel> activeOrderList = DataFile.getActiveOrderList();
@@ -172,7 +166,7 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
     ConstantData.setThemePosition();
 
     motionTabBar = new MotionTabBar(
-      labels: ["Orders", "New Order", "Chat", "Profile"],
+      labels: ["Orders", "New Order", "Profile"],
       initialSelectedTab: s[_selectedIndex],
       tabIconColor: ConstantData.mainTextColor,
       tabSelectedColor: ConstantData.primaryColor,
@@ -187,7 +181,7 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
       icons: [
         "bottom_icon_1.png",
         "bottom_icon_2.png",
-        "bottom_icon_3.png",
+        // "bottom_icon_3.png",
         "bottom_icon_4.png",
         //"Icons.category",
         // "Icons.add_box_outlined",
@@ -217,9 +211,9 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
                 Container(
                   child: newOrderPage(),
                 ),
-                Container(
-                  child: getChatPage(),
-                ),
+                // Container(
+                //   child: getChatPage(),
+                // ),
                 Container(
                   child: getProfilePage(),
                 ),
@@ -357,14 +351,14 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
                           ),
                         ),
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ChatScreen(
-                                  user: chats[0].sender,
-                                  chatModel: chatUserList[index],
-                                ),
-                              ));
+                          // Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //       builder: (context) => ChatScreen(
+                          //         user: chats[0].sender,
+                          //         chatModel: chatUserList[index],
+                          //       ),
+                          //     ));
                         },
                       );
                     })),
@@ -509,14 +503,14 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
         ),
       ),
       onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ChatScreen(
-                user: chats[0].sender,
-                chatModel: chatModel,
-              ),
-            ));
+        // Navigator.push(
+        //     context,
+        //     MaterialPageRoute(
+        //       builder: (context) => ChatScreen(
+        //         user: chats[0].sender,
+        //         chatModel: chatModel,
+        //       ),
+        //     ));
       },
     );
   }
@@ -835,8 +829,8 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => ActiveOrderDetail(
-                                    activeOrderListModel.elementAt(index)),
+                                builder: (context) =>
+                                    ActiveOrderDetail(orderSnap.data[index]),
                               ));
                         },
                       );
@@ -1084,6 +1078,7 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
         ),
       );
     } else {
+      double appbarHeight = ConstantWidget.getScreenPercentSize(context, 8);
       return Container(
         color: ConstantData.bgColor,
         width: double.infinity,
@@ -1148,20 +1143,58 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
                                     ConstantData.font18Px),
                               ),
                               InkWell(
-                                child: Icon(
-                                  Icons.notifications,
-                                  size: (margin * 1.5),
-                                  color: ConstantData.primaryColor,
+                                  child: Center(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Image.asset(
+                                      ConstantData.assetsPath + "delivery.png",
+                                      height: ConstantWidget.getPercentSize(
+                                          appbarHeight, 50),
+                                      color: Colors.white,
+                                    ),
+                                    SizedBox(
+                                      width: ConstantData.font15Px,
+                                    ),
+                                    InkWell(
+                                        child: ConstantWidget.getTextWidget(
+                                            S.of(context).tracknorder,
+                                            Colors.white,
+                                            TextAlign.center,
+                                            FontWeight.w400,
+                                            ConstantData.font18Px),
+                                        onTap: () {
+                                          if (orderSnap.data[index].status ==
+                                              "new") {
+                                          } else {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      OrderLocation(
+                                                          orderSnap.data[index]
+                                                              .orderNumber,
+                                                          orderSnap.data[index]
+                                                              .driverNumber,
+                                                          orderSnap.data[index]
+                                                              .senderCoordinates,
+                                                          orderSnap.data[index]
+                                                              .receiverCoordinates),
+                                                ));
+                                          }
+                                        }),
+                                    SizedBox(
+                                      width: ConstantData.font15Px,
+                                    ),
+                                    // Icon(
+                                    //   Icons.info_outlined,
+                                    //   size: ConstantWidget.getPercentSize(appbarHeight, 50),
+                                    //   color: Colors.white,
+                                    // ),
+                                  ],
                                 ),
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            NotificationPage(),
-                                      ));
-                                },
-                              )
+                              ))
                             ],
                           ),
                           SizedBox(
@@ -1384,6 +1417,14 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
     return new Future.value(false);
   }
 
+  String email, names, phoneNumber;
+  Future<String> getData() async {
+    email = await PrefData.getEmail();
+    names = await PrefData.getFirstName() + " " + await PrefData.getLastName();
+    phoneNumber = await PrefData.getPhoneNumber();
+    return names;
+  }
+
   getProfilePage() {
     ProfileModel profileModel = DataFile.getProfileModel();
 
@@ -1423,27 +1464,48 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
                         ),
                       ),
                       Expanded(
-                        child: Container(
-                          margin: EdgeInsets.only(left: deftMargin),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ConstantWidget.getCustomTextWithoutAlign(
-                                  profileModel.name,
-                                  ConstantData.mainTextColor,
-                                  FontWeight.bold,
-                                  ConstantData.font22Px),
-                              Padding(
-                                padding: EdgeInsets.only(top: 2),
-                                child: ConstantWidget.getCustomTextWithoutAlign(
-                                    profileModel.email,
-                                    ConstantData.textColor,
-                                    FontWeight.w500,
-                                    ConstantData.font15Px),
-                              )
-                            ],
-                          ),
+                        child: FutureBuilder<String>(
+                          builder: (ctx, snapshot) {
+                            if (!snapshot.hasData) {
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            } else {
+                              return Container(
+                                margin: EdgeInsets.only(left: deftMargin),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ConstantWidget.getCustomTextWithoutAlign(
+                                        names,
+                                        ConstantData.mainTextColor,
+                                        FontWeight.bold,
+                                        ConstantData.font22Px),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 2),
+                                      child: ConstantWidget
+                                          .getCustomTextWithoutAlign(
+                                              email,
+                                              ConstantData.textColor,
+                                              FontWeight.w500,
+                                              ConstantData.font15Px),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 2),
+                                      child: ConstantWidget
+                                          .getCustomTextWithoutAlign(
+                                              phoneNumber,
+                                              ConstantData.textColor,
+                                              FontWeight.w500,
+                                              ConstantData.font15Px),
+                                    )
+                                  ],
+                                ),
+                              );
+                            }
+                          },
+                          future: getData(),
                         ),
                         flex: 1,
                       )
@@ -1456,7 +1518,7 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
           InkWell(
             child: _getCell(S.of(context).editProfiles, Icons.edit),
             onTap: () {
-              sendAction(EditProfilePage());
+              //sendAction(EditProfilePage());
             },
           ),
 
@@ -1470,7 +1532,7 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
           InkWell(
             child: _getCell(S.of(context).notification, Icons.notifications),
             onTap: () {
-              sendAction(NotificationPage());
+              // sendAction(NotificationPage());
             },
           ),
 
@@ -1478,14 +1540,14 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
             child: _getCell(
                 S.of(context).resetPassword, Icons.lock_outline_rounded),
             onTap: () {
-              sendAction(ResetPasswordPage());
+              // sendAction(ResetPasswordPage());
             },
           ),
 
           InkWell(
             child: _getCell(S.of(context).giftCard, Icons.card_giftcard),
             onTap: () {
-              sendAction(MyVouchers(false));
+              //sendAction(MyVouchers(false));
             },
           ),
           InkWell(
@@ -1515,13 +1577,13 @@ class _TabWidget extends State<TabWidgetRider> with TickerProviderStateMixin {
             child: _getCell(
                 S.of(context).termsConditions, Icons.privacy_tip_outlined),
             onTap: () {
-              sendAction(TermsConditionPage(true));
+              // sendAction(TermsConditionPage(true));
             },
           ),
           InkWell(
             child: _getCell(S.of(context).aboutUs, Icons.info_outlined),
             onTap: () {
-              sendAction(AboutUsPage());
+              //sendAction(AboutUsPage());
             },
           ),
           InkWell(

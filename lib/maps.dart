@@ -322,12 +322,16 @@ class _HomePageState extends State<maps> {
                 )))
           ])),
       floatingActionButton: FloatingActionButton.extended(
-        label: Text('Select Location'),
-        icon: Icon(Icons.location_searching),
-        backgroundColor: Colors.pink,
-        onPressed: () => Navigator.of(context)
-            .pop(loc.toString() + ";" + distance.toString()),
-      ),
+          label: Text('Select Location'),
+          icon: Icon(Icons.location_searching),
+          backgroundColor: Colors.pink,
+          onPressed: () {
+            if (distance <= 0) {
+            } else {
+              Navigator.of(context)
+                  .pop(loc.toString() + ";" + distance.toString());
+            }
+          }),
     );
   }
 }

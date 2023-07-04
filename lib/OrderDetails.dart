@@ -162,10 +162,10 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
       return lis;
     }
 
-    void _callNumber() async {
+    void _callNumber(number) async {
       String s = driverPhone;
 
-      String url = "tel:" + s;
+      String url = "tel:" + number;
       await launch(url);
     }
 
@@ -334,9 +334,16 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           ConstantWidget.getCustomText(
-                                              data.elementAt(2) +
-                                                  " " +
-                                                  data.elementAt(3),
+                                              (widget.activeOrderModel.status !=
+                                                      "new")
+                                                  ? data
+                                                          .elementAt(2)
+                                                          .toString() +
+                                                      " " +
+                                                      data
+                                                          .elementAt(3)
+                                                          .toString()
+                                                  : "NOT ASSIGNED",
                                               ConstantData.mainTextColor,
                                               1,
                                               TextAlign.start,
@@ -357,7 +364,8 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
                                                           .safeBlockHorizontal *
                                                       1.2),
                                               ConstantWidget.getCustomText(
-                                                  driverPhone,
+                                                  widget.activeOrderModel
+                                                      .driverNumber,
                                                   Colors.grey,
                                                   1,
                                                   TextAlign.start,
@@ -377,7 +385,8 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
                                               bottomHeight, 20),
                                         ),
                                         onPressed: () {
-                                          _callNumber();
+                                          _callNumber(widget
+                                              .activeOrderModel.driverNumber);
                                         }),
                                   ],
                                 ),
@@ -422,14 +431,6 @@ class _ActiveOrderDetail extends State<ActiveOrderDetail> {
                                       widget.activeOrderModel.packageWeight,
                                     ),
 
-                                    //
-                                    SizedBox(
-                                      height: ((margin * 1.2)),
-                                    ),
-                                    getColumnCell(
-                                      "Delivery Method",
-                                      widget.activeOrderModel.deliveryType,
-                                    ),
                                     //
                                     SizedBox(
                                       height: ((margin * 1.2)),
@@ -560,6 +561,10 @@ class _DeliveryProcesses extends StatelessWidget {
         super(key: key);
 
   final List<OrderTimeLine> processes;
+  void _callNumber(number) async {
+    String url = "tel:" + number;
+    await launch(url);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -643,12 +648,16 @@ class _DeliveryProcesses extends StatelessWidget {
                         ),
                         Align(
                           alignment: Alignment.centerRight,
-                          child: Icon(
-                            Icons.call,
-                            color: Colors.grey,
-                            size:
-                                ConstantWidget.getScreenPercentSize(context, 3),
-                          ),
+                          child: IconButton(
+                              icon: Icon(
+                                Icons.call,
+                                color: Colors.grey,
+                                size: ConstantWidget.getScreenPercentSize(
+                                    context, 3),
+                              ),
+                              onPressed: () {
+                                _callNumber(processes[index].phone);
+                              }),
                         )
                       ],
                     ),
